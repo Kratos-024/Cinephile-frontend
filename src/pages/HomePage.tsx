@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { NavBar } from "../components/NavBar";
+import { Hero } from "../components/Hero";
 
 export const HomePage = ({
   menuHandler,
@@ -19,6 +20,7 @@ export const HomePage = ({
       className="px-6"
     >
       <NavBar menu={menu} menuHandler={menuHandler} />
+      <Hero />
     </motion.section>
   );
 };

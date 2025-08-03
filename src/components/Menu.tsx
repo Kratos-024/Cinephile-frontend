@@ -3,7 +3,65 @@ import { BsBrowserEdge } from "react-icons/bs";
 import { CiHeart } from "react-icons/ci";
 import { SlCalender } from "react-icons/sl";
 import { motion } from "framer-motion";
+import { FaChevronDown } from "react-icons/fa";
+import { IoIosLogOut } from "react-icons/io";
 
+const UserFollowingSection = () => {
+  return (
+    <div className="">
+      <h2 className="text-center">Following</h2>
+      <ul className="mt-7 space-y-7">
+        <li className="flex items-center gap-3 ">
+          <div className="   ">
+            <img
+              className="w-12 h-12 rounded-full"
+              src="/images/users/liba.avif"
+            />
+          </div>
+          <span className="text-gray-700">Litz</span>
+        </li>
+        <li className="flex items-center gap-3 ">
+          <div className="   ">
+            <img
+              className="w-12 h-12 rounded-full"
+              src="/images/users/madock.avif"
+            />
+          </div>
+          <span className="text-gray-700">Madock</span>
+        </li>{" "}
+        <li className="flex items-center gap-3 ">
+          <div className="   ">
+            <img
+              className="w-12 h-12 rounded-full"
+              src="/images/users/gini.avif"
+            />
+          </div>
+          <span className="text-gray-700">Gini</span>
+        </li>{" "}
+        <li className="flex items-center gap-3 ">
+          <div className="   ">
+            <img
+              className="w-12 h-12 rounded-full"
+              src="/images/users/Lebra.avif"
+            />
+          </div>
+          <span className="text-gray-700">Lebra</span>
+        </li>
+      </ul>
+      <div className="flex items-center mt-9  cursor-pointer gap-3">
+        <div
+          className={`
+  bg-red-500 w-fit 
+         p-2 rounded-full text-black transition-colors
+          duration-200`}
+        >
+          <FaChevronDown />
+        </div>
+        <span>Load More</span>
+      </div>
+    </div>
+  );
+};
 export const Menu = ({ menu }: { menu: boolean }) => {
   const [feed, setFeed] = useState<string>("Browser");
 
@@ -68,7 +126,10 @@ export const Menu = ({ menu }: { menu: boolean }) => {
           <span className="text-red-600">phile</span>
         </motion.h2>
 
-        <div className="flex flex-col items-center gap-8 text-slate-500 text-[21px]">
+        <div
+          className="flex flex-col items-center gap-8
+         text-gray-500 w-full  text-[21px]"
+        >
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -162,6 +223,20 @@ export const Menu = ({ menu }: { menu: boolean }) => {
               <span className="font-semibold">Coming Soon</span>
             </motion.li>
           </motion.ul>
+          <div className="w-[196px] bg-slate-700 right-0  h-[1px]"></div>
+          <div className="w-[196px]">
+            <UserFollowingSection />
+          </div>
+        </div>
+        <div className="flex items-center mt-[148px]  cursor-pointer gap-3">
+          <div
+            className={`
+ w-fit p-2 rounded-full text-white transition-colors
+          duration-200`}
+          >
+            <IoIosLogOut className="w-7 h-7" />
+          </div>
+          <span>Logout</span>
         </div>
       </div>
     </motion.section>
