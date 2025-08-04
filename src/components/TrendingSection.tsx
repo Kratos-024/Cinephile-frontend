@@ -1,7 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 
-const TrendingSectionTemplate = ({ movie }) => {
+const TrendingSectionTemplate = ({
+  movie,
+}: {
+  movie: {
+    id: number;
+    title: string;
+    image: string;
+    genre: string;
+    rating: string;
+  };
+}) => {
   const [isLiked, setIsLiked] = useState(false);
 
   return (
@@ -154,13 +164,12 @@ export const TrendingSection = () => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  // Auto-scroll functionality (pauses on hover)
   useEffect(() => {
     if (!isHovering) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => {
           if (prev >= maxIndex) {
-            return 0; // Reset to beginning
+            return 0;
           }
           return prev + 1;
         });
@@ -170,9 +179,8 @@ export const TrendingSection = () => {
     }
   }, [isHovering, maxIndex]);
 
-  // Handle keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: { key: string }) => {
       if (e.key === "ArrowLeft") goToPrev();
       if (e.key === "ArrowRight") goToNext();
     };
