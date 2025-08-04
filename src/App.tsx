@@ -3,6 +3,8 @@ import "./App.css";
 import { Container } from "./components/Container";
 import { Menu } from "./components/Menu";
 import { HomePage } from "./pages/HomePage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { MoviePage } from "./pages/MoviePage";
 
 function App() {
   const [menu, setMenu] = useState<boolean>(true);
@@ -10,11 +12,21 @@ function App() {
     setMenu(!menu);
   };
   return (
-    <section className=" h-screen relative w-full bg-primary">
-      <Container>
-        <Menu menu={menu} />
-        <HomePage menu={menu} menuHandler={menuHandler} />
-      </Container>
+    <section className="">
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Container>
+                <Menu menu={menu} />
+                <HomePage menu={menu} menuHandler={menuHandler} />
+              </Container>
+            }
+          ></Route>
+          <Route path="/movie" element={<MoviePage />}></Route>
+        </Routes>
+      </BrowserRouter>
     </section>
   );
 }

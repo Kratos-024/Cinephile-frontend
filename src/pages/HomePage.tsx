@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { NavBar } from "../components/NavBar";
-import { Hero } from "../components/Hero";
+import Hero from "../components/Hero";
+import { TrendingSection } from "../components/TrendingSection";
+import { ReccomendedByOurModel } from "../components/ReccomendedByOurModel";
 
 export const HomePage = ({
   menuHandler,
@@ -17,10 +19,12 @@ export const HomePage = ({
         width: menu ? "calc(100% - 280px)" : "100%",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="px-6"
+      className="px-6 bg-primary   "
     >
-      <NavBar menu={menu} menuHandler={menuHandler} />
+      <NavBar menuHandler={menuHandler} menu={menu} />;
       <Hero />
+      <TrendingSection />
+      <ReccomendedByOurModel />
     </motion.section>
   );
 };

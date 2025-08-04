@@ -111,7 +111,7 @@ export const Menu = ({ menu }: { menu: boolean }) => {
       initial="hidden"
       animate={menu ? "visible" : "hidden"}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed top-0 left-0 h-screen z-50"
+      className="fixed bg-primary top-0 left-0 h-screen z-50"
     >
       <div className="w-[1px] bg-slate-700 right-0 absolute h-screen"></div>
 
