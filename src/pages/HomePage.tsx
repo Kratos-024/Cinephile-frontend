@@ -19,7 +19,7 @@ export const HomePage = ({
         width: menu ? "calc(100% - 280px)" : "100%",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="px-6 bg-primary   "
+      className="px-3 bg-primary   "
     >
       <NavBar menuHandler={menuHandler} menu={menu} />;
       <Hero />

@@ -1,187 +1,263 @@
-import { useState } from "react";
-import { Search, Play } from "lucide-react";
+import { useEffect, useState } from "react";
+import { IoIosSearch } from "react-icons/io";
+import { RiMenuSearchFill } from "react-icons/ri";
+import { FaCheck } from "react-icons/fa";
+import { getMovieByTitle } from "../services/movie.service";
+
+// Updated interface to match the new API response
+interface Movie {
+  imdbID: string;
+  Title: string;
+  Poster: string;
+  Year: string;
+  Type: string;
+}
+
 const TrendingSectionTemplate = ({
   movie,
+  isSelected,
+  onSelect,
 }: {
-  movie: {
-    id: number;
-    title: string;
-    poster: string;
-    genre: string;
-  };
+  movie: Movie;
+  isSelected: boolean;
+  onSelect: (movieId: string) => void;
 }) => {
   return (
     <div
-      className="relative rounded-2xl group w-[160px] 
-    cursor-pointer transform transition-all
-     duration-300 hover:scale-105"
+      key={movie.imdbID}
+      className={`relative rounded-2xl group w-[160px] cursor-pointer transform transition-all duration-300 hover:scale-105 ${
+        isSelected ? "ring-4 ring-green-500" : ""
+      }`}
+      onClick={() => onSelect(movie.imdbID)}
     >
       <div className="relative overflow-hidden rounded-2xl">
         <img
-          className=" rounded-2xl transition-transform 
-          duration-300 group-hover:scale-110"
-          src={movie.poster}
-          alt={movie.title}
+          className="rounded-2xl transition-transform duration-300 group-hover:scale-110"
+          src={movie.Poster}
+          alt={movie.Title}
         />
+
+        {/* Green tick mark for selected movies */}
+        {isSelected && (
+          <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1">
+            <FaCheck className="text-white w-3 h-3" />
+          </div>
+        )}
 
         <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <h4 className="text-white font-semibold text-lg mb-1">
-            {movie.title}
+            {movie.Title}
           </h4>
-          <p className="text-gray-300 text-sm">{movie.genre}</p>
+          <p className="text-gray-300 text-sm">
+            {movie.Year} • {movie.Type}
+          </p>
         </div>
       </div>
     </div>
   );
 };
+
+const movieTitles = [
+  "Inception",
+  "The Godfather",
+  "The Dark Knight",
+  "Pulp Fiction",
+  "Forrest Gump",
+  "Interstellar",
+  "Fight Club",
+  "The Shawshank Redemption",
+  "La La Land",
+  "Parasite",
+  "Spirited Away",
+  "The Social Network",
+  "Gladiator",
+  "Whiplash",
+  "The Matrix",
+  "Avengers: Endgame",
+];
+
 const MoviesApp = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeGenre, setActiveGenre] = useState("POST-APOCALYPTIC");
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const genres = ["POST-APOCALYPTIC", "HEIST", "SUPERHERO"];
+  useEffect(() => {
+    const loadInitialMovies = async () => {
+      setLoading(true);
+      const allMovies: Movie[] = [];
 
-  const movies = [
-    {
-      id: 1,
-      title: "Ant-Man",
-      poster:
-        "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&h=450&fit=crop&crop=faces",
-      genre: "SUPERHERO",
-    },
-    {
-      id: 2,
-      title: "The Hangover Part III",
-      poster:
-        "https://images.unsplash.com/photo-1489599396154-c2f0c7e5e397?w=300&h=450&fit=crop",
-      genre: "HEIST",
-    },
-    {
-      id: 3,
-      title: "Crazy Stupid Love",
-      poster:
-        "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 4,
-      title: "The Silence of the Lambs",
-      poster:
-        "https://images.unsplash.com/photo-1551792843-4146d55ae2ce?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 5,
-      title: "Moonlight",
-      poster:
-        "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 6,
-      title: "Saving Private Ryan",
-      poster:
-        "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 7,
-      title: "Rise of the Planet of the Apes",
-      poster:
-        "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 8,
-      title: "Predestination",
-      poster:
-        "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 9,
-      title: "Star Wars: The Last Jedi",
-      poster:
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-    {
-      id: 10,
-      title: "Children of Men",
-      poster:
-        "https://images.unsplash.com/photo-1518062031-7bac7df10386?w=300&h=450&fit=crop",
-      genre: "POST-APOCALYPTIC",
-    },
-  ];
+      for (const title of movieTitles) {
+        try {
+          const res = await getMovieByTitle(title);
+          if (
+            res.success &&
+            res.data.Response === "True" &&
+            res.data.Search.length > 0
+          ) {
+            // Get the first result for each title
+            const firstResult = res.data.Search[0];
+            allMovies.push({
+              imdbID: firstResult.imdbID,
+              Title: firstResult.Title,
+              Poster: firstResult.Poster,
+              Year: firstResult.Year,
+              Type: firstResult.Type,
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching ${title}:`, error);
+        }
+      }
+
+      setMovies(allMovies);
+      setLoading(false);
+    };
+
+    loadInitialMovies();
+  }, []);
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) return;
+
+    setLoading(true);
+    try {
+      const res = await getMovieByTitle(query.trim());
+      if (
+        res.success &&
+        res.data.Response === "True" &&
+        res.data.Search.length > 0
+      ) {
+        const searchedMovies: Movie[] = res.data.Search.map((movie) => ({
+          imdbID: movie.imdbID,
+          Title: movie.Title,
+          Poster: movie.Poster,
+          Year: movie.Year,
+          Type: movie.Type,
+        }));
+        setMovies(searchedMovies);
+      } else {
+        setMovies([]);
+      }
+    } catch (error) {
+      console.error("Error searching movies:", error);
+      setMovies([]);
+    }
+    setLoading(false);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearch(suggestion);
+    setSuggestions([]);
+    handleSearch(suggestion);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearch(value);
+
+    if (value.trim()) {
+      const filtered = movieTitles.filter((title) =>
+        title.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filtered.slice(0, 5));
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const toggleMovieSelection = (movieId: string) => {
+    setSelectedMovies((prev) =>
+      prev.includes(movieId)
+        ? prev.filter((id) => id !== movieId)
+        : [...prev, movieId]
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-primary relative">
       <div className="text-center py-8">
-        <h1
-          className="text-white text-2xl font-bold 
-        tracking-wider"
-        >
+        <h1 className="text-white text-2xl font-bold tracking-wider">
           AN AI MOVIES APP CREATED WITH REACT
         </h1>
       </div>
 
       <div className="w-[920px] mx-auto px-6">
         <div className="bg-[#1b1919] rounded-lg p-8 shadow-2xl">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-8">
-              <h2 className="text-white text-3xl font-bold flex items-center">
-                <div className="w-8 h-8 bg-blue-500 rounded-full mr-3 flex items-center justify-center">
-                  <Play className="w-4 h-4 text-white" />
-                </div>
-                Movies
-              </h2>
-
-              <div className="flex space-x-6">
-                {genres.map((genre) => (
-                  <button
-                    key={genre}
-                    onClick={() => setActiveGenre(genre)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                      activeGenre === genre
-                        ? "bg-blue-600 text-white"
-                        : "text-blue-400 hover:text-blue-300"
-                    }`}
-                  >
-                    {genre}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          {/* 🔍 Search Bar */}
+          <div className="relative flex items-center justify-end mb-[48px]">
+            <div className="flex items-center px-2 pl-5 py-3 w-[320px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0 relative bg-[#111]">
+              <IoIosSearch className="text-gray-400 w-6 h-6" />
               <input
-                type="text"
-                placeholder="Search for a movie..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-800 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none w-80"
+                className="text-white bg-transparent outline-none flex-1 min-w-0"
+                placeholder="Search Anything"
+                value={search}
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(search);
+                    setSuggestions([]);
+                  }
+                }}
               />
+              <RiMenuSearchFill
+                className="text-gray-400 w-6 h-6 cursor-pointer hover:text-white transition-colors"
+                onClick={() => {
+                  handleSearch(search);
+                  setSuggestions([]);
+                }}
+              />
+
+              {/* 🔽 Suggestions Dropdown */}
+              {suggestions.length > 0 && (
+                <ul className="absolute top-[110%] left-0 right-0 bg-[#222] text-white z-10 rounded-md overflow-hidden shadow-lg">
+                  {suggestions.map((sug, i) => (
+                    <li
+                      key={i}
+                      className="px-4 py-2 hover:bg-[#333] cursor-pointer text-sm transition-colors"
+                      onClick={() => handleSuggestionClick(sug)}
+                    >
+                      {sug}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
+
+          {loading && (
+            <div className="flex justify-center items-center mb-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <span className="text-white ml-3">Loading movies...</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-4 gap-6">
-            {movies.map((movie) => (
-              <div>{TrendingSectionTemplate({ movie })}</div>
-            ))}
+            {!loading && movies.length > 0 ? (
+              movies.map((movie) => (
+                <TrendingSectionTemplate
+                  key={movie.imdbID}
+                  movie={movie}
+                  isSelected={selectedMovies.includes(movie.imdbID)}
+                  onSelect={toggleMovieSelection}
+                />
+              ))
+            ) : !loading ? (
+              <p className="text-white col-span-4 text-center">
+                No movies found
+              </p>
+            ) : null}
           </div>
-        </div>
-      </div>
 
-      {/* Footer */}
-      <div className="text-center mt-8 pb-8">
-        <div className="flex items-center justify-center space-x-3">
-          <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-bold">{`{}`}</span>
-          </div>
-          <span className="text-white font-medium">Coding Torque</span>
-          <span className="text-gray-300 text-sm">
-            Source code on codingtorque.com
-          </span>
+          {selectedMovies.length > 0 && (
+            <div className="mt-6 text-center">
+              <p className="text-green-400 font-semibold">
+                {selectedMovies.length} movie
+                {selectedMovies.length !== 1 ? "s" : ""} selected
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

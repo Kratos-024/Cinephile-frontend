@@ -1,5 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import {
+  getTrendingMovies,
+  type MovieTrendingResult,
+} from "../services/movie.service";
+import { MovieLoader } from "./Loader";
 
 const TrendingSectionTemplate = ({
   movie,
@@ -7,9 +13,8 @@ const TrendingSectionTemplate = ({
   movie: {
     id: number;
     title: string;
-    image: string;
-    genre: string;
-    rating: string;
+    poster_path: string | null;
+    vote_average: number;
   };
 }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -19,28 +24,26 @@ const TrendingSectionTemplate = ({
       <div className="relative overflow-hidden rounded-2xl">
         <img
           className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-          src={movie.image}
+          src={`https://image.tmdb.org/t/p/w500/${
+            movie.poster_path || "Image loading"
+          }`}
           alt={movie.title}
         />
 
-        {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
-        {/* Movie title on hover */}
         <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <h4 className="text-white font-semibold text-lg mb-1">
             {movie.title}
           </h4>
-          <p className="text-gray-300 text-sm">{movie.genre}</p>
+          {/* <p className="text-gray-300 text-sm">{movie.genre}</p> */}
         </div>
       </div>
 
-      {/* Rating badge */}
       <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
-        <span>{movie.rating}</span>
+        <span>{movie.vote_average}</span>
       </div>
 
-      {/* Heart icon */}
       <div className="absolute top-3 right-3">
         <button
           onClick={() => setIsLiked(!isLiked)}
@@ -61,99 +64,43 @@ const TrendingSectionTemplate = ({
 
 export const TrendingSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const [isHovering, setIsHovering] = useState(false);
+  const [movies, setMovie] = useState<MovieTrendingResult[]>([
+    {
+      adult: false,
+      backdrop_path: "",
+      id: 0,
+      title: "",
+      original_title: "",
+      overview: "",
+      poster_path: "",
+      media_type: "",
+      original_language: "",
+      genre_ids: [0],
+      popularity: 0,
+      release_date: "",
+      video: false,
+      vote_average: 0,
+      vote_count: 0,
+    },
+  ]);
+
   const sliderRef = useRef(null);
-  const itemWidth = 300; // 280px + 20px gap
-  const visibleItems = 4; // Number of items visible at once
+  const itemWidth = 300;
+  const visibleItems = 4;
 
-  // Sample movie data - replace with your actual data
-  const movies = [
-    {
-      id: 1,
-      title: "Aladdin",
-      genre: "Adventure",
-      rating: "7.8",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 2,
-      title: "The Lion King",
-      genre: "Animation",
-      rating: "8.5",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 3,
-      title: "Frozen",
-      genre: "Musical",
-      rating: "7.4",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 4,
-      title: "Moana",
-      genre: "Adventure",
-      rating: "7.6",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 5,
-      title: "Toy Story",
-      genre: "Animation",
-      rating: "8.3",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 6,
-      title: "Finding Nemo",
-      genre: "Adventure",
-      rating: "8.2",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 7,
-      title: "Incredibles",
-      genre: "Action",
-      rating: "8.0",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 8,
-      title: "Coco",
-      genre: "Musical",
-      rating: "8.4",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 9,
-      title: "Up",
-      genre: "Adventure",
-      rating: "8.3",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 10,
-      title: "WALL-E",
-      genre: "Sci-Fi",
-      rating: "8.4",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 11,
-      title: "Ratatouille",
-      genre: "Comedy",
-      rating: "8.1",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 12,
-      title: "Inside Out",
-      genre: "Comedy",
-      rating: "8.2",
-      image: "images/heroImages/aladin.jpg",
-    },
-  ];
-
+  useEffect(() => {
+    const getTrendingMovieArray = async () => {
+      const reponse = await getTrendingMovies();
+      if (reponse.success) {
+        setMovie(reponse.data.results);
+        setLoading(false);
+      }
+    };
+    getTrendingMovieArray();
+  }, []);
   const maxIndex = Math.max(0, movies.length - visibleItems);
 
   const goToNext = () => {
@@ -190,14 +137,16 @@ export const TrendingSection = () => {
   }, []);
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between mb-12">
+    <section className="py-11">
+      <div className="container mx-auto px-2">
+        <div
+          className="flex items-center justify-between
+         mb-12"
+        >
           <h3 className="text-4xl lg:text-5xl font-bold text-white">
             Trending Movies
           </h3>
 
-          {/* Navigation arrows */}
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={goToPrev}
@@ -215,28 +164,32 @@ export const TrendingSection = () => {
             </button>
           </div>
         </div>
-
-        {/* Slider container */}
         <div
           className="relative overflow-hidden"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          <div
-            ref={sliderRef}
-            className="flex transition-transform duration-500 ease-in-out gap-5"
-            style={{
-              transform: `translateX(-${currentIndex * itemWidth}px)`,
-            }}
-          >
-            {movies.map((movie) => (
-              <div key={movie.id} className="flex-shrink-0">
-                <TrendingSectionTemplate movie={movie} />
-              </div>
-            ))}
-          </div>
+          {loading && (
+            <div className=" justify-center flex  ">
+              <MovieLoader />
+            </div>
+          )}
+          {!loading && (
+            <div
+              ref={sliderRef}
+              className="flex transition-transform duration-500 ease-in-out gap-5"
+              style={{
+                transform: `translateX(-${currentIndex * itemWidth}px)`,
+              }}
+            >
+              {movies.map((movie) => (
+                <div key={movie.id} className="flex-shrink-0">
+                  <TrendingSectionTemplate movie={movie} />
+                </div>
+              ))}
+            </div>
+          )}
 
-          {/* Mobile navigation arrows */}
           <button
             onClick={goToPrev}
             disabled={currentIndex === 0}
@@ -253,7 +206,6 @@ export const TrendingSection = () => {
           </button>
         </div>
 
-        {/* Pagination dots */}
         <div className="flex justify-center items-center gap-2 mt-8">
           {Array.from({ length: maxIndex + 1 }).map((_, index) => (
             <button
