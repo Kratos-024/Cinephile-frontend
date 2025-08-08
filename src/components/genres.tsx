@@ -4,7 +4,6 @@ import { RiMenuSearchFill } from "react-icons/ri";
 import { FaCheck } from "react-icons/fa";
 import { getMovieByTitle } from "../services/movie.service";
 
-// Updated interface to match the new API response
 interface Movie {
   imdbID: string;
   Title: string;
@@ -96,7 +95,6 @@ const MoviesApp = () => {
             res.data.Response === "True" &&
             res.data.Search.length > 0
           ) {
-            // Get the first result for each title
             const firstResult = res.data.Search[0];
             allMovies.push({
               imdbID: firstResult.imdbID,
@@ -185,7 +183,6 @@ const MoviesApp = () => {
 
       <div className="w-[920px] mx-auto px-6">
         <div className="bg-[#1b1919] rounded-lg p-8 shadow-2xl">
-          {/* 🔍 Search Bar */}
           <div className="relative flex items-center justify-end mb-[48px]">
             <div className="flex items-center px-2 pl-5 py-3 w-[320px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0 relative bg-[#111]">
               <IoIosSearch className="text-gray-400 w-6 h-6" />

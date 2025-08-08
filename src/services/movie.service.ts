@@ -58,7 +58,7 @@ const getMovieByTitle = async (
     }
 
     const encodedTitle = encodeURIComponent(title.trim());
-    const url = `http://localhost:8000/api/v1/tmdb/getMovieByTitle?title=${encodedTitle}`;
+    const url = `http://localhost:8000/api/v1/omdb/getMovieByTitle?title=${encodedTitle}`;
 
     const response = await fetch(url, {
       method: "GET",
