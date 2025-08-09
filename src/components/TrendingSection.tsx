@@ -1,24 +1,25 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import {
   getTrendingMovies,
-  type MovieTrendingResult,
+  type IMDBTrendingResponse,
 } from "../services/movie.service";
 import { MovieLoader } from "./Loader";
+import { Link } from "react-router-dom";
 
 export const TrendingSectionTemplate = ({
   movie,
 }: {
   movie: {
-    id: number;
+    watchlistId: string;
     title: string;
     poster_path: string | null;
-    vote_average: number;
+    vote_average: string;
   };
 }) => {
   const [isLiked, setIsLiked] = useState(false);
-
   return (
     <div className="relative rounded-2xl group cursor-pointer transform transition-all duration-300 hover:scale-105">
       <div className="relative overflow-hidden rounded-2xl">
@@ -26,7 +27,7 @@ export const TrendingSectionTemplate = ({
           className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
           src={
             movie.poster_path?.includes("http")
-              ? movie.poster_path
+              ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
               : `https://image.tmdb.org/t/p/w500/${
                   movie.poster_path || "Image_loading"
                 }`
@@ -40,7 +41,6 @@ export const TrendingSectionTemplate = ({
           <h4 className="text-white font-semibold text-lg mb-1">
             {movie.title}
           </h4>
-          {/* <p className="text-gray-300 text-sm">{movie.genre}</p> */}
         </div>
       </div>
 
@@ -69,84 +69,117 @@ export const TrendingSectionTemplate = ({
 export const TrendingSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-
   const [isHovering, setIsHovering] = useState(false);
-  const [movies, setMovie] = useState<MovieTrendingResult[]>([
-    {
-      adult: false,
-      backdrop_path: "",
-      id: 0,
-      title: "",
-      original_title: "",
-      overview: "",
-      poster_path: "",
-      media_type: "",
-      original_language: "",
-      genre_ids: [0],
-      popularity: 0,
-      release_date: "",
-      video: false,
-      vote_average: 0,
-      vote_count: 0,
-    },
-  ]);
+  const [, setMovie] = useState<IMDBTrendingResponse[]>([]);
+  const [movie2025, setMovie2025] = useState<IMDBTrendingResponse[]>([]);
 
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const sliderRef = useRef(null);
   const itemWidth = 300;
   const visibleItems = 4;
+  const maxIndex = Math.max(0, movie2025.length - visibleItems);
 
   useEffect(() => {
     const getTrendingMovieArray = async () => {
-      const reponse = await getTrendingMovies();
-      if (reponse.success) {
-        setMovie(reponse.data.results);
+      try {
+        setLoading(true);
+        const response = await getTrendingMovies();
+
+        if (response.success && Array.isArray(response.data)) {
+          setMovie(response.data);
+          console.log(response.data);
+
+          const filteredMovies = response.data.filter(
+            (movie) =>
+              +movie.year === 2025 &&
+              +movie.imdbRating > 6 &&
+              +movie.metascore > 50
+          );
+
+          const uniqueMovies = filteredMovies.reduce((acc, movie) => {
+            if (
+              !acc.find(
+                (m: IMDBTrendingResponse) => m.watchlistId === movie.watchlistId
+              )
+            ) {
+              acc.push(movie);
+            }
+            return acc;
+          }, []);
+
+          setMovie2025(uniqueMovies);
+        }
+      } catch (error) {
+        console.error("Error fetching trending movies:", error);
+      } finally {
         setLoading(false);
       }
     };
+
     getTrendingMovieArray();
   }, []);
-  const maxIndex = Math.max(0, movies.length - visibleItems);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
-  };
+  }, [maxIndex]);
 
-  const goToPrev = () => {
+  const goToPrev = useCallback(() => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
-  };
+  }, []);
 
   useEffect(() => {
-    if (!isHovering) {
-      const interval = setInterval(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (!isHovering && movie2025.length > 0) {
+      intervalRef.current = setInterval(() => {
         setCurrentIndex((prev) => {
-          if (prev >= maxIndex) {
-            return 0;
-          }
-          return prev + 1;
+          const nextIndex = prev + 1;
+          return nextIndex > maxIndex ? 0 : nextIndex;
         });
       }, 4000);
-
-      return () => clearInterval(interval);
     }
-  }, [isHovering, maxIndex]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isHovering, movie2025.length, maxIndex]);
 
   useEffect(() => {
-    const handleKeyDown = (e: { key: string }) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") goToPrev();
       if (e.key === "ArrowRight") goToNext();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [goToNext, goToPrev]);
+
+  if (loading || movie2025.length === 0) {
+    return (
+      <section className="py-11">
+        <div className="container mx-auto px-2">
+          <div className="flex items-center justify-between mb-12">
+            <h3 className="text-4xl lg:text-5xl font-bold text-white">
+              Trending Movies
+            </h3>
+          </div>
+          <div className="justify-center flex">
+            <MovieLoader />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-11">
       <div className="container mx-auto px-2">
-        <div
-          className="flex items-center justify-between
-         mb-12"
-        >
+        <div className="flex items-center justify-between mb-12">
           <h3 className="text-4xl lg:text-5xl font-bold text-white">
             Trending Movies
           </h3>
@@ -173,27 +206,39 @@ export const TrendingSection = () => {
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          {loading && (
-            <div className=" justify-center flex  ">
-              <MovieLoader />
-            </div>
-          )}
-          {!loading && (
+          <div
+            ref={sliderRef}
+            className="flex transition-transform duration-500 ease-in-out gap-5"
+            style={{
+              transform: `translateX(-${currentIndex * itemWidth}px)`,
+            }}
+          >
+            {movie2025.map((movie, index) => (
+              <div
+                key={movie.watchlistId || `movie-${index}`}
+                className="flex-shrink-0"
+              >
+                <Link to={`movie/${movie.watchlistId}/${movie.title}`}>
+                  {" "}
+                  <TrendingSectionTemplate
+                    movie={{
+                      watchlistId: movie.watchlistId,
+                      title: movie.title,
+                      poster_path: movie.posterUrl,
+                      vote_average: movie.metascore,
+                    }}
+                  />
+                </Link>
+              </div>
+            ))}
             <div
-              ref={sliderRef}
-              className="flex transition-transform duration-500 ease-in-out gap-5"
-              style={{
-                transform: `translateX(-${currentIndex * itemWidth}px)`,
-              }}
+              className="
+             w-[480px] cursor-pointer text-white text-[24px] font-semibold h-[400px] px-[96px] whitespace-nowrap  bg-neutral-800 flex justify-center items-center object-cover rounded-2xl 
+             transition-transform duration-300 group-hover:scale-110"
             >
-              {movies.map((movie) => (
-                <div key={movie.id} className="flex-shrink-0">
-                  <TrendingSectionTemplate movie={movie} />
-                </div>
-              ))}
+              Load more+
             </div>
-          )}
-
+          </div>
           <button
             onClick={goToPrev}
             disabled={currentIndex === 0}
@@ -209,20 +254,21 @@ export const TrendingSection = () => {
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-
-        <div className="flex justify-center items-center gap-2 mt-8">
-          {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? "bg-white w-8"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
-            />
-          ))}
-        </div>
+        {maxIndex > 0 && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex
+                    ? "bg-white w-8"
+                    : "bg-white/30 hover:bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

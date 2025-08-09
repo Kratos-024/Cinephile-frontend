@@ -26,7 +26,7 @@ function App() {
               </Container>
             }
           ></Route>
-          <Route path="/movie" element={<MoviePage />}></Route>
+          <Route path="/movie/:id/:title" element={<MoviePage />}></Route>
           <Route path="/genres" element={<GenrePage />}></Route>{" "}
           <Route
             path="/userprofile"

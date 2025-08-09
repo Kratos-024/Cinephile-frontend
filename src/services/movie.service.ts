@@ -16,27 +16,27 @@ interface MovieTitleApiResponse {
   success: boolean;
   data: MovieTitleApiResponseData;
 }
-export interface MovieTrendingResult {
-  adult: boolean;
-  backdrop_path: string | null;
-  id: number;
+export interface IMDBTrendingResponse {
   title: string;
-  original_title: string;
-  overview: string;
-  poster_path: string | null;
-  media_type: string;
-  original_language: string;
-  genre_ids: number[];
-  popularity: number;
-  release_date: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
+  movieUrl: string;
+  watchlistId: string;
+  year: string;
+  posterUrl: string;
+  posterAlt: string;
+  metascore: string;
+  imdbVotes: string;
+  imdbRating: string;
+  rating: string;
+  runtime: string;
+  ranking: string;
+  plot: string;
+  director: string;
+  stars: string[];
 }
 
 export interface MovieTrendingApiResponseData {
   page: number;
-  results: MovieTrendingResult[];
+  results: IMDBTrendingResponse[];
   total_pages: number;
   total_results: number;
 }
@@ -104,7 +104,6 @@ const getTrendingMovies = async (): Promise<MovieTrendingApiResponse> => {
     }
 
     const data: MovieTrendingApiResponse = await response.json();
-
     return data;
   } catch (error) {
     console.error("Error fetching movie by title:", error);
@@ -115,21 +114,21 @@ const getTrendingMovies = async (): Promise<MovieTrendingApiResponse> => {
         page: 0,
         results: [
           {
-            adult: false,
-            backdrop_path: "",
-            id: 0,
             title: "",
-            original_title: "",
-            overview: "",
-            poster_path: "",
-            media_type: "",
-            original_language: "",
-            genre_ids: [0],
-            popularity: 0,
-            release_date: "",
-            video: false,
-            vote_average: 0,
-            vote_count: 0,
+            movieUrl: "",
+            watchlistId: "",
+            year: "",
+            posterUrl: "",
+            posterAlt: "",
+            metascore: "",
+            imdbVotes: "",
+            imdbRating: "",
+            rating: "",
+            runtime: "",
+            ranking: "",
+            plot: "",
+            director: "",
+            stars: [""],
           },
         ],
         total_pages: 0,

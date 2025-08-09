@@ -304,11 +304,12 @@ export const MoviePage = () => {
 
   return (
     <>
-      {/* Fixed background image */}
       <div
-        className="fixed inset-0 min-h-screen w-full bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 h-full w-full
+         bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/images/heroImages/soul.jpg')",
+          backgroundImage:
+            "url('https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg')",
         }}
       />
 
@@ -321,10 +322,8 @@ export const MoviePage = () => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="relative z-10"
       >
-        {/* Left vignette gradient overlay */}
         <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0b0818] via-[#0b0818]/50 to-transparent z-20"></div>
 
-        {/* Right vignette gradient overlay */}
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0b0818] via-[#0b0818]/50 to-transparent z-20"></div>
 
         <div className="min-h-screen relative z-10">

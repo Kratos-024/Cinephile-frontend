@@ -40,8 +40,6 @@ export const NavBar = ({
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-
-        syncUserProfileToBackend(user).catch(console.error);
       } else {
         console.log("User not authenticated");
         setIsLoggedIn(false);
@@ -68,36 +66,6 @@ export const NavBar = ({
         document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [showUserPopup]);
-
-  const syncUserProfileToBackend = async (user: any) => {
-    try {
-      const idToken = await user.getIdToken();
-      const response = await fetch(
-        `${
-          process.env.REACT_APP_API_URL || "http://localhost:8000"
-        }/api/v1/user/sync-profile`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        console.log("User profile synced to backend successfully");
-      }
-    } catch (error) {
-      console.log("Backend sync failed (not critical):", error);
-    }
-  };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
