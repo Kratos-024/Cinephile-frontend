@@ -102,6 +102,63 @@ const getAuthHeaders = (token?: string) => {
   return headers;
 };
 
+// Helper function to handle fetch responses with better error handling
+const handleFetchResponse = async (response: Response): Promise<any> => {
+  console.log("Response status:", response.status);
+  console.log("Response headers:", response.headers);
+
+  // Check if response is ok
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  // Check if response has content
+  const contentLength = response.headers.get("content-length");
+  const contentType = response.headers.get("content-type");
+
+  console.log("Content-Length:", contentLength);
+  console.log("Content-Type:", contentType);
+
+  if (contentLength === "0") {
+    throw new Error("Server returned empty response");
+  }
+
+  if (!contentType || !contentType.includes("application/json")) {
+    const text = await response.text();
+    console.log("Non-JSON response:", text);
+    throw new Error("Server returned non-JSON response");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+// Helper function to handle fetch errors
+const handleFetchError = (error: any, operation: string) => {
+  console.error(`Error in ${operation}:`, error);
+
+  if (error instanceof TypeError && error.message.includes("fetch")) {
+    return {
+      success: false,
+      message: `Cannot connect to server. Please check if the backend is running on ${API_BASE_URL}`,
+    };
+  }
+
+  if (error.name === "SyntaxError" && error.message.includes("JSON")) {
+    return {
+      success: false,
+      message:
+        "Server communication error. Please check if the backend is running.",
+      code: "BACKEND_ERROR",
+    };
+  }
+
+  return {
+    success: false,
+    message: error instanceof Error ? error.message : `${operation} failed`,
+  };
+};
+
 // Auth Services
 const registerUser = async (
   email: string,
@@ -109,6 +166,8 @@ const registerUser = async (
   displayName?: string
 ): Promise<AuthResponse> => {
   try {
+    console.log("Registering user...");
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/register`, {
       method: "POST",
       headers: getAuthHeaders(),
@@ -119,7 +178,7 @@ const registerUser = async (
       }),
     });
 
-    const data: AuthResponse = await response.json();
+    const data: AuthResponse = await handleFetchResponse(response);
 
     if (data.success && data.data?.customToken) {
       localStorage.setItem("authToken", data.data.customToken);
@@ -127,23 +186,21 @@ const registerUser = async (
 
     return data;
   } catch (error) {
-    console.error("Error registering user:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Registration failed",
-    };
+    return handleFetchError(error, "registerUser") as AuthResponse;
   }
 };
 
 const loginUser = async (idToken: string): Promise<AuthResponse> => {
   try {
+    console.log("Sending idToken to backend...");
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/login`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ idToken }),
     });
 
-    const data: AuthResponse = await response.json();
+    const data: AuthResponse = await handleFetchResponse(response);
 
     if (data.success && idToken) {
       localStorage.setItem("authToken", idToken);
@@ -151,34 +208,29 @@ const loginUser = async (idToken: string): Promise<AuthResponse> => {
 
     return data;
   } catch (error) {
-    console.error("Error logging in user:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Login failed",
-    };
+    return handleFetchError(error, "loginUser") as AuthResponse;
   }
 };
 
 const resetPassword = async (email: string): Promise<UserApiResponse> => {
   try {
+    console.log("Sending password reset request...");
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/reset-password`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ email }),
     });
 
-    const data: UserApiResponse = await response.json();
+    const data: UserApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error resetting password:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Password reset failed",
-    };
+    return handleFetchError(error, "resetPassword");
   }
 };
 
 const logoutUser = (): void => {
+  console.log("Logging out user...");
   localStorage.removeItem("authToken");
 };
 
@@ -188,21 +240,21 @@ const saveUserPreferences = async (
   token?: string
 ): Promise<UserPreferenceApiResponse> => {
   try {
+    console.log("Saving user preferences...");
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/preferences`, {
       method: "POST",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ preferences }),
     });
 
-    const data: UserPreferenceApiResponse = await response.json();
+    const data: UserPreferenceApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error saving user preferences:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to save preferences",
-    };
+    return handleFetchError(
+      error,
+      "saveUserPreferences"
+    ) as UserPreferenceApiResponse;
   }
 };
 
@@ -215,20 +267,20 @@ const getUserPreferences = async (
       ? `${API_BASE_URL}/api/v1/user/preferences/${userId}`
       : `${API_BASE_URL}/api/v1/user/preferences`;
 
+    console.log("Getting user preferences from:", url);
+
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
     });
 
-    const data: UserPreferenceApiResponse = await response.json();
+    const data: UserPreferenceApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error getting user preferences:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to get preferences",
-    };
+    return handleFetchError(
+      error,
+      "getUserPreferences"
+    ) as UserPreferenceApiResponse;
   }
 };
 
@@ -237,21 +289,21 @@ const updateUserPreferences = async (
   token?: string
 ): Promise<UserPreferenceApiResponse> => {
   try {
+    console.log("Updating user preferences...");
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/preferences`, {
       method: "PUT",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ preferences }),
     });
 
-    const data: UserPreferenceApiResponse = await response.json();
+    const data: UserPreferenceApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error updating user preferences:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to update preferences",
-    };
+    return handleFetchError(
+      error,
+      "updateUserPreferences"
+    ) as UserPreferenceApiResponse;
   }
 };
 
@@ -264,6 +316,8 @@ const saveUserReview = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
+    console.log("Saving user review...");
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/reviews`, {
       method: "POST",
       headers: getAuthHeaders(token),
@@ -275,14 +329,10 @@ const saveUserReview = async (
       }),
     });
 
-    const data: UserApiResponse = await response.json();
+    const data: UserApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error saving user review:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to save review",
-    };
+    return handleFetchError(error, "saveUserReview");
   }
 };
 
@@ -297,21 +347,22 @@ const getUserReviews = async (
       ? `${API_BASE_URL}/api/v1/user/reviews/${userId}?limit=${limit}&offset=${offset}`
       : `${API_BASE_URL}/api/v1/user/reviews?limit=${limit}&offset=${offset}`;
 
+    console.log("Getting user reviews from:", url);
+
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
     });
 
-    const data: UserReviewsApiResponse = await response.json();
+    const data: UserReviewsApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error getting user reviews:", error);
+    const errorResponse = handleFetchError(error, "getUserReviews");
     return {
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to get reviews",
+      ...errorResponse,
       data: [],
       total: 0,
-    };
+    } as UserReviewsApiResponse;
   }
 };
 
@@ -320,6 +371,8 @@ const deleteUserReview = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
+    console.log("Deleting user review:", reviewId);
+
     const response = await fetch(
       `${API_BASE_URL}/api/v1/user/reviews/${reviewId}`,
       {
@@ -328,15 +381,10 @@ const deleteUserReview = async (
       }
     );
 
-    const data: UserApiResponse = await response.json();
+    const data: UserApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error deleting user review:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to delete review",
-    };
+    return handleFetchError(error, "deleteUserReview");
   }
 };
 
@@ -346,20 +394,18 @@ const followUser = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
+    console.log("Following user:", targetUserId);
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/follow`, {
       method: "POST",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ targetUserId }),
     });
 
-    const data: UserApiResponse = await response.json();
+    const data: UserApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error following user:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to follow user",
-    };
+    return handleFetchError(error, "followUser");
   }
 };
 
@@ -368,21 +414,18 @@ const unfollowUser = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
+    console.log("Unfollowing user:", targetUserId);
+
     const response = await fetch(`${API_BASE_URL}/api/v1/user/unfollow`, {
       method: "POST",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ targetUserId }),
     });
 
-    const data: UserApiResponse = await response.json();
+    const data: UserApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error unfollowing user:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to unfollow user",
-    };
+    return handleFetchError(error, "unfollowUser");
   }
 };
 
@@ -395,21 +438,21 @@ const getUserFollowers = async (
       ? `${API_BASE_URL}/api/v1/user/followers/${userId}`
       : `${API_BASE_URL}/api/v1/user/followers`;
 
+    console.log("Getting user followers from:", url);
+
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
     });
 
-    const data: UserFollowApiResponse = await response.json();
+    const data: UserFollowApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error getting user followers:", error);
+    const errorResponse = handleFetchError(error, "getUserFollowers");
     return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to get followers",
+      ...errorResponse,
       data: { followersCount: 0, followingCount: 0 },
-    };
+    } as UserFollowApiResponse;
   }
 };
 
@@ -422,21 +465,21 @@ const getUserFollowing = async (
       ? `${API_BASE_URL}/api/v1/user/following/${userId}`
       : `${API_BASE_URL}/api/v1/user/following`;
 
+    console.log("Getting user following from:", url);
+
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
     });
 
-    const data: UserFollowApiResponse = await response.json();
+    const data: UserFollowApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error getting user following:", error);
+    const errorResponse = handleFetchError(error, "getUserFollowing");
     return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to get following",
+      ...errorResponse,
       data: { followersCount: 0, followingCount: 0 },
-    };
+    } as UserFollowApiResponse;
   }
 };
 
@@ -450,19 +493,17 @@ const getUserProfile = async (
       ? `${API_BASE_URL}/api/v1/user/profile/${userId}`
       : `${API_BASE_URL}/api/v1/user/profile`;
 
+    console.log("Getting user profile from:", url);
+
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
     });
 
-    const data: UserProfileApiResponse = await response.json();
+    const data: UserProfileApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.error("Error getting user profile:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to get profile",
-    };
+    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
   }
 };
 
@@ -471,10 +512,11 @@ const isAuthenticated = (): boolean => {
   return !!localStorage.getItem("authToken");
 };
 
-// Utility function to get current user from token (you might need to decode JWT or call API)
+// Utility function to get current user from token
 const getCurrentUser = async (
   token?: string
 ): Promise<UserProfileApiResponse> => {
+  console.log("Getting current user profile...");
   return getUserProfile(undefined, token);
 };
 

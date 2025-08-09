@@ -7,7 +7,7 @@ import {
 } from "../services/movie.service";
 import { MovieLoader } from "./Loader";
 
-const TrendingSectionTemplate = ({
+export const TrendingSectionTemplate = ({
   movie,
 }: {
   movie: {
@@ -24,9 +24,13 @@ const TrendingSectionTemplate = ({
       <div className="relative overflow-hidden rounded-2xl">
         <img
           className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-          src={`https://image.tmdb.org/t/p/w500/${
-            movie.poster_path || "Image loading"
-          }`}
+          src={
+            movie.poster_path?.includes("http")
+              ? movie.poster_path
+              : `https://image.tmdb.org/t/p/w500/${
+                  movie.poster_path || "Image_loading"
+                }`
+          }
           alt={movie.title}
         />
 

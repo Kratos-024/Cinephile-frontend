@@ -6,6 +6,7 @@ import { HomePage } from "./pages/HomePage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MoviePage } from "./pages/MoviePage";
 import { GenrePage } from "./pages/GenrePage";
+import { UserProfile } from "./pages/UserProfile";
 
 function App() {
   const [menu, setMenu] = useState<boolean>(true);
@@ -26,11 +27,19 @@ function App() {
             }
           ></Route>
           <Route path="/movie" element={<MoviePage />}></Route>
-          <Route path="/genres" element={<GenrePage />}></Route>
+          <Route path="/genres" element={<GenrePage />}></Route>{" "}
+          <Route
+            path="/userprofile"
+            element={
+              <Container>
+                <Menu menu={menu} />
+                <UserProfile menu={menu} menuHandler={menuHandler} />{" "}
+              </Container>
+            }
+          ></Route>
         </Routes>
       </BrowserRouter>
     </section>
-    
   );
 }
 
