@@ -6,17 +6,14 @@ export async function googleLogin() {
   try {
     console.log("Starting Firebase Google login...");
 
-    // Firebase Authentication - this is all we need for login
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     const idToken = await user.getIdToken();
 
     console.log("Firebase auth successful:", user);
 
-    // Store auth info locally
     localStorage.setItem("authToken", idToken);
 
-    // Return user info directly from Firebase
     return {
       success: true,
       data: {
@@ -76,7 +73,6 @@ export async function googleLogin() {
   }
 }
 
-// Optional: Create account with email/password
 export async function createAccountWithEmail(
   email: string,
   password: string,

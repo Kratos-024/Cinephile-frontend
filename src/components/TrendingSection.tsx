@@ -8,49 +8,99 @@ import {
 } from "../services/movie.service";
 import { MovieLoader } from "./Loader";
 import { Link } from "react-router-dom";
+import { addToWatchList, RemoveFromWatchlist } from "../services/user..service";
+import { toast } from "react-toastify";
 
 export const TrendingSectionTemplate = ({
   movie,
 }: {
   movie: {
+    releaseData: string;
     watchlistId: string;
     title: string;
-    poster_path: string | null;
+    poster_path: string;
     vote_average: string;
   };
 }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const likeHandler = async () => {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      return;
+    }
+    console.log("liked came to handler");
+    if (!isLiked) {
+      setIsLiked(true);
+      console.log("liked added to watchylist");
+
+      const response = await addToWatchList(token, {
+        imdbId: movie.watchlistId,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        release_date: movie.releaseData,
+        vote_average: movie.vote_average,
+      });
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    } else {
+      setIsLiked(false);
+      const response = await RemoveFromWatchlist(token, {
+        imdbId: movie.watchlistId,
+      });
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    }
+  };
   return (
     <div className="relative rounded-2xl group cursor-pointer transform transition-all duration-300 hover:scale-105">
-      <div className="relative overflow-hidden rounded-2xl">
-        <img
-          className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-          src={
-            movie.poster_path?.includes("http")
-              ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
-              : `https://image.tmdb.org/t/p/w500/${
-                  movie.poster_path || "Image_loading"
-                }`
-          }
-          alt={movie.title}
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-
-        <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <h4 className="text-white font-semibold text-lg mb-1">
-            {movie.title}
-          </h4>
+      <Link to={`movie/${movie.watchlistId}/${movie.title}`}>
+        <div className="relative overflow-hidden rounded-2xl">
+          <img
+            className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
+            src={
+              movie.poster_path?.includes("http")
+                ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
+                : `https://image.tmdb.org/t/p/w500/${
+                    movie.poster_path || "Image_loading"
+                  }`
+            }
+            alt={movie.title}
+          />{" "}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+          <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <h4 className="text-white font-semibold text-lg mb-1">
+              {movie.title}
+            </h4>
+          </div>
         </div>
-      </div>
-
-      <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
-        <span>{movie.vote_average}</span>
-      </div>
-
+        <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
+          <span>{movie.vote_average}</span>
+        </div>
+      </Link>
       <div className="absolute top-3 right-3">
-        <button
-          onClick={() => setIsLiked(!isLiked)}
+        <div
+          onClick={() => likeHandler()}
           className="p-2 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-300"
         >
           <Heart
@@ -60,7 +110,7 @@ export const TrendingSectionTemplate = ({
                 : "text-white hover:text-red-400"
             }`}
           />
-        </button>
+        </div>
       </div>
     </div>
   );
@@ -218,17 +268,16 @@ export const TrendingSection = () => {
                 key={movie.watchlistId || `movie-${index}`}
                 className="flex-shrink-0"
               >
-                <Link to={`movie/${movie.watchlistId}/${movie.title}`}>
-                  {" "}
-                  <TrendingSectionTemplate
-                    movie={{
-                      watchlistId: movie.watchlistId,
-                      title: movie.title,
-                      poster_path: movie.posterUrl,
-                      vote_average: movie.metascore,
-                    }}
-                  />
-                </Link>
+                {" "}
+                <TrendingSectionTemplate
+                  movie={{
+                    releaseData: movie.year,
+                    watchlistId: movie.watchlistId,
+                    title: movie.title,
+                    poster_path: movie.posterUrl,
+                    vote_average: movie.metascore,
+                  }}
+                />
               </div>
             ))}
             <div

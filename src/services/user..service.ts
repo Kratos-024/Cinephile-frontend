@@ -88,31 +88,26 @@ export interface AuthResponse extends UserApiResponse {
   };
 }
 
-// Helper function to get auth headers
 const getAuthHeaders = (token?: string) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
-
   const authToken = token || localStorage.getItem("authToken");
+
   if (authToken) {
     headers.Authorization = `Bearer ${authToken}`;
   }
-
   return headers;
 };
 
-// Helper function to handle fetch responses with better error handling
 const handleFetchResponse = async (response: Response): Promise<any> => {
   console.log("Response status:", response.status);
   console.log("Response headers:", response.headers);
 
-  // Check if response is ok
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 
-  // Check if response has content
   const contentLength = response.headers.get("content-length");
   const contentType = response.headers.get("content-type");
 
@@ -388,7 +383,6 @@ const deleteUserReview = async (
   }
 };
 
-// User Social Services
 const followUser = async (
   targetUserId: string,
   token?: string
@@ -483,7 +477,6 @@ const getUserFollowing = async (
   }
 };
 
-// User Profile Services
 const getUserProfile = async (
   userId?: string,
   token?: string
@@ -494,10 +487,11 @@ const getUserProfile = async (
       : `${API_BASE_URL}/api/v1/user/profile`;
 
     console.log("Getting user profile from:", url);
-
+    const header = getAuthHeaders(token);
+    console.log(header);
     const response = await fetch(url, {
       method: "GET",
-      headers: getAuthHeaders(token),
+      headers: header,
     });
 
     const data: UserProfileApiResponse = await handleFetchResponse(response);
@@ -507,12 +501,62 @@ const getUserProfile = async (
   }
 };
 
-// Utility function to check if user is authenticated
+const addToWatchList = async (
+  token: string,
+  movieData: {
+    imdbId: string;
+    title: string;
+    poster_path: string;
+    release_date: string;
+    vote_average: string;
+  }
+): Promise<UserProfileApiResponse> => {
+  try {
+    console.log("Adding to user profile watchlist:");
+    const url = API_BASE_URL + "/api/v1/user/AddToWatchlist";
+    const header = getAuthHeaders(token);
+    console.log(header);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(movieData),
+    });
+    console.log(response);
+    const data: UserProfileApiResponse = await handleFetchResponse(response);
+
+    return data;
+  } catch (error) {
+    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
+  }
+};
+
+const RemoveFromWatchlist = async (
+  token: string,
+  movieData: {
+    imdbId: string;
+  }
+): Promise<UserProfileApiResponse> => {
+  try {
+    console.log("Removing watchlist from user:");
+    const url = API_BASE_URL + "/api/v1/user/RemoveFromWatchlist";
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: getAuthHeaders(token),
+      body: JSON.stringify(movieData),
+    });
+
+    const data: UserProfileApiResponse = await handleFetchResponse(response);
+    return data;
+  } catch (error) {
+    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
+  }
+};
 const isAuthenticated = (): boolean => {
   return !!localStorage.getItem("authToken");
 };
 
-// Utility function to get current user from token
 const getCurrentUser = async (
   token?: string
 ): Promise<UserProfileApiResponse> => {
@@ -520,34 +564,24 @@ const getCurrentUser = async (
   return getUserProfile(undefined, token);
 };
 
-// Export all services
 export {
-  // Auth services
+  RemoveFromWatchlist,
   registerUser,
   loginUser,
+  addToWatchList,
   resetPassword,
   logoutUser,
-
-  // Preference services
   saveUserPreferences,
   getUserPreferences,
   updateUserPreferences,
-
-  // Review services
   saveUserReview,
   getUserReviews,
   deleteUserReview,
-
-  // Social services
   followUser,
   unfollowUser,
   getUserFollowers,
   getUserFollowing,
-
-  // Profile services
   getUserProfile,
-
-  // Utility functions
   isAuthenticated,
   getCurrentUser,
 };

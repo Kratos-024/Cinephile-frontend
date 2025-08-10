@@ -48,6 +48,79 @@ export interface MovieTrendingApiResponse {
   cached_at?: string;
   expires_at?: string;
 }
+export interface CastMember {
+  actorName: string;
+  actorUrl: string;
+  characterName: string;
+  characterUrl: string;
+  imageUrl: string;
+  imageAlt: string;
+  isVoiceRole: boolean;
+}
+
+export interface MovieImage {
+  src: string;
+  alt: string;
+}
+
+export interface MovieVideo {
+  title: string;
+  videoUrl: string;
+  imageUrl: string;
+  imageAlt: string;
+}
+
+export interface MovieRatings {
+  imdbScore: {
+    rating: string;
+    totalVotes: string;
+    fullRating: string;
+  };
+  metascore: {
+    score: string;
+    backgroundColor: string;
+  };
+}
+
+interface MovieStoryline {
+  tagline: string;
+  story: string;
+  genres: string[];
+  keywords: string[];
+}
+
+interface MovieData {
+  cast: CastMember[];
+  images: MovieImage[];
+  ratings: MovieRatings;
+  storyline: MovieStoryline;
+  videos: MovieVideo[];
+  scrapedAt: string;
+  url: string;
+}
+
+interface MovieApiResponse {
+  success: boolean;
+  imdb_id: string;
+  data: MovieData;
+  source: string;
+}
+
+interface MovieApiErrorResponse {
+  success: false;
+  status: number;
+  message: string;
+  type?: string;
+}
+
+export type MovieResponse = MovieApiResponse | MovieApiErrorResponse;
+
+export interface ApiMovieResponse {
+  success: boolean;
+  imdb_id: string;
+  data: MovieData;
+  source: string;
+}
 
 const getMovieByTitle = async (
   title: string
@@ -137,4 +210,34 @@ const getTrendingMovies = async (): Promise<MovieTrendingApiResponse> => {
     };
   }
 };
-export { getTrendingMovies, getMovieByTitle };
+
+const getMovieData = async (
+  imdbid: string
+): Promise<ApiMovieResponse | MovieApiErrorResponse> => {
+  try {
+    const url = `http://localhost:8000/api/v1/tmdb/moviesdata/${imdbid}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data: ApiMovieResponse = await response.json();
+    return data;
+  } catch (error: unknown) {
+    console.error("Error fetching movie by title:", error);
+
+    return {
+      success: false,
+      type: "Movie error",
+      status: 400,
+      message: "Something went wrong",
+    };
+  }
+};
+export { getTrendingMovies, getMovieByTitle, getMovieData };

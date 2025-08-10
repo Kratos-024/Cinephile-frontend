@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MoviePage } from "./pages/MoviePage";
 import { GenrePage } from "./pages/GenrePage";
 import { UserProfile } from "./pages/UserProfile";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const [menu, setMenu] = useState<boolean>(true);
@@ -15,6 +16,8 @@ function App() {
   };
   return (
     <section className="">
+      <ToastContainer />
+
       <BrowserRouter>
         <Routes>
           <Route
