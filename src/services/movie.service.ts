@@ -64,10 +64,18 @@ export interface MovieImage {
 }
 
 export interface MovieVideo {
-  title: string;
-  videoUrl: string;
-  imageUrl: string;
-  imageAlt: string;
+  src: string;
+  type: string;
+  poster: string;
+  className: string;
+  id: string;
+  preload: string;
+  controls: boolean;
+  autoplay: boolean;
+  muted: boolean;
+  loop: boolean;
+  width: number;
+  height: number;
 }
 
 export interface MovieRatings {
@@ -81,7 +89,10 @@ export interface MovieRatings {
     backgroundColor: string;
   };
 }
-
+export interface MovieRating {
+  Source: string;
+  Value: string;
+}
 interface MovieStoryline {
   tagline: string;
   story: string;
@@ -90,12 +101,24 @@ interface MovieStoryline {
 }
 
 interface MovieData {
+  Awards: string;
+  Director: string;
+  Country: string;
+  Rated: string;
+  Runtime: string;
+  Released: string;
+  genre: string;
   cast: CastMember[];
   images: MovieImage[];
   ratings: MovieRatings;
   storyline: MovieStoryline;
-  videos: MovieVideo[];
+  rating: MovieRating[];
+  storyLine: string;
+  videoSources: MovieVideo[];
   scrapedAt: string;
+  Language: string;
+  BoxOffice: string;
+  title: string;
   url: string;
 }
 
