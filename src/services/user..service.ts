@@ -563,6 +563,25 @@ const getCurrentUser = async (
   console.log("Getting current user profile...");
   return getUserProfile(undefined, token);
 };
+const getUserInfo = async (token: string) => {
+  try {
+    console.log("Adding to user profile watchlist:");
+    const url = API_BASE_URL + "/api/v1/user/getUserInfo";
+    const header = getAuthHeaders(token);
+    console.log(header);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: header,
+    });
+    console.log(response);
+    const data = await handleFetchResponse(response);
+    console.log(data);
+    return data;
+  } catch (error) {
+    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
+  }
+};
 
 export {
   RemoveFromWatchlist,
@@ -584,4 +603,5 @@ export {
   getUserProfile,
   isAuthenticated,
   getCurrentUser,
+  getUserInfo,
 };
