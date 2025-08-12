@@ -16,51 +16,56 @@ export const MoviePage = () => {
   const [menu, setMenu] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [movieData, setMovieData] = useState<ApiMovieResponse["data"]>({
-    Awards: "",
-    Director: "",
-    Country: "",
-    Rated: "",
-    Runtime: "",
-    Released: "",
-    genre: "",
-    title: "",
-    Language: "",
-    rating: [{ Source: "", Value: "" }],
-    storyLine: "",
-    BoxOffice: "",
-    cast: [],
-    images: [],
-    ratings: {
-      imdbScore: {
-        rating: "",
-        totalVotes: "",
-        fullRating: "",
+  const [movieData, setMovieData] = useState<ApiMovieResponse>({
+    imdb_id: "",
+    success: false,
+    source: "",
+    data: {
+      Awards: "",
+      Director: "",
+      Country: "",
+      Rated: "",
+      Runtime: "",
+      Released: "",
+      genre: "",
+      title: "",
+      Language: "",
+      rating: [{ Source: "", Value: "" }],
+      storyLine: "",
+      BoxOffice: "",
+      cast: [],
+      images: [],
+      ratings: {
+        imdbScore: {
+          rating: "",
+          totalVotes: "",
+          fullRating: "",
+        },
+        metascore: {
+          score: "",
+          backgroundColor: "",
+        },
       },
-      metascore: {
-        score: "",
-        backgroundColor: "",
-      },
+      storyline: { tagline: "", story: "", genres: [""], keywords: [""] },
+      videoSources: [
+        {
+          src: "",
+          type: "",
+          poster: "",
+          className: "",
+          id: "",
+          preload: "",
+          controls: false,
+          autoplay: false,
+          muted: false,
+          loop: false,
+          width: 0,
+          height: 0,
+        },
+      ],
+      scrapedAt: "",
+      url: "",
     },
-    storyline: { tagline: "", story: "", genres: [""], keywords: [""] },
-    videoSources: [
-      {
-        src: "",
-        type: "",
-        poster: "",
-        className: "",
-        id: "",
-        preload: "",
-        controls: false,
-        autoplay: false,
-        muted: false,
-        loop: false,
-        width: 0,
-        height: 0,
-      },
-    ],
-    scrapedAt: "",
-    url: "",
   });
 
   const menuHandler = () => {
@@ -76,9 +81,9 @@ export const MoviePage = () => {
         try {
           const response: MovieResponse = await getMovieData(id);
           if (response.success) {
-            console.log("Fetched movieData:", response.data);
+            console.log("Fetched movieData:", response);
             console.log("Fetched movieData:", response.data.Rated);
-            setMovieData(response.data);
+            setMovieData(response);
           }
         } catch (error) {
           console.error("Error fetching movie data:", error);
@@ -91,20 +96,20 @@ export const MoviePage = () => {
   }, [id]);
 
   useEffect(() => {
-    if (movieData.images && movieData.images.length > 0) {
+    if (movieData["data"].images && movieData["data"].images.length > 0) {
       const interval = setInterval(() => {
         setCurrentImageIndex(
-          (prevIndex) => (prevIndex + 1) % movieData.images.length
+          (prevIndex) => (prevIndex + 1) % movieData["data"].images.length
         );
       }, 10000);
 
       return () => clearInterval(interval);
     }
-  }, [movieData.images]);
+  }, [movieData["data"].images]);
 
   const currentBackgroundImage =
-    movieData.images && movieData.images.length > 0
-      ? (movieData.images[currentImageIndex]?.src || "").replace(
+    movieData["data"].images && movieData["data"].images.length > 0
+      ? (movieData["data"].images[currentImageIndex]?.src || "").replace(
           /_V1_.*\.jpg$/,
           "_V1_.jpg"
         )

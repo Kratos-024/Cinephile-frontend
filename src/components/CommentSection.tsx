@@ -1,70 +1,117 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth } from "../firebase/firebase";
+
 export interface commentType {
+  imdb_id: string;
   title: string;
   comment: string;
-  displayName: string;
+  userDisplayName: string;
   photoURL: string;
   rating: number;
 }
+
 export type CommentSectionProps = {
   onHandler: (data: commentType) => void;
+  imdb_id: string;
+  userReview?: commentType;
 };
 
-export const CommentSection = ({ onHandler }: CommentSectionProps) => {
+export const CommentSection = ({
+  onHandler,
+  imdb_id,
+  userReview,
+}: CommentSectionProps) => {
   const [title, setTitle] = useState<string>("");
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
   const [displayName, setDisplayName] = useState<string>("");
   const [photoURL, setPhotoURL] = useState<string>("");
 
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      setDisplayName(user.displayName || "");
-      setPhotoURL(user.photoURL || "");
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setDisplayName(user.displayName || "");
+        setPhotoURL(user.photoURL || "");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (userReview) {
+      setTitle(userReview.title);
+      setComment(userReview.comment);
+      setRating(userReview.rating);
     }
-  });
+  }, [userReview]);
+
+  const handleSubmit = async () => {
+    if (!comment.trim() || !title.trim() || rating === 0) {
+      alert("Please fill in all fields and provide a rating");
+      return;
+    }
+
+    onHandler({
+      imdb_id: imdb_id,
+      title: title,
+      comment: comment,
+      rating: rating,
+      userDisplayName: displayName,
+      photoURL: photoURL,
+    });
+
+    setTitle("");
+    setComment("");
+    setRating(0);
+  };
+
   return (
     <section>
-      <div className="flex flex-col w-fit ">
-        <div>
-          <img src={photoURL} className="rounded-full p-2" />
-          <p>{displayName}</p>
+      <div className="flex flex-col w-full max-w-2xl">
+        <div className="flex items-center gap-3 mb-4">
+          <img
+            src={photoURL || "/default-avatar.png"}
+            alt="User avatar"
+            className="w-12 h-12 rounded-full object-cover"
+          />
+          <p className="text-white font-medium">{displayName}</p>
         </div>
-        <div className="flex gap-2 mb-1">
+
+        <div className="flex gap-2 mb-4">
           <input
-            className=" bg-gray-800/50 placeholder:p-2 rounded-md"
+            className="flex-1 bg-gray-800/50 text-white p-3 rounded-md placeholder-gray-400"
+            value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-          ></input>
-          <input
-            className=" bg-gray-800/50 placeholder:p-2 rounded-md"
-            onChange={(e) => setRating(+e.target.value)}
-            placeholder="Rating"
-          ></input>
+            placeholder="Review title"
+          />
+          <div className="flex flex-col">
+            <input
+              type="number"
+              min="1"
+              max="5"
+              className="bg-gray-800/50 text-white p-3 rounded-md placeholder-gray-400 w-24"
+              value={rating || ""}
+              onChange={(e) => setRating(Number(e.target.value))}
+              placeholder="1-5"
+            />
+            <span className="text-xs text-gray-400 mt-1">Rating</span>
+          </div>
         </div>
+
         <textarea
           rows={5}
-          cols={100}
-          className="text-gray-400 rounded-xl placeholder:p-2 bg-gray-800/50"
-          placeholder="Reply as reviewer"
+          className="text-white rounded-xl p-3 bg-gray-800/50 placeholder-gray-400 resize-none"
+          placeholder="Write your review..."
+          value={comment}
           onChange={(e) => setComment(e.target.value)}
-        ></textarea>
+        />
 
-        <div className="flex justify-end mt-2">
+        <div className="flex justify-end gap-3 mt-4">
           <button
-            onClick={() =>
-              onHandler({
-                title: title,
-                comment: comment,
-                rating: rating,
-                displayName: displayName,
-                photoURL: photoURL,
-              })
-            }
-            className="cursor-pointer rounded-lg bg-green-700 text-white font-semibold px-4 py-2"
+            onClick={handleSubmit}
+            className="cursor-pointer rounded-lg bg-green-700 hover:bg-green-600 text-white font-semibold px-6 py-2 transition-colors"
           >
-            COMMENT
+            SUBMIT
           </button>
         </div>
       </div>

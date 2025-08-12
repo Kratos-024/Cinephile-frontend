@@ -22,7 +22,7 @@ export interface UserPreference {
 export interface UserReview {
   id: string;
   userId: string;
-  tmdbId: number;
+  imdbid: number;
   title: string;
   review: string;
   rating?: number;
@@ -88,7 +88,7 @@ export interface AuthResponse extends UserApiResponse {
   };
 }
 
-const getAuthHeaders = (token?: string) => {
+export const getAuthHeaders = (token?: string) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -229,7 +229,6 @@ const logoutUser = (): void => {
   localStorage.removeItem("authToken");
 };
 
-// User Preference Services
 const saveUserPreferences = async (
   preferences: SelectedMovie[],
   token?: string
@@ -302,7 +301,6 @@ const updateUserPreferences = async (
   }
 };
 
-// User Review Services
 const saveUserReview = async (
   tmdbId: number,
   title: string,
@@ -331,33 +329,38 @@ const saveUserReview = async (
   }
 };
 
-const getUserReviews = async (
-  userId?: string,
-  limit: number = 10,
-  offset: number = 0,
-  token?: string
-): Promise<UserReviewsApiResponse> => {
+const getUserReviewsHandler = async ({
+  userId,
+  token,
+}: {
+  userId?: string;
+  token: string;
+}): Promise<any> => {
   try {
     const url = userId
-      ? `${API_BASE_URL}/api/v1/user/reviews/${userId}?limit=${limit}&offset=${offset}`
-      : `${API_BASE_URL}/api/v1/user/reviews?limit=${limit}&offset=${offset}`;
-
-    console.log("Getting user reviews from:", url);
+      ? `http://localhost:8000/api/v1/user/reviews/${userId}`
+      : `http://localhost:8000/api/v1/user/reviews`;
 
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
     });
 
-    const data: UserReviewsApiResponse = await handleFetchResponse(response);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
     return data;
-  } catch (error) {
-    const errorResponse = handleFetchError(error, "getUserReviews");
+  } catch (error: any) {
+    console.error("Error getting user reviews:", error);
     return {
-      ...errorResponse,
-      data: [],
-      total: 0,
-    } as UserReviewsApiResponse;
+      success: false,
+      status: 500,
+      message: "Something went wrong while getting user reviews",
+      type: "INTERNAL_ERROR",
+    };
   }
 };
 
@@ -594,7 +597,7 @@ export {
   getUserPreferences,
   updateUserPreferences,
   saveUserReview,
-  getUserReviews,
+  getUserReviewsHandler,
   deleteUserReview,
   followUser,
   unfollowUser,

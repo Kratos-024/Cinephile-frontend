@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { commentType } from "../components/CommentSection";
+import { getAuthHeaders } from "./user..service";
+
 interface MovieTitleResult {
   Title: string;
   Year: string;
@@ -122,7 +126,7 @@ interface MovieData {
   url: string;
 }
 
-interface MovieApiResponse {
+export interface MovieApiResponse {
   success: boolean;
   imdb_id: string;
   data: MovieData;
@@ -263,4 +267,150 @@ const getMovieData = async (
     };
   }
 };
-export { getTrendingMovies, getMovieByTitle, getMovieData };
+export interface CommentResponseType {
+  success: boolean;
+  message: string;
+  data: {
+    reviewId: string;
+    userId: string;
+    tmdbId: string;
+    title: string;
+  };
+}
+interface CommentErrorResponseType {
+  success: false;
+  status: number;
+  message: string;
+  type: string;
+}
+const deleteCommentHandler = async ({
+  imdb_id,
+  token,
+}: {
+  imdb_id: string;
+  token: string;
+}): Promise<CommentResponseType | CommentErrorResponseType> => {
+  try {
+    const url = `http://localhost:8000/api/v1/user/reviews/${imdb_id}`;
+
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: getAuthHeaders(token),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: CommentResponseType = await response.json();
+    console.log(data);
+    return data;
+  } catch (error: any) {
+    console.error("Error deleting review:", error);
+
+    if (error) {
+      return {
+        success: false,
+        status: error.statusCode,
+        message: error.message,
+        type: error.type,
+      };
+    } else {
+      return {
+        success: false,
+        status: 500,
+        message: "Something went wrong while deleting review",
+        type: "INTERNAL_ERROR",
+      };
+    }
+  }
+};
+
+const submitCommentHandler = async ({
+  data: { imdb_id, title, comment, rating, photoURL, displayName },
+  token,
+}: {
+  data: commentType;
+  token: string;
+}): Promise<CommentResponseType | CommentErrorResponseType> => {
+  try {
+    const url = `http://localhost:8000/api/v1/user/reviews/`;
+    const commentData = {
+      imdb_id,
+      title,
+      comment,
+      rating,
+      photoURL,
+      displayName,
+    };
+    const response = await fetch(url, {
+      method: "POST",
+      headers: getAuthHeaders(token),
+      body: JSON.stringify(commentData),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data: CommentResponseType = await response.json();
+    console.log(data);
+    return data;
+  } catch (error: any) {
+    console.error("Error saving review:", error);
+
+    if (error) {
+      return {
+        success: false,
+        status: error.statusCode,
+        message: error.message,
+        type: error.type,
+      };
+    } else {
+      return {
+        success: false,
+        status: 500,
+        message: "Something went wrong while saving review",
+        type: "INTERNAL_ERROR",
+      };
+    }
+  }
+};
+const getMovieReviewsHandler = async ({
+  imdb_id,
+}: {
+  imdb_id: string;
+}): Promise<any> => {
+  try {
+    const url = `http://localhost:8000/api/v1/tmdb/moviesdata/reviews/${imdb_id}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error("Error getting movie reviews:", error);
+    return {
+      success: false,
+      status: 500,
+      message: "Something went wrong while getting movie reviews",
+      type: "INTERNAL_ERROR",
+    };
+  }
+};
+
+export {
+  getTrendingMovies,
+  getMovieByTitle,
+  getMovieData,
+  submitCommentHandler,
+  deleteCommentHandler,
+  getMovieReviewsHandler,
+};
