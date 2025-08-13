@@ -1,3 +1,5 @@
+import type { Timestamp } from "firebase/firestore";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const API_BASE_URL = "http://localhost:8000";
 
@@ -41,6 +43,18 @@ export interface UserProfile {
   followingCount: number;
   createdAt: any;
   updatedAt: any;
+}
+
+export interface UserProfileResponse {
+  success: boolean;
+  data: {
+    displayName: string;
+    email: string;
+    emailVerified: boolean;
+    joinedDate: Timestamp;
+    photoURL: string;
+    updatedAt: Timestamp;
+  };
 }
 
 export interface UserFollowData {
@@ -101,18 +115,12 @@ export const getAuthHeaders = (token?: string) => {
 };
 
 const handleFetchResponse = async (response: Response): Promise<any> => {
-  console.log("Response status:", response.status);
-  console.log("Response headers:", response.headers);
-
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 
   const contentLength = response.headers.get("content-length");
   const contentType = response.headers.get("content-type");
-
-  console.log("Content-Length:", contentLength);
-  console.log("Content-Type:", contentType);
 
   if (contentLength === "0") {
     throw new Error("Server returned empty response");
@@ -123,8 +131,8 @@ const handleFetchResponse = async (response: Response): Promise<any> => {
     console.log("Non-JSON response:", text);
     throw new Error("Server returned non-JSON response");
   }
-
   const data = await response.json();
+
   return data;
 };
 
@@ -329,17 +337,37 @@ const saveUserReview = async (
   }
 };
 
-const getUserReviewsHandler = async ({
-  userId,
-  token,
-}: {
+export interface MovieApiReview {
+  id: string;
+  imdb_id: string;
+  title: string;
+  comment: string;
+  rating: number;
+  userDisplayName: string;
+  userId: string;
+  userPhotoURL: string;
+  timestamp: string;
+  updatedAt: Timestamp;
+}
+
+export interface MovieCommentResponse {
+  imdb_id: string;
+  id?: string;
+  rating: number;
+  userDisplayName: string;
+  comment: string;
+  title: string;
   userId?: string;
-  token: string;
-}): Promise<any> => {
+  userPhotoURL: string;
+  timestamp?: string;
+  updatedAt?: Timestamp;
+}
+const getUserReviewsHandler = async (
+  userId: string,
+  token: string
+): Promise<any> => {
   try {
-    const url = userId
-      ? `http://localhost:8000/api/v1/user/reviews/${userId}`
-      : `http://localhost:8000/api/v1/user/reviews`;
+    const url = `http://localhost:8000/api/v1/user/reviews/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -350,8 +378,7 @@ const getUserReviewsHandler = async ({
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log(data);
+    const data: MovieCommentResponse = await response.json();
     return data;
   } catch (error: any) {
     console.error("Error getting user reviews:", error);
@@ -481,23 +508,22 @@ const getUserFollowing = async (
 };
 
 const getUserProfile = async (
-  userId?: string,
-  token?: string
-): Promise<UserProfileApiResponse> => {
+  userId: string,
+  token: string
+): Promise<UserProfileResponse | UserProfileApiResponse> => {
   try {
     const url = userId
       ? `${API_BASE_URL}/api/v1/user/profile/${userId}`
       : `${API_BASE_URL}/api/v1/user/profile`;
 
-    console.log("Getting user profile from:", url);
     const header = getAuthHeaders(token);
     console.log(header);
     const response = await fetch(url, {
       method: "GET",
       headers: header,
     });
+    const data: UserProfileResponse = await handleFetchResponse(response);
 
-    const data: UserProfileApiResponse = await handleFetchResponse(response);
     return data;
   } catch (error) {
     return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
@@ -541,7 +567,6 @@ const RemoveFromWatchlist = async (
   }
 ): Promise<UserProfileApiResponse> => {
   try {
-    console.log("Removing watchlist from user:");
     const url = API_BASE_URL + "/api/v1/user/RemoveFromWatchlist";
 
     const response = await fetch(url, {
@@ -558,32 +583,6 @@ const RemoveFromWatchlist = async (
 };
 const isAuthenticated = (): boolean => {
   return !!localStorage.getItem("authToken");
-};
-
-const getCurrentUser = async (
-  token?: string
-): Promise<UserProfileApiResponse> => {
-  console.log("Getting current user profile...");
-  return getUserProfile(undefined, token);
-};
-const getUserInfo = async (token: string) => {
-  try {
-    console.log("Adding to user profile watchlist:");
-    const url = API_BASE_URL + "/api/v1/user/getUserInfo";
-    const header = getAuthHeaders(token);
-    console.log(header);
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: header,
-    });
-    console.log(response);
-    const data = await handleFetchResponse(response);
-    console.log(data);
-    return data;
-  } catch (error) {
-    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
-  }
 };
 
 export {
@@ -605,6 +604,4 @@ export {
   getUserFollowing,
   getUserProfile,
   isAuthenticated,
-  getCurrentUser,
-  getUserInfo,
 };

@@ -178,14 +178,12 @@ export const NavBar = ({
               onClick={handleUserClick}
             />
 
-            {/* Loading indicator */}
             {isLoading && (
               <div className="absolute -top-1 -right-1">
                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
               </div>
             )}
 
-            {/* User Popup - only show for logged in users or error states */}
             {showUserPopup && (
               <UserPopup
                 isLoggedIn={isLoggedIn}

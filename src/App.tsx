@@ -37,7 +37,16 @@ function App() {
             <Route path="/movie/:id/:title" element={<MoviePage />}></Route>
             <Route path="/genres" element={<GenrePage />}></Route>{" "}
             <Route
-              path="/userprofile"
+              path="/userprofile/myprofile"
+              element={
+                <Container>
+                  <Menu menu={menu} />
+                  <UserProfile menu={menu} menuHandler={menuHandler} />{" "}
+                </Container>
+              }
+            ></Route>
+            <Route
+              path="/profile/:userid/:username"
               element={
                 <Container>
                   <Menu menu={menu} />

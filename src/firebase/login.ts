@@ -1,6 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { auth, googleProvider } from "./firebase";
+import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, updateProfile } from "firebase/auth";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+async function createOrUpdateUserProfile(user: any) {
+  try {
+    const userRef = doc(db, "user_profiles", user.uid);
+    const userDoc = await getDoc(userRef);
+
+    const profileData = {
+      displayName: user.displayName || "",
+      email: user.email || "",
+      photoURL: user.photoURL || "",
+      emailVerified: user.emailVerified || false,
+      updatedAt: serverTimestamp(),
+    };
+
+    if (userDoc.exists()) {
+      await updateDoc(userRef, profileData);
+    } else {
+      await setDoc(userRef, {
+        ...profileData,
+        joinedDate: serverTimestamp(),
+      });
+    }
+  } catch (err) {
+    console.error("Error creating/updating user profile:", err);
+  }
+}
 
 export async function googleLogin() {
   try {
@@ -9,6 +41,7 @@ export async function googleLogin() {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     const idToken = await user.getIdToken();
+    await createOrUpdateUserProfile(user);
 
     console.log("Firebase auth successful:", user);
 
@@ -28,7 +61,6 @@ export async function googleLogin() {
   } catch (error) {
     console.error("Google login error:", error);
 
-    // Handle Firebase auth errors
     if (typeof error === "object" && error !== null && "code" in error) {
       const errorCode = error.code as string;
       const errorMessage =
@@ -81,16 +113,16 @@ export async function createAccountWithEmail(
   try {
     const { createUserWithEmailAndPassword } = await import("firebase/auth");
 
-    // Create user in Firebase Auth
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
 
-    // Update profile if displayName provided
     if (displayName) {
       await updateProfile(user, { displayName });
     }
 
     const idToken = await user.getIdToken();
+    await createOrUpdateUserProfile(user);
+
     localStorage.setItem("authToken", idToken);
 
     return {

@@ -327,7 +327,7 @@ const deleteCommentHandler = async ({
 };
 
 const submitCommentHandler = async ({
-  data: { imdb_id, title, comment, rating, photoURL, displayName },
+  data: { imdb_id, title, comment, rating, userPhotoURL, userDisplayName },
   token,
 }: {
   data: commentType;
@@ -340,8 +340,8 @@ const submitCommentHandler = async ({
       title,
       comment,
       rating,
-      photoURL,
-      displayName,
+      userPhotoURL,
+      userDisplayName,
     };
     const response = await fetch(url, {
       method: "POST",

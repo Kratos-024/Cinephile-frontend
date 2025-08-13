@@ -6,7 +6,7 @@ export interface commentType {
   title: string;
   comment: string;
   userDisplayName: string;
-  photoURL: string;
+  userPhotoURL: string;
   rating: number;
 }
 
@@ -25,7 +25,7 @@ export const CommentSection = ({
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
   const [displayName, setDisplayName] = useState<string>("");
-  const [photoURL, setPhotoURL] = useState<string>("");
+  const [userPhotoURL, setPhotoURL] = useState<string>("");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -50,14 +50,13 @@ export const CommentSection = ({
       alert("Please fill in all fields and provide a rating");
       return;
     }
-
     onHandler({
       imdb_id: imdb_id,
       title: title,
       comment: comment,
       rating: rating,
       userDisplayName: displayName,
-      photoURL: photoURL,
+      userPhotoURL: userPhotoURL,
     });
 
     setTitle("");
@@ -70,7 +69,7 @@ export const CommentSection = ({
       <div className="flex flex-col w-full max-w-2xl">
         <div className="flex items-center gap-3 mb-4">
           <img
-            src={photoURL || "/default-avatar.png"}
+            src={userPhotoURL || "/default-avatar.png"}
             alt="User avatar"
             className="w-12 h-12 rounded-full object-cover"
           />

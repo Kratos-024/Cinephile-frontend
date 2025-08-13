@@ -1,5 +1,14 @@
 import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getUserProfile,
+  getUserReviewsHandler,
+  type MovieApiReview,
+  type UserProfileApiResponse,
+  type UserProfileResponse,
+} from "../services/user..service";
+import { Timestamp } from "firebase/firestore";
+// import { getUserProfile } from "../services/user..service";
 
 interface Movie {
   id: number;
@@ -270,7 +279,37 @@ const FilmSection = () => {
   );
 };
 
-const ReviewsSection = () => {
+const ReviewsSection = ({ userId }: { userId: string }) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [review, setReview] = useState<MovieApiReview>({
+    id: "",
+    imdb_id: "",
+    title: "",
+    comment: "",
+    rating: 0,
+    userDisplayName: "",
+    userId: "",
+    userPhotoURL: "",
+    timestamp: "",
+    updatedAt: Timestamp.now(),
+  });
+
+  useEffect(() => {
+    const getUserReview = async () => {
+      setLoading(true);
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        return;
+      }
+      const response = await getUserReviewsHandler(userId, token);
+      if (response.success) {
+        setReview(response.data);
+        setLoading(false);
+      }
+    };
+    getUserReview();
+  }, []);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -279,7 +318,12 @@ const ReviewsSection = () => {
         </h2>
         <button className="text-gray-400 text-sm hover:text-white">MORE</button>
       </div>
-
+      {loading && (
+        <div className="flex justify-center items-center mb-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          <span className="text-white ml-3">Loading movies...</span>
+        </div>
+      )}
       <div className="flex gap-4 p-4 bg-gray-800 bg-opacity-30 rounded">
         <img
           src="https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg"
@@ -479,29 +523,55 @@ const ProfileSection = () => {
     </div>
   );
 };
-export const UserProfileHero = () => {
+export const UserProfileHero = ({ userid }: { userid: string }) => {
   const [navigation, setNavigation] = useState("Profile");
   const navigationHandler = (nav: string) => {
     setNavigation(nav);
   };
+  const [user, setUser] = useState<UserProfileResponse["data"]>();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+
+      const response = await getUserProfile(userid, token);
+
+      if (response.success) {
+        const userResponse = response as UserProfileResponse;
+
+        const data: UserProfileResponse["data"] = userResponse.data || {
+          displayName: "",
+          email: "",
+          emailVerified: false,
+          joinedDate: Timestamp.now(),
+          photoURL: "",
+          updatedAt: Timestamp.now(),
+        };
+        setUser(data);
+      }
+    };
+    getUser();
+  }, []);
+
   return (
     <section className="bg-primary w-full min-h-screen  pb-[96px]">
       <div className="relative">
         <img
           className="w-full h-[340px] relative"
-          src="images/heroImages/cinemaCover.png"
+          src={`${user?.photoURL}`}
           alt="user-profile-hero"
         />
         <div className="flex items-start gap-6 px-8 -mt-20 relative z-10">
           <img
             className="rounded-full w-[246px] h-[246px] object-cover border-4 border-white"
-            src="images/heroImages/userProfile.jpg"
+            src={`${user?.photoURL}`}
             alt="profile"
           />
           <div className="flex-1 flex justify-between mt-[86px]">
             <div className="flex flex-col gap-4 mb-4">
               <h1 className="text-white text-4xl font-bold">
-                Priyanshu Tiwari
+                {user?.displayName}
               </h1>
               <p className="text-gray-300 text-lg mb-6">
                 It makes you forget the wonderful yesterday
@@ -551,7 +621,7 @@ export const UserProfileHero = () => {
       </div>
 
       {navigation == "Profile" && <ProfileSection />}
-      {navigation === "Reviews" && <ReviewsSection />}
+      {navigation === "Reviews" && <ReviewsSection userId={userid} />}
       {navigation === "Films" && <FilmSection />}
       {navigation === "Watchlist" && <WatchlistSection />}
     </section>

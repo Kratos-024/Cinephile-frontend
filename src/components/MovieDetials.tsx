@@ -9,6 +9,8 @@ import {
 } from "../services/movie.service";
 import { toast } from "react-toastify";
 import { MdDeleteForever } from "react-icons/md";
+import type { MovieCommentResponse } from "../services/user..service";
+import { Link } from "react-router-dom";
 
 export const MovieDetails = ({
   movieData,
@@ -17,8 +19,8 @@ export const MovieDetails = ({
 }) => {
   const [activeTab, setActiveTab] = useState("Info");
   const [selectedLanguage, setSelectedLanguage] = useState("Tamil");
-  const [reviews, setReview] = useState<commentType[]>([]);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [reviews, setReview] = useState<MovieCommentResponse[]>([]);
+  const [loading, setLoading] = useState(false);
   const imdbId = movieData["imdb_id"];
 
   useEffect(() => {
@@ -31,7 +33,6 @@ export const MovieDetails = ({
     setLoading(true);
     try {
       const response = await getMovieReviewsHandler({ imdb_id: imdbId });
-      console.log(response);
       if (response?.success) {
         setReview(response.data);
       } else {
@@ -70,7 +71,7 @@ export const MovieDetails = ({
     title,
     comment,
     rating,
-    photoURL,
+    userPhotoURL,
     userDisplayName,
   }: commentType) => {
     const newReview = {
@@ -78,7 +79,7 @@ export const MovieDetails = ({
       title: title,
       comment: comment,
       rating: rating,
-      photoURL: photoURL,
+      userPhotoURL: userPhotoURL,
       userDisplayName,
     };
 
@@ -92,7 +93,7 @@ export const MovieDetails = ({
           title: title,
           comment: comment,
           rating: rating,
-          photoURL: photoURL,
+          userPhotoURL: userPhotoURL,
           userDisplayName,
         },
         token,
@@ -360,7 +361,6 @@ export const MovieDetails = ({
 
                   {activeTab === "Reviews" && (
                     <div className="max-w-4xl mx-auto p-6">
-                      {/* Show loading spinner when fetching comments */}
                       {loading ? (
                         <div className="flex items-center justify-center py-12">
                           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
@@ -378,94 +378,101 @@ export const MovieDetails = ({
                             )}
                           />
                           <div className="space-y-6 mt-8">
-                            {reviews.map((review: commentType, idx) => (
-                              <div
-                                key={idx}
-                                className="bg-gradient-to-br from-gray-800/60 to-gray-900/40 backdrop-blur-sm
-        border border-gray-700/50 p-6 rounded-xl shadow-lg
-        hover:shadow-xl transition-all duration-300
-        hover:border-gray-600/50 group relative"
-                              >
-                                {/* Delete Icon - Positioned absolutely in top right */}
-                                <div
-                                  onClick={() => {
-                                    onDeleteReviewHandler(movieData["imdb_id"]);
-                                  }}
-                                  className="absolute top-4 right-4 cursor-pointer p-2 rounded-full
+                            {reviews.map(
+                              (review: MovieCommentResponse, idx) => (
+                                <Link
+                                  to={`/profile/${review.userId}/${review.userDisplayName}`}
+                                >
+                                  <div
+                                    key={idx}
+                                    className="bg-gradient-to-br from-gray-800/60 to-gray-900/40 backdrop-blur-sm
+                                                        border border-gray-700/50 p-6 rounded-xl shadow-lg
+                                                        hover:shadow-xl transition-all duration-300
+                                                        hover:border-gray-600/50 group relative"
+                                  >
+                                    <div
+                                      onClick={() => {
+                                        onDeleteReviewHandler(
+                                          movieData["imdb_id"]
+                                        );
+                                      }}
+                                      className="absolute top-4 right-4 cursor-pointer p-2 rounded-full
           bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300
           transition-all duration-200 opacity-0 group-hover:opacity-100
           hover:scale-110 active:scale-95"
-                                  title="Delete Review"
-                                >
-                                  <MdDeleteForever className="w-5 h-5" />
-                                </div>
+                                      title="Delete Review"
+                                    >
+                                      <MdDeleteForever className="w-5 h-5" />
+                                    </div>
 
-                                <div className="flex items-start gap-4 mb-4">
-                                  <div className="relative flex-shrink-0">
-                                    <img
-                                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-600/50
+                                    <div className="flex items-start gap-4 mb-4">
+                                      <div className="relative flex-shrink-0">
+                                        <img
+                                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-600/50
               group-hover:border-gray-500/70 transition-colors duration-300"
-                                      src={
-                                        review.photoURL || "/default-avatar.png"
-                                      }
-                                      alt={`${review.userDisplayName}'s avatar`}
-                                    />
-                                    <div
-                                      className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500
+                                          src={
+                                            review.userPhotoURL ||
+                                            "/default-avatar.png"
+                                          }
+                                          alt={`${review.userDisplayName}'s avatar`}
+                                        />
+                                        <div
+                                          className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500
               rounded-full border-2 border-gray-800"
-                                    ></div>
-                                  </div>
-                                  <div className="flex-1 min-w-0 pr-8">
-                                    {" "}
-                                    {/* Added pr-8 to avoid overlap with delete icon */}
-                                    <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                                      <div className="flex items-center gap-3">
-                                        <h4 className="font-semibold text-white text-lg">
-                                          {review.userDisplayName}
-                                        </h4>
-                                        <span className="text-gray-400 text-sm">
-                                          @
-                                          {review.userDisplayName
-                                            .toLowerCase()
-                                            .replace(/\s+/g, "")}
-                                        </span>
+                                        ></div>
                                       </div>
-                                    </div>
-                                    <div className="flex items-center gap-2 mb-3">
-                                      <div className="flex items-center gap-1">
-                                        {[...Array(5)].map((_, i) => (
-                                          <span
-                                            key={i}
-                                            className={`text-lg transition-colors duration-200 ${
-                                              i < review.rating
-                                                ? "text-yellow-400 drop-shadow-sm"
-                                                : "text-gray-600"
-                                            }`}
-                                          >
-                                            ★
+                                      <div className="flex-1 min-w-0 pr-8">
+                                        {" "}
+                                        <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                                          <div className="flex items-center gap-3">
+                                            <h4 className="font-semibold text-white text-lg">
+                                              {review.userDisplayName}
+                                            </h4>
+                                            <span className="text-gray-400 text-sm">
+                                              @
+                                              {review.userDisplayName
+                                                .toLowerCase()
+                                                .replace(/\s+/g, "")}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                          <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, i) => (
+                                              <span
+                                                key={i}
+                                                className={`text-lg transition-colors duration-200 ${
+                                                  i < review.rating
+                                                    ? "text-yellow-400 drop-shadow-sm"
+                                                    : "text-gray-600"
+                                                }`}
+                                              >
+                                                ★
+                                              </span>
+                                            ))}
+                                          </div>
+                                          <span className="text-sm font-medium text-gray-300">
+                                            {review.rating}/5
                                           </span>
-                                        ))}
+                                        </div>
                                       </div>
-                                      <span className="text-sm font-medium text-gray-300">
-                                        {review.rating}/5
-                                      </span>
+                                    </div>
+
+                                    <div className="ml-16">
+                                      {review.title && (
+                                        <h5 className="font-medium text-gray-200 mb-3 text-lg leading-relaxed">
+                                          "{review.title}"
+                                        </h5>
+                                      )}
+
+                                      <p className="text-gray-300 leading-relaxed text-base">
+                                        {review.comment}
+                                      </p>
                                     </div>
                                   </div>
-                                </div>
-
-                                <div className="ml-16">
-                                  {review.title && (
-                                    <h5 className="font-medium text-gray-200 mb-3 text-lg leading-relaxed">
-                                      "{review.title}"
-                                    </h5>
-                                  )}
-
-                                  <p className="text-gray-300 leading-relaxed text-base">
-                                    {review.comment}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
+                                </Link>
+                              )
+                            )}
 
                             {!loading && reviews.length === 0 && (
                               <div className="text-center py-12">

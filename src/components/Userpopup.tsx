@@ -4,6 +4,7 @@ import { IoClose } from "react-icons/io5";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import type { UserProfile } from "../services/user..service";
+import { useNavigate } from "react-router-dom";
 
 interface UserPopupProps {
   isLoggedIn: boolean;
@@ -19,7 +20,7 @@ export const UserPopup = ({
   onAuthChange,
 }: UserPopupProps) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
   const handleLogout = async () => {
     setIsLoading(true);
     try {
@@ -38,10 +39,9 @@ export const UserPopup = ({
   const handleMyProfile = () => {
     console.log("Navigate to profile");
     onClose();
-    // Add your navigation logic here
+    navigate("/userprofile/myprofile");
   };
 
-  // Only show popup for logged-in users
   if (!isLoggedIn) {
     return null;
   }
@@ -58,7 +58,6 @@ export const UserPopup = ({
 
       <div className="p-4">
         <div className="space-y-4">
-          {/* User Info */}
           <div className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
             <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
               {userProfile?.photoURL ? (
@@ -81,7 +80,6 @@ export const UserPopup = ({
             </div>
           </div>
 
-          {/* User Stats */}
           {userProfile && (
             <div className="flex justify-between p-3 bg-gray-800/30 rounded-lg">
               <div className="text-center">
@@ -103,7 +101,6 @@ export const UserPopup = ({
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="space-y-2">
             <button
               onClick={handleMyProfile}

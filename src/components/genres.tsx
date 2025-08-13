@@ -205,8 +205,6 @@ const MoviesApp = () => {
                   setSuggestions([]);
                 }}
               />
-
-              {/* 🔽 Suggestions Dropdown */}
               {suggestions.length > 0 && (
                 <ul className="absolute top-[110%] left-0 right-0 bg-[#222] text-white z-10 rounded-md overflow-hidden shadow-lg">
                   {suggestions.map((sug, i) => (

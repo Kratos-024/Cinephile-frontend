@@ -3,8 +3,6 @@ import { NavBar } from "../components/NavBar";
 import Hero from "../components/Hero";
 import { TrendingSection } from "../components/TrendingSection";
 import { ReccomendedByOurModel } from "../components/ReccomendedByOurModel";
-import { getUserInfo } from "../services/user..service";
-import { useEffect } from "react";
 
 export const HomePage = ({
   menuHandler,
@@ -13,10 +11,6 @@ export const HomePage = ({
   menu: boolean;
   menuHandler: () => void;
 }) => {
-  useEffect(() => {
-    const token = localStorage.getItem("authToken") || "";
-    getUserInfo(token);
-  }, []);
   return (
     <motion.section
       initial={{ marginLeft: 0 }}
