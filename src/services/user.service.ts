@@ -35,8 +35,8 @@ export interface UserProfile {
   bio?: string;
   uid: string;
   email: string;
-  displayName: string;
-  photoURL: string;
+  displayName: string | null;
+  photoURL: string | null;
   followers?: string[];
   following?: string[];
   followersCount?: number;

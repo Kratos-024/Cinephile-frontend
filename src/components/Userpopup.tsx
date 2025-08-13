@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 interface UserPopupProps {
   isLoggedIn: boolean;
-  userProfile: UserProfile | null;
+  userProfile: UserProfile;
   onClose: () => void;
   onAuthChange: (authenticated: boolean, profile?: UserProfile) => void;
 }
@@ -39,7 +39,7 @@ export const UserPopup = ({
   const handleMyProfile = () => {
     console.log("Navigate to profile");
     onClose();
-    navigate("/userprofile/myprofile");
+    navigate(`/profile/${userProfile?.uid}/${userProfile?.displayName}`);
   };
 
   if (!isLoggedIn) {

@@ -21,7 +21,18 @@ export const NavBar = ({
 }) => {
   const [showUserPopup, setShowUserPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfileData, setUserProfile] = useState<UserProfile>({
+    uid: "",
+    email: "",
+    displayName: "",
+    photoURL: "",
+    followers: [],
+    following: [],
+    followersCount: 0,
+    followingCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
   const dispath = useDispatch();
@@ -46,8 +57,8 @@ export const NavBar = ({
         setUserProfile({
           uid: user.uid,
           email: user.email!,
-          displayName: user.displayName || undefined,
-          photoURL: user.photoURL || undefined,
+          displayName: user.displayName || null,
+          photoURL: user.photoURL,
           followers: [],
           following: [],
           followersCount: 0,
@@ -57,7 +68,6 @@ export const NavBar = ({
         });
       } else {
         setIsLoggedIn(false);
-        setUserProfile(null);
       }
     });
 
@@ -187,7 +197,7 @@ export const NavBar = ({
             {showUserPopup && (
               <UserPopup
                 isLoggedIn={isLoggedIn}
-                userProfile={userProfile}
+                userProfile={userProfileData}
                 onClose={handleClosePopup}
                 onAuthChange={handleAuthChange}
               />
