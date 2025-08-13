@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+
+import { MovieLoader } from "./Loader";
+import { Link } from "react-router-dom";
+import { addToWatchList, RemoveFromWatchlist } from "../services/user.service";
+import { toast } from "react-toastify";
 import {
   getTrendingMovies,
   type IMDBTrendingResponse,
 } from "../services/movie.service";
-import { MovieLoader } from "./Loader";
-import { Link } from "react-router-dom";
-import { addToWatchList, RemoveFromWatchlist } from "../services/user..service";
-import { toast } from "react-toastify";
 
 export const TrendingSectionTemplate = ({
   movie,

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { auth } from "../firebase/firebase";
 
 export interface commentType {
+  movieTitle?: string;
+  poster?: string;
   imdb_id: string;
   title: string;
   comment: string;

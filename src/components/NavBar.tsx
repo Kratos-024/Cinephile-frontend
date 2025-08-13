@@ -8,7 +8,7 @@ import { CiUser } from "react-icons/ci";
 import { googleLogin } from "../firebase/login";
 import { UserPopup } from "./Userpopup";
 import { auth } from "../firebase/firebase";
-import type { UserProfile } from "../services/user..service";
+import type { UserProfile } from "../services/user.service";
 import { useDispatch } from "react-redux";
 import { addUser } from "../function/user.redux";
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { commentType } from "../components/CommentSection";
-import { getAuthHeaders } from "./user..service";
+import { getAuthHeaders } from "./user.service";
 
 interface MovieTitleResult {
   Title: string;
@@ -97,34 +97,73 @@ export interface MovieRating {
   Source: string;
   Value: string;
 }
-interface MovieStoryline {
-  tagline: string;
-  story: string;
-  genres: string[];
-  keywords: string[];
-}
 
-interface MovieData {
-  Awards: string;
-  Director: string;
-  Country: string;
-  Rated: string;
-  Runtime: string;
-  Released: string;
-  genre: string;
-  cast: CastMember[];
-  images: MovieImage[];
-  ratings: MovieRatings;
-  storyline: MovieStoryline;
-  rating: MovieRating[];
-  storyLine: string;
-  videoSources: MovieVideo[];
-  scrapedAt: string;
-  Language: string;
-  BoxOffice: string;
-  title: string;
+type MovieData = {
   url: string;
-}
+  scrapedAt: string;
+  imdbId: string;
+  title: string;
+  storyline: string | null;
+  ratings: {
+    imdbScore: {
+      rating: string;
+      totalVotes: string;
+      fullRating: string;
+    };
+    metascore: {
+      score: string;
+      backgroundColor: string;
+    };
+  };
+  cast: {
+    actorName: string;
+    actorUrl: string;
+    characterName: string;
+    characterUrl: string;
+    imageUrl: string;
+    imageAlt: string;
+    isVoiceRole: boolean;
+  }[];
+  videos: {
+    title: string;
+    videoUrl: string;
+    imageUrl: string;
+    imageAlt: string;
+  }[];
+  images: {
+    src: string;
+    alt: string;
+  }[];
+  videoSources: {
+    src: string;
+    type: string;
+    poster: string;
+    className: string;
+    id: string;
+    preload: string;
+    controls: boolean;
+    autoplay: boolean;
+    muted: boolean;
+    loop: boolean;
+    width: number;
+    height: number;
+  }[];
+  poster: string;
+  Country: string;
+  Director: string;
+  Released: string;
+  Runtime: string;
+  Awards: string;
+  Language: string;
+  storyLine: string;
+  rating: {
+    Source: string;
+    Value: string;
+  }[];
+  genre: string;
+  BoxOffice: string;
+  Rated: string;
+};
 
 export interface MovieApiResponse {
   success: boolean;
@@ -325,9 +364,17 @@ const deleteCommentHandler = async ({
     }
   }
 };
-
 const submitCommentHandler = async ({
-  data: { imdb_id, title, comment, rating, userPhotoURL, userDisplayName },
+  data: {
+    imdb_id,
+    title,
+    comment,
+    rating,
+    userPhotoURL,
+    userDisplayName,
+    movieTitle,
+    poster,
+  },
   token,
 }: {
   data: commentType;
@@ -337,6 +384,8 @@ const submitCommentHandler = async ({
     const url = `http://localhost:8000/api/v1/user/reviews/`;
     const commentData = {
       imdb_id,
+      movieTitle,
+      poster,
       title,
       comment,
       rating,

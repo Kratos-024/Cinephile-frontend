@@ -13,7 +13,7 @@ import { useState } from "react";
 import { MovieDetails } from "../components/MovieDetials";
 
 export const MoviePage = () => {
-  const [menu, setMenu] = useState(true);
+  const [menu, setMenu] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [movieData, setMovieData] = useState<ApiMovieResponse>({
@@ -46,7 +46,7 @@ export const MoviePage = () => {
           backgroundColor: "",
         },
       },
-      storyline: { tagline: "", story: "", genres: [""], keywords: [""] },
+      storyline: null,
       videoSources: [
         {
           src: "",
@@ -65,6 +65,9 @@ export const MoviePage = () => {
       ],
       scrapedAt: "",
       url: "",
+      imdbId: "",
+      videos: [],
+      poster: "",
     },
   });
 
@@ -81,8 +84,6 @@ export const MoviePage = () => {
         try {
           const response: MovieResponse = await getMovieData(id);
           if (response.success) {
-            console.log("Fetched movieData:", response);
-            console.log("Fetched movieData:", response.data.Rated);
             setMovieData(response);
           }
         } catch (error) {

@@ -1,9 +1,8 @@
-import type { Timestamp } from "firebase/firestore";
+import type { WatchlistResponse } from "../components/UserProfileHero";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const API_BASE_URL = "http://localhost:8000";
 
-// Interfaces
 export interface SelectedMovie {
   tmdbId: number;
   imdbId?: string;
@@ -33,21 +32,75 @@ export interface UserReview {
 }
 
 export interface UserProfile {
+  bio?: string;
   uid: string;
   email: string;
-  displayName?: string;
-  photoURL?: string;
-  followers: string[];
-  following: string[];
+  displayName: string;
+  photoURL: string;
+  followers?: string[];
+  following?: string[];
+  followersCount?: number;
+  followingCount?: number;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+type Timestamp = {
+  _seconds: number;
+  _nanoseconds: number;
+};
+
+type Profile = {
+  displayName: string;
+  email: string;
+  emailVerified: boolean;
+  joinedDate: Timestamp;
+  photoURL: string;
+  updatedAt: Timestamp;
+  userId: string;
+};
+
+type CountWithProfiles = {
+  count: number;
+  profiles: Profile[];
+};
+
+type Stats = {
   followersCount: number;
   followingCount: number;
-  createdAt: any;
-  updatedAt: any;
+  totalReviews: number;
+  totalWatchlistItems: number;
+};
+export interface MovieCommentResponse {
+  movieTitle: string;
+  poster: string;
+  imdb_id: string;
+  id?: string;
+  rating: number;
+  userDisplayName: string;
+  comment: string;
+  title: string;
+  userId?: string;
+  userPhotoURL: string;
+  timestamp?: string;
+  updatedAt?: Timestamp;
 }
+export type UserData = {
+  data: {
+    followers: CountWithProfiles;
+    following: CountWithProfiles;
+    profile: Profile;
+    reviews: MovieCommentResponse[];
+    stats: Stats;
+    watchlist: any[];
+  };
+  success: boolean;
+};
 
 export interface UserProfileResponse {
   success: boolean;
   data: {
+    userId: string;
     displayName: string;
     email: string;
     emailVerified: boolean;
@@ -102,6 +155,18 @@ export interface AuthResponse extends UserApiResponse {
   };
 }
 
+export interface MovieApiReview {
+  id: string;
+  imdb_id: string;
+  title: string;
+  comment: string;
+  rating: number;
+  userDisplayName: string;
+  userId: string;
+  userPhotoURL: string;
+  timestamp: string;
+}
+
 export const getAuthHeaders = (token?: string) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -136,7 +201,6 @@ const handleFetchResponse = async (response: Response): Promise<any> => {
   return data;
 };
 
-// Helper function to handle fetch errors
 const handleFetchError = (error: any, operation: string) => {
   console.error(`Error in ${operation}:`, error);
 
@@ -162,7 +226,6 @@ const handleFetchError = (error: any, operation: string) => {
   };
 };
 
-// Auth Services
 const registerUser = async (
   email: string,
   password: string,
@@ -259,6 +322,26 @@ const saveUserPreferences = async (
     ) as UserPreferenceApiResponse;
   }
 };
+const isFollowingServiceHandler = async (
+  token: string,
+  targetUserId: string
+) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/user/isfollowing/${targetUserId}`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(token),
+      }
+    );
+
+    const data = await handleFetchResponse(response);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return handleFetchError(error, "isFollowingHandler");
+  }
+};
 
 const getUserPreferences = async (
   userId?: string,
@@ -337,31 +420,6 @@ const saveUserReview = async (
   }
 };
 
-export interface MovieApiReview {
-  id: string;
-  imdb_id: string;
-  title: string;
-  comment: string;
-  rating: number;
-  userDisplayName: string;
-  userId: string;
-  userPhotoURL: string;
-  timestamp: string;
-  updatedAt: Timestamp;
-}
-
-export interface MovieCommentResponse {
-  imdb_id: string;
-  id?: string;
-  rating: number;
-  userDisplayName: string;
-  comment: string;
-  title: string;
-  userId?: string;
-  userPhotoURL: string;
-  timestamp?: string;
-  updatedAt?: Timestamp;
-}
 const getUserReviewsHandler = async (
   userId: string,
   token: string
@@ -560,6 +618,22 @@ const addToWatchList = async (
   }
 };
 
+const getUserWatchlist = async (token: string): Promise<WatchlistResponse> => {
+  try {
+    const url = API_BASE_URL + "/api/v1/user/GetUserWatchlist";
+    const header = getAuthHeaders(token);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: header,
+    });
+    const data: WatchlistResponse = await handleFetchResponse(response);
+
+    return data;
+  } catch (error) {
+    return handleFetchError(error, "getUserProfile") as WatchlistResponse;
+  }
+};
 const RemoveFromWatchlist = async (
   token: string,
   movieData: {
@@ -604,4 +678,6 @@ export {
   getUserFollowing,
   getUserProfile,
   isAuthenticated,
+  getUserWatchlist,
+  isFollowingServiceHandler,
 };

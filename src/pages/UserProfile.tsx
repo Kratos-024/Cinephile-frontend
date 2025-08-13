@@ -25,7 +25,7 @@ export const UserProfile = ({
       className="px-3 bg-primary"
     >
       <NavBar menuHandler={menuHandler} menu={menu} />;
-      <UserProfileHero userid={userid} />
+      <UserProfileHero user_userid={userid} />
     </motion.section>
   );
 };

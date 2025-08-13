@@ -124,6 +124,7 @@ export async function createAccountWithEmail(
     await createOrUpdateUserProfile(user);
 
     localStorage.setItem("authToken", idToken);
+    localStorage.setItem("uid", user.uid);
 
     return {
       success: true,

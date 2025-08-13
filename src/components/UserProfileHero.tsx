@@ -1,28 +1,49 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
+  followUser,
   getUserProfile,
-  getUserReviewsHandler,
-  type MovieApiReview,
-  type UserProfileApiResponse,
-  type UserProfileResponse,
-} from "../services/user..service";
-import { Timestamp } from "firebase/firestore";
-// import { getUserProfile } from "../services/user..service";
+  getUserWatchlist,
+  isFollowingServiceHandler,
+  unfollowUser,
+  type MovieCommentResponse,
+  type UserData,
+} from "../services/user.service";
+import { useParams } from "react-router-dom";
+import NetworkSection from "./NetworkSection";
 
-interface Movie {
-  id: number;
+// Type definitions
+type WatchlistMovie = {
+  imdbId: string;
   title: string;
-  poster_path: string | null;
-  vote_average: number;
-  release_date?: string;
-}
+  poster_path: string;
+  release_date: string;
+  vote_average: string;
+  addedAt?: string;
+};
+
+type WatchlistData = {
+  currentPage: number;
+  totalPages: number;
+  totalWatchlist: number;
+  userId: string;
+  watchlistMovies: WatchlistMovie[];
+};
+
+export type WatchlistResponse = {
+  success: boolean;
+  message: string;
+  data: WatchlistData;
+};
+
 export const MovieSectionTemplate = ({
   movie,
   section,
 }: {
   section: string;
-  movie: Movie;
+  movie: WatchlistData["watchlistMovies"][0];
 }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -52,13 +73,7 @@ export const MovieSectionTemplate = ({
           className={`w-full aspect-[2/3] object-cover 
             rounded-2xl transition-transform duration-300 
             group-hover:scale-110 ${!imageLoaded ? "hidden" : "block"}`}
-          src={
-            movie.poster_path?.includes("http")
-              ? movie.poster_path
-              : `https://image.tmdb.org/t/p/w500/${
-                  movie.poster_path || "placeholder"
-                }`
-          }
+          src={movie.poster_path}
           alt={`${movie.title} poster`}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageLoaded(true)}
@@ -80,7 +95,7 @@ export const MovieSectionTemplate = ({
             <button className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-white/30 transition-colors">
               View Details
             </button>
-            {section != "watchlist" && (
+            {section !== "watchlist" && (
               <button className="bg-orange-500/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-orange-500 transition-colors">
                 Add to List
               </button>
@@ -96,7 +111,7 @@ export const MovieSectionTemplate = ({
        items-center gap-1 shadow-lg"
       >
         <span className="text-yellow-400">★</span>
-        <span>{formatRating(movie.vote_average)}</span>
+        <span>{formatRating(+movie.vote_average)}</span>
       </div>
 
       <div className="absolute top-3 right-3">
@@ -124,191 +139,86 @@ export const MovieSectionTemplate = ({
 };
 
 const WatchlistSection = () => {
-  const sampleMovies: Movie[] = [
-    {
-      id: 1,
-      title: "I Saw the TV Glow",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 77,
-      release_date: "2024-05-03",
-    },
-    {
-      id: 2,
-      title: "Dune: Part Two",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 83,
-      release_date: "2024-03-01",
-    },
-    {
-      id: 3,
-      title: "The Substance",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 75,
-      release_date: "2024-09-20",
-    },
-    {
-      id: 4,
-      title: "Furiosa: A Mad Max Saga",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 79,
-      release_date: "2024-05-24",
-    },
-  ];
-
-  return (
-    <div className="w-full">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-1">
-            Recent Activity
-          </h2>
-          <p className="text-gray-400 text-sm">Your latest watched films</p>
-        </div>
-      </div>
-
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 
-          md:grid-cols-3 
-      lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
-      >
-        {sampleMovies.map((movie) => (
-          <MovieSectionTemplate
-            section={"watchlist"}
-            key={movie.id}
-            movie={movie}
-          />
-        ))}
-      </div>
-
-      {sampleMovies.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-            <span className="text-gray-600 text-2xl">🎬</span>
-          </div>
-          <h3 className="text-gray-400 text-lg font-medium mb-2">
-            No films yet
-          </h3>
-          <p className="text-gray-500 text-sm">
-            Start watching and rating movies to see them here
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const FilmSection = () => {
-  const sampleMovies: Movie[] = [
-    {
-      id: 1,
-      title: "I Saw the TV Glow",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 77,
-      release_date: "2024-05-03",
-    },
-    {
-      id: 2,
-      title: "Dune: Part Two",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 83,
-      release_date: "2024-03-01",
-    },
-    {
-      id: 3,
-      title: "The Substance",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 75,
-      release_date: "2024-09-20",
-    },
-    {
-      id: 4,
-      title: "Furiosa: A Mad Max Saga",
-      poster_path:
-        "https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg",
-      vote_average: 79,
-      release_date: "2024-05-24",
-    },
-  ];
-
-  return (
-    <div className="w-full">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-1">
-            Recent Activity
-          </h2>
-          <p className="text-gray-400 text-sm">Your latest watched films</p>
-        </div>
-      </div>
-
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 
-          md:grid-cols-3 
-      lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
-      >
-        {sampleMovies.map((movie) => (
-          <MovieSectionTemplate
-            section={"films"}
-            key={movie.id}
-            movie={movie}
-          />
-        ))}
-      </div>
-
-      {sampleMovies.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-            <span className="text-gray-600 text-2xl">🎬</span>
-          </div>
-          <h3 className="text-gray-400 text-lg font-medium mb-2">
-            No films yet
-          </h3>
-          <p className="text-gray-500 text-sm">
-            Start watching and rating movies to see them here
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ReviewsSection = ({ userId }: { userId: string }) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [review, setReview] = useState<MovieApiReview>({
-    id: "",
-    imdb_id: "",
-    title: "",
-    comment: "",
-    rating: 0,
-    userDisplayName: "",
+  const [watchlist, setWatchlist] = useState<WatchlistResponse["data"]>({
+    currentPage: 0,
+    totalPages: 0,
+    totalWatchlist: 0,
     userId: "",
-    userPhotoURL: "",
-    timestamp: "",
-    updatedAt: Timestamp.now(),
+    watchlistMovies: [],
   });
 
   useEffect(() => {
-    const getUserReview = async () => {
-      setLoading(true);
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        return;
-      }
-      const response = await getUserReviewsHandler(userId, token);
+    const getUserWatchList = async () => {
+      const token =
+        typeof window !== "undefined"
+          ? window.localStorage?.getItem("authToken") || ""
+          : "";
+      if (!token) return;
+
+      const response = await getUserWatchlist(token);
       if (response.success) {
-        setReview(response.data);
-        setLoading(false);
+        setWatchlist(response.data);
       }
     };
-    getUserReview();
+    getUserWatchList();
   }, []);
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-1">
+            Recent Activity
+          </h2>
+          <p className="text-gray-400 text-sm">Your latest watched films</p>
+        </div>
+      </div>
+
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 
+          md:grid-cols-3 
+      lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+      >
+        {watchlist.watchlistMovies.map(
+          (movie: WatchlistData["watchlistMovies"][0], idx: number) => {
+            return (
+              <MovieSectionTemplate
+                section={"watchlist"}
+                key={idx}
+                movie={movie}
+              />
+            );
+          }
+        )}
+      </div>
+
+      {watchlist.watchlistMovies.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
+            <span className="text-gray-600 text-2xl">🎬</span>
+          </div>
+          <h3 className="text-gray-400 text-lg font-medium mb-2">
+            No films yet
+          </h3>
+          <p className="text-gray-500 text-sm">
+            Start watching and rating movies to see them here
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ReviewsSection = ({
+  userReviewData,
+}: {
+  userReviewData: UserData["data"]["reviews"];
+}) => {
+  const [review, setReview] = useState<UserData["data"]["reviews"]>([]);
+
+  useEffect(() => {
+    setReview(userReviewData);
+  }, [userReviewData]);
 
   return (
     <div>
@@ -318,37 +228,44 @@ const ReviewsSection = ({ userId }: { userId: string }) => {
         </h2>
         <button className="text-gray-400 text-sm hover:text-white">MORE</button>
       </div>
-      {loading && (
-        <div className="flex justify-center items-center mb-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-          <span className="text-white ml-3">Loading movies...</span>
-        </div>
-      )}
-      <div className="flex gap-4 p-4 bg-gray-800 bg-opacity-30 rounded">
-        <img
-          src="https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg"
-          alt="I Saw the TV Glow"
-          className="w-16 h-24 object-cover rounded"
-        />
-        <div className="flex-1">
-          <h3 className="text-white text-lg font-semibold mb-1">
-            I Saw the TV Glow
-            <span className="text-gray-400 font-normal">2024</span>
-          </h3>
-          <div className="flex text-green-500 text-xs mb-2">
-            {"★★★☆☆".split("").map((star, i) => (
-              <span key={i}>{star}</span>
-            ))}
-            <span className="text-gray-400 ml-2">Watched 12 Jul 2024</span>
-          </div>
-          <p className="text-gray-300 text-sm mb-2">
-            very weird movie with a good plot that explore escapism from reality
-            However, the ending is strange and difficult to understand
-          </p>
-          <div className="flex items-center text-gray-400 text-xs">
-            <span>♡ No likes yet</span>
-          </div>
-        </div>
+
+      <div className="space-y-4">
+        {review.map((reviewItem: MovieCommentResponse, idx: number) => {
+          return (
+            <div
+              key={idx}
+              className="flex gap-4 p-4 bg-gray-800 bg-opacity-30 rounded"
+            >
+              <img
+                src={reviewItem.poster}
+                alt={reviewItem.movieTitle}
+                className="w-16 h-24 object-cover rounded"
+              />
+              <div className="flex-1">
+                <h3 className="text-white text-lg font-semibold mb-1">
+                  {reviewItem.movieTitle}
+                </h3>
+                <div className="flex text-green-500 text-xs mb-2">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <span key={i}>{i < reviewItem.rating ? "★" : "☆"}</span>
+                  ))}
+
+                  <span className="text-gray-400 ml-2">
+                    Watched 12 Jul 2024
+                  </span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <p className="text-gray-300 text-sm mb-2">
+                    {reviewItem.title}
+                  </p>
+                  <p className="text-gray-300 text-sm mb-2">
+                    {reviewItem.comment}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -357,9 +274,7 @@ const ReviewsSection = ({ userId }: { userId: string }) => {
 const ProfileSection = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-8 py-8">
-      {/* Left Column */}
       <div className="lg:col-span-2 space-y-8">
-        {/* Favorite Films Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-gray-400 text-sm uppercase tracking-wide">
@@ -368,11 +283,10 @@ const ProfileSection = () => {
           </div>
           <p className="text-gray-400 text-sm">
             Don't forget to select your
-            <span className="text-orange-500">favorite films</span>!
+            <span className="text-orange-500"> favorite films</span>!
           </p>
         </div>
 
-        {/* Recent Activity Section */}
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-gray-400 text-sm uppercase tracking-wide">
@@ -406,7 +320,6 @@ const ProfileSection = () => {
           </div>
         </div>
 
-        {/* Recent Reviews Section */}
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-gray-400 text-sm uppercase tracking-wide">
@@ -426,7 +339,7 @@ const ProfileSection = () => {
             <div className="flex-1">
               <h3 className="text-white text-lg font-semibold mb-1">
                 I Saw the TV Glow
-                <span className="text-gray-400 font-normal">2024</span>
+                <span className="text-gray-400 font-normal"> 2024</span>
               </h3>
               <div className="flex text-green-500 text-xs mb-2">
                 {"★★★☆☆".split("").map((star, i) => (
@@ -447,9 +360,7 @@ const ProfileSection = () => {
         </div>
       </div>
 
-      {/* Right Sidebar */}
       <div className="space-y-8">
-        {/* Diary Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-gray-400 text-sm uppercase tracking-wide">
@@ -468,7 +379,6 @@ const ProfileSection = () => {
           </div>
         </div>
 
-        {/* Ratings Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-gray-400 text-sm uppercase tracking-wide">
@@ -492,7 +402,6 @@ const ProfileSection = () => {
           </div>
         </div>
 
-        {/* Activity Section */}
         <div>
           <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">
             Activity
@@ -500,7 +409,6 @@ const ProfileSection = () => {
           <p className="text-gray-400 text-sm">No recent activity</p>
         </div>
 
-        {/* Pro Upgrade Banner */}
         <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-6 relative overflow-hidden">
           <div className="relative z-10">
             <h3 className="text-white text-xl font-bold mb-2">
@@ -523,75 +431,179 @@ const ProfileSection = () => {
     </div>
   );
 };
-export const UserProfileHero = ({ userid }: { userid: string }) => {
+
+const FollowButton = ({ targetId }: { targetId: string }) => {
+  const [isFollow, setIsFollowed] = useState<boolean>(false);
+  const [loader, setLoader] = useState<boolean>(true);
+  const token = localStorage.getItem("authToken") || "";
+  const [self, setSelf] = useState<boolean>(false);
+
+  const followHandler = async () => {
+    try {
+      const response = await followUser(targetId, token);
+      if (response.success) {
+        setIsFollowed(true);
+        setLoader(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsFollowed(false);
+      setLoader(true);
+    }
+  };
+  const unfollowHandler = async () => {
+    try {
+      const response = await unfollowUser(targetId, token);
+      if (response.success) {
+        setIsFollowed(false);
+        setLoader(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsFollowed(false);
+      setLoader(true);
+    }
+  };
+  useEffect(() => {
+    const isFollowingHandler = async () => {
+      setIsFollowed(false);
+      try {
+        const response = await isFollowingServiceHandler(token, targetId);
+        if (response.success) {
+          if (response.data.isSelf) {
+            setLoader(false);
+            setSelf(true);
+          } else {
+            setIsFollowed(response.data.isFollowing);
+            setLoader(false);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        setLoader(true);
+
+        setIsFollowed(false);
+      }
+    };
+    isFollowingHandler();
+  }, []);
+  if (loader) {
+    return <div>Loading...</div>;
+  }
+  return (
+    <>
+      {!self && (
+        <div className="relative">
+          {!isFollow && (
+            <div onClick={followHandler}>
+              <span className=" bg-emerald-400 rounded-xl  cursor-pointer hover:opacity-95 text-white px-2 py-2">
+                Follow
+              </span>
+            </div>
+          )}{" "}
+          {isFollow && (
+            <div onClick={unfollowHandler}>
+              <span className=" bg-blue-400 rounded-xl  cursor-pointer hover:opacity-95 text-white px-2 py-2">
+                unfollow
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
+export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
   const [navigation, setNavigation] = useState("Profile");
   const navigationHandler = (nav: string) => {
     setNavigation(nav);
   };
-  const [user, setUser] = useState<UserProfileResponse["data"]>();
+
+  const [user, setUser] = useState<UserData["data"]>({
+    followers: {
+      count: 0,
+      profiles: [],
+    },
+    following: {
+      count: 0,
+      profiles: [],
+    },
+    profile: {
+      displayName: "",
+      email: "",
+      emailVerified: false,
+      joinedDate: { _seconds: 0, _nanoseconds: 0 },
+      photoURL: "",
+      updatedAt: { _seconds: 0, _nanoseconds: 0 },
+      userId: "",
+    },
+    reviews: [],
+    stats: {
+      followersCount: 0,
+      followingCount: 0,
+      totalReviews: 0,
+      totalWatchlistItems: 0,
+    },
+    watchlist: [],
+  });
 
   useEffect(() => {
     const getUser = async () => {
-      const token = localStorage.getItem("authToken");
+      const token =
+        typeof window !== "undefined"
+          ? window.localStorage?.getItem("authToken")
+          : null;
       if (!token) return;
 
-      const response = await getUserProfile(userid, token);
+      const response = await getUserProfile(user_userid, token);
 
-      if (response.success) {
-        const userResponse = response as UserProfileResponse;
-
-        const data: UserProfileResponse["data"] = userResponse.data || {
-          displayName: "",
-          email: "",
-          emailVerified: false,
-          joinedDate: Timestamp.now(),
-          photoURL: "",
-          updatedAt: Timestamp.now(),
-        };
-        setUser(data);
+      if (response.success && response.data) {
+        console.log(response.data);
+        //@ts-ignore
+        setUser(response.data);
       }
     };
     getUser();
-  }, []);
-
+  }, [user_userid]);
+  const { userid } = useParams() || "";
+  if (!userid) return;
   return (
-    <section className="bg-primary w-full min-h-screen  pb-[96px]">
+    <section className="bg-primary w-full min-h-screen pb-[96px]">
       <div className="relative">
         <img
-          className="w-full h-[340px] relative"
-          src={`${user?.photoURL}`}
+          className="w-full h-[340px] relative object-cover"
+          src={user?.profile.photoURL || "/default-banner.jpg"}
           alt="user-profile-hero"
         />
         <div className="flex items-start gap-6 px-8 -mt-20 relative z-10">
           <img
             className="rounded-full w-[246px] h-[246px] object-cover border-4 border-white"
-            src={`${user?.photoURL}`}
+            src={user?.profile.photoURL || "/default-avatar.jpg"}
             alt="profile"
           />
           <div className="flex-1 flex justify-between mt-[86px]">
             <div className="flex flex-col gap-4 mb-4">
-              <h1 className="text-white text-4xl font-bold">
-                {user?.displayName}
-              </h1>
+              <div className="flex items-center gap-4">
+                <h1 className="text-white text-4xl font-bold">
+                  {user?.profile.displayName}
+                </h1>
+                <FollowButton targetId={userid} />
+              </div>
               <p className="text-gray-300 text-lg mb-6">
                 It makes you forget the wonderful yesterday
               </p>
             </div>
             <div className="flex gap-8">
               <div className="text-center">
-                <div className="text-white text-2xl font-bold">1</div>
-                <div className="text-gray-400 text-sm">FANS</div>
-              </div>
-              <div className="text-center">
-                <div className="text-white text-2xl font-bold">1</div>
-                <div className="text-gray-400 text-sm">IN 2023</div>
-              </div>
-              <div className="text-center">
-                <div className="text-white text-2xl font-bold">0</div>
+                <div className="text-white text-2xl font-bold">
+                  {user?.stats.followingCount || 0}
+                </div>
                 <div className="text-gray-400 text-sm">FOLLOWING</div>
               </div>
               <div className="text-center">
-                <div className="text-white text-2xl font-bold">0</div>
+                <div className="text-white text-2xl font-bold">
+                  {user?.stats.followersCount || 0}
+                </div>
                 <div className="text-gray-400 text-sm">FOLLOWERS</div>
               </div>
             </div>
@@ -600,7 +612,7 @@ export const UserProfileHero = ({ userid }: { userid: string }) => {
       </div>
       <div className="border-b border-gray-700 mt-8">
         <nav className="flex space-x-8 px-8">
-          {["Profile", "Films", "Watchlist", "Reviews", "Likes", "Network"].map(
+          {["Profile", "Watchlist", "Reviews", "Likes", "Network"].map(
             (tab) => (
               <button
                 onClick={() => {
@@ -619,11 +631,12 @@ export const UserProfileHero = ({ userid }: { userid: string }) => {
           )}
         </nav>
       </div>
-
-      {navigation == "Profile" && <ProfileSection />}
-      {navigation === "Reviews" && <ReviewsSection userId={userid} />}
-      {navigation === "Films" && <FilmSection />}
+      {navigation === "Profile" && <ProfileSection />}
+      {navigation === "Reviews" && (
+        <ReviewsSection userReviewData={user.reviews} />
+      )}
       {navigation === "Watchlist" && <WatchlistSection />}
+      {navigation === "Network" && <NetworkSection />}
     </section>
   );
 };

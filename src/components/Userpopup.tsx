@@ -3,7 +3,7 @@ import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase";
-import type { UserProfile } from "../services/user..service";
+import type { UserProfile } from "../services/user.service";
 import { useNavigate } from "react-router-dom";
 
 interface UserPopupProps {

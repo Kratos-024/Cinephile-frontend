@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { VideoPlayer } from "./MovieVideo";
 import { CommentSection, type commentType } from "./CommentSection";
-import {
-  deleteCommentHandler,
-  submitCommentHandler,
-  getMovieReviewsHandler,
-  type MovieApiResponse,
-} from "../services/movie.service";
+
 import { toast } from "react-toastify";
 import { MdDeleteForever } from "react-icons/md";
-import type { MovieCommentResponse } from "../services/user..service";
+import type { MovieCommentResponse } from "../services/user.service";
 import { Link } from "react-router-dom";
+import {
+  type MovieApiResponse,
+  getMovieReviewsHandler,
+  submitCommentHandler,
+  deleteCommentHandler,
+} from "../services/movie.service";
 
 export const MovieDetails = ({
   movieData,
@@ -75,6 +76,8 @@ export const MovieDetails = ({
     userDisplayName,
   }: commentType) => {
     const newReview = {
+      movieTitle: movieData["data"]["title"],
+      poster: movieData["data"]["poster"],
       imdb_id: imdb_id,
       title: title,
       comment: comment,
@@ -89,6 +92,8 @@ export const MovieDetails = ({
       const token = localStorage.getItem("authToken") || "";
       const response = await submitCommentHandler({
         data: {
+          movieTitle: movieData["data"]["title"],
+          poster: movieData["data"]["poster"],
           imdb_id: imdb_id,
           title: title,
           comment: comment,
