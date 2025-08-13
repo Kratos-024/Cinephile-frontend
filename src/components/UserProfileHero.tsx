@@ -14,7 +14,6 @@ import {
 import { useParams } from "react-router-dom";
 import NetworkSection from "./NetworkSection";
 
-// Type definitions
 type WatchlistMovie = {
   imdbId: string;
   title: string;

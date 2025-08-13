@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MoreHorizontal, User } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   type UserFollowData,
   getUserFollowers,
@@ -10,8 +10,8 @@ import {
 
 interface UserProfile {
   uid: string;
-  displayName: string;
-  photoURL: string;
+  displayName: string | null;
+  photoURL: string | null;
   email: string;
   bio?: string;
 }
@@ -19,7 +19,6 @@ interface UserProfile {
 const UserCard = ({ users }: { users: UserProfile }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const navigate = useNavigate();
   const unFollowHandler = async () => {
     try {
       const token = localStorage.getItem("authToken") || "";
@@ -53,7 +52,7 @@ const UserCard = ({ users }: { users: UserProfile }) => {
           <img
             className={`w-20 h-20 object- rounded-full mb-3 transition-transform duration-300 group-hover:scale-110
                  border-2 border-gray-600 ${!imageLoaded ? "hidden" : "block"}`}
-            src={users.photoURL}
+            src={users.photoURL || ""}
             alt={`${users.displayName} profile`}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageLoaded(true)}
@@ -92,7 +91,7 @@ const UserCard = ({ users }: { users: UserProfile }) => {
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowMenu(false);
-                      navigate(`/profile/${users.uid}/${users.displayName}`);
+                      window.location.href = `/profile/${users.uid}/${users.displayName}`;
                     }}
                     className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 transition-colors text-sm"
                   >
