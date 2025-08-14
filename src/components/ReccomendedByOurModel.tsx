@@ -1,36 +1,89 @@
-import React, { useState, useRef, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { getCachedMoviesHandler } from "../services/movie.service";
+type Timestamp = {
+  _seconds: number;
+  _nanoseconds: number;
+};
 
-const ReccomendedByOurModelTempalte = ({ movie }) => {
+type Rating = {
+  Source: string;
+  Value: string;
+};
+
+export type MovieResponseCached = {
+  Actors: string;
+  Awards: string;
+  BoxOffice: string;
+  Country: string;
+  DVD: string;
+  Director: string;
+  Genre: string;
+  Language: string;
+  Metascore: string;
+  Plot: string;
+  Poster: string;
+  Production: string;
+  Rated: string;
+  Ratings: Rating[];
+  Released: string;
+  Response: string;
+  Runtime: string;
+  Title: string;
+  Type: string;
+  Website: string;
+  Writer: string;
+  Year: string;
+  added_at: Timestamp;
+  id: string;
+  imdbID: string;
+  imdbRating: string;
+  imdbVotes: string;
+  movie_id: string;
+  user_id: string;
+};
+
+const ReccomendedByOurModelTemplate = ({
+  movie,
+}: {
+  movie: MovieResponseCached;
+}) => {
   const [isLiked, setIsLiked] = useState(false);
+  const movieData = {
+    title: movie.Title,
+    genre: movie.Genre,
+    rating: movie.imdbRating,
+    image: movie.Poster,
+  };
 
   return (
     <div className="relative rounded-2xl group cursor-pointer transform transition-all duration-300 hover:scale-105">
       <div className="relative overflow-hidden rounded-2xl">
         <img
           className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-          src={movie.image}
-          alt={movie.title}
+          src={movieData.image}
+          alt={movieData.title}
+          loading="lazy"
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+            e.currentTarget.src = "images/heroImages/placeholder.jpg";
+          }}
         />
 
-        {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
-        {/* Movie title on hover */}
         <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <h4 className="text-white font-semibold text-lg mb-1">
-            {movie.title}
+            {movieData.title}
           </h4>
-          <p className="text-gray-300 text-sm">{movie.genre}</p>
+          <p className="text-gray-300 text-sm">{movieData.genre}</p>
         </div>
       </div>
 
-      {/* Rating badge */}
       <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
-        <span>{movie.rating}</span>
+        <span>{movieData.rating}</span>
       </div>
-
-      {/* Heart icon */}
       <div className="absolute top-3 right-3">
         <button
           onClick={() => setIsLiked(!isLiked)}
@@ -52,96 +105,42 @@ const ReccomendedByOurModelTempalte = ({ movie }) => {
 export const ReccomendedByOurModel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-  const sliderRef = useRef(null);
-  const itemWidth = 300; // 280px + 20px gap
-  const visibleItems = 4; // Number of items visible at once
+  const [movies, setMovies] = useState<MovieResponseCached[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const movies = [
-    {
-      id: 1,
-      title: "Aladdin",
-      genre: "Adventure",
-      rating: "7.8",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 2,
-      title: "The Lion King",
-      genre: "Animation",
-      rating: "8.5",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 3,
-      title: "Frozen",
-      genre: "Musical",
-      rating: "7.4",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 4,
-      title: "Moana",
-      genre: "Adventure",
-      rating: "7.6",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 5,
-      title: "Toy Story",
-      genre: "Animation",
-      rating: "8.3",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 6,
-      title: "Finding Nemo",
-      genre: "Adventure",
-      rating: "8.2",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 7,
-      title: "Incredibles",
-      genre: "Action",
-      rating: "8.0",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 8,
-      title: "Coco",
-      genre: "Musical",
-      rating: "8.4",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 9,
-      title: "Up",
-      genre: "Adventure",
-      rating: "8.3",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 10,
-      title: "WALL-E",
-      genre: "Sci-Fi",
-      rating: "8.4",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 11,
-      title: "Ratatouille",
-      genre: "Comedy",
-      rating: "8.1",
-      image: "images/heroImages/aladin.jpg",
-    },
-    {
-      id: 12,
-      title: "Inside Out",
-      genre: "Comedy",
-      rating: "8.2",
-      image: "images/heroImages/aladin.jpg",
-    },
-  ];
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const itemWidth = 300;
+  const visibleItems = 4;
+
+  useEffect(() => {
+    const loadCachedMovies = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("authToken") || "";
+        const result = await getCachedMoviesHandler({
+          limit: 12,
+          page: 1,
+          token,
+        });
+
+        if (result.success) {
+          setMovies(result.data);
+          setError(null);
+        } else {
+          //@ts-ignore
+          setError(result.message);
+        }
+      } catch (err) {
+        console.error("Error loading cached movies:", err);
+        setError("Failed to load movies");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCachedMovies();
+  }, []);
 
   const maxIndex = Math.max(0, movies.length - visibleItems);
 
@@ -153,13 +152,12 @@ export const ReccomendedByOurModel = () => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  // Auto-scroll functionality (pauses on hover)
   useEffect(() => {
-    if (!isHovering) {
+    if (!isHovering && movies.length > 0) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => {
           if (prev >= maxIndex) {
-            return 0; // Reset to beginning
+            return 0;
           }
           return prev + 1;
         });
@@ -167,11 +165,10 @@ export const ReccomendedByOurModel = () => {
 
       return () => clearInterval(interval);
     }
-  }, [isHovering, maxIndex]);
+  }, [isHovering, maxIndex, movies.length]);
 
-  // Handle keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") goToPrev();
       if (e.key === "ArrowRight") goToNext();
     };
@@ -180,15 +177,45 @@ export const ReccomendedByOurModel = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  if (loading) {
+    return (
+      <section className="py-16">
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-white text-xl">Loading movies...</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error && movies.length === 0) {
+    return (
+      <section className="py-16">
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-red-400 text-xl">Error: {error}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between mb-12">
-          <h3 className="text-4xl lg:text-5xl font-bold text-white">
-            Recommended By our model
-          </h3>
+          <div>
+            <h3 className="text-4xl lg:text-5xl font-bold text-white">
+              Recommended By our model
+            </h3>
+            {error && (
+              <p className="text-yellow-400 text-sm mt-2">
+                Showing fallback data due to: {error}
+              </p>
+            )}
+          </div>
 
-          {/* Navigation arrows */}
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={goToPrev}
@@ -207,7 +234,6 @@ export const ReccomendedByOurModel = () => {
           </div>
         </div>
 
-        {/* Slider container */}
         <div
           className="relative overflow-hidden"
           onMouseEnter={() => setIsHovering(true)}
@@ -222,12 +248,11 @@ export const ReccomendedByOurModel = () => {
           >
             {movies.map((movie) => (
               <div key={movie.id} className="flex-shrink-0">
-                <ReccomendedByOurModelTempalte movie={movie} />
+                <ReccomendedByOurModelTemplate movie={movie} />
               </div>
             ))}
           </div>
 
-          {/* Mobile navigation arrows */}
           <button
             onClick={goToPrev}
             disabled={currentIndex === 0}
@@ -244,7 +269,6 @@ export const ReccomendedByOurModel = () => {
           </button>
         </div>
 
-        {/* Pagination dots */}
         <div className="flex justify-center items-center gap-2 mt-8">
           {Array.from({ length: maxIndex + 1 }).map((_, index) => (
             <button

@@ -532,15 +532,30 @@ const getUserFollowers = async (
     } as UserFollowApiResponse;
   }
 };
+// Types
+interface User {
+  uid: string;
+  displayName: string;
+  photoURL: string;
+  email: string;
+}
 
+interface FollowingData {
+  following: User[];
+  followingCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
+}
 const getUserFollowing = async (
-  userId?: string,
   token?: string
-): Promise<UserFollowApiResponse> => {
+): Promise<{
+  data: FollowingData;
+  message: string;
+  success: boolean;
+}> => {
   try {
-    const url = userId
-      ? `${API_BASE_URL}/api/v1/user/following/${userId}`
-      : `${API_BASE_URL}/api/v1/user/following`;
+    const url = `${API_BASE_URL}/api/v1/user/following`;
 
     console.log("Getting user following from:", url);
 
@@ -549,14 +564,22 @@ const getUserFollowing = async (
       headers: getAuthHeaders(token),
     });
 
-    const data: UserFollowApiResponse = await handleFetchResponse(response);
+    const data: {
+      data: FollowingData;
+      message: string;
+      success: boolean;
+    } = await handleFetchResponse(response);
+    console.log(data);
     return data;
   } catch (error) {
     const errorResponse = handleFetchError(error, "getUserFollowing");
     return {
       ...errorResponse,
-      data: { followersCount: 0, followingCount: 0 },
-    } as UserFollowApiResponse;
+    } as {
+      data: FollowingData;
+      message: "";
+      success: false;
+    };
   }
 };
 

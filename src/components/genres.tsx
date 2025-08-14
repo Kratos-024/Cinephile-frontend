@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { RiMenuSearchFill } from "react-icons/ri";
 import { FaCheck } from "react-icons/fa";
-import { getMovieByTitle } from "../services/movie.service";
+import { getMovieByTitle, getMovieByTitles } from "../services/movie.service";
 import { saveUserPreferences } from "../services/user.service";
 
 interface Movie {
@@ -103,12 +103,9 @@ const MoviesApp = () => {
       for (const title of movieTitles) {
         try {
           const res = await getMovieByTitle(title);
-          if (
-            res.success &&
-            res.data.Response === "True" &&
-            res.data.Search?.length > 0
-          ) {
-            const firstResult = res.data.Search[0];
+          console.log(res);
+          if (res.success) {
+            const firstResult = res.data;
             if (firstResult.imdbID && firstResult.Title) {
               allMovies.push({
                 imdbID: firstResult.imdbID,
@@ -150,7 +147,7 @@ const MoviesApp = () => {
     setError(null);
 
     try {
-      const res = await getMovieByTitle(query.trim());
+      const res = await getMovieByTitles(query.trim());
       if (
         res.success &&
         res.data.Response === "True" &&
@@ -216,11 +213,10 @@ const MoviesApp = () => {
   };
 
   const userPreferenceHandler = async () => {
-    if (selectedMovies.length < 3) {
-      alert("Please select at least 3 movies");
+    if (selectedMovies.length < 2) {
+      alert("Please select at least 2 movies");
       return;
     }
-    console.log(selectedMovies);
     setIsProcessing(true);
     try {
       const token = localStorage.getItem("authToken") || "";
@@ -229,8 +225,6 @@ const MoviesApp = () => {
         title: movie.title,
         imdbID: movie.imdbID,
       }));
-
-      console.log("Saving preferences:", preferences);
 
       const response = await saveUserPreferences(preferences, token);
 
@@ -266,7 +260,6 @@ const MoviesApp = () => {
 
       <div className="w-[920px] mx-auto px-6">
         <div className="bg-[#1b1919] rounded-lg p-8 shadow-2xl">
-          {/* Search Bar */}
           <div className="relative flex items-center justify-end mb-[48px]">
             <div className="flex items-center px-2 pl-5 py-3 w-[320px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0 relative bg-[#111]">
               <IoIosSearch className="text-gray-400 w-6 h-6" />
@@ -356,7 +349,7 @@ const MoviesApp = () => {
 
               {/* Action Buttons */}
               <div className="flex justify-center gap-4">
-                {selectedMovies.length >= 3 && (
+                {selectedMovies.length >= 2 && (
                   <button
                     onClick={userPreferenceHandler}
                     disabled={isProcessing}
@@ -383,10 +376,10 @@ const MoviesApp = () => {
                 )}
               </div>
 
-              {selectedMovies.length < 3 && (
+              {selectedMovies.length < 2 && (
                 <p className="text-gray-400 text-sm mt-4">
-                  Select {3 - selectedMovies.length} more movie
-                  {3 - selectedMovies.length !== 1 ? "s" : ""} to continue
+                  Select {2 - selectedMovies.length} more movie
+                  {2 - selectedMovies.length !== 1 ? "s" : ""} to continue
                 </p>
               )}
 

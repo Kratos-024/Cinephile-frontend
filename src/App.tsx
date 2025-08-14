@@ -10,6 +10,7 @@ import { UserProfile } from "./pages/UserProfile";
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import { store } from "./Apps/store";
+import { WatchListPage } from "./pages/WatchListPage";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return <Provider store={store}>{children}</Provider>;
@@ -42,6 +43,15 @@ function App() {
                 <Container>
                   <Menu menu={menu} />
                   <UserProfile menu={menu} menuHandler={menuHandler} />{" "}
+                </Container>
+              }
+            ></Route>
+            <Route
+              path="/WatchlistPage"
+              element={
+                <Container>
+                  <Menu menu={menu} />
+                  <WatchListPage />{" "}
                 </Container>
               }
             ></Route>

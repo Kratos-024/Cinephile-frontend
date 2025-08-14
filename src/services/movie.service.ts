@@ -1,24 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { commentType } from "../components/CommentSection";
+import type { MovieResponseCached } from "../components/ReccomendedByOurModel";
 import { getAuthHeaders } from "./user.service";
-
-interface MovieTitleResult {
-  Title: string;
-  Year: string;
-  imdbID: string;
-  Type: string;
-  Poster: string;
-}
-
-interface MovieTitleApiResponseData {
-  Search: MovieTitleResult[];
-  totalResults: string;
-  Response: string;
-}
 
 interface MovieTitleApiResponse {
   success: boolean;
-  data: MovieTitleApiResponseData;
+  data: {
+    Title: string;
+    Year: string;
+    imdbID: string;
+    Type: string;
+    Poster: string;
+  };
+}
+interface MovieTitlesApiResponse {
+  success: boolean;
+  data: {
+    Response: string;
+    totalResults: string;
+    Search: {
+      Title: string;
+      Year: string;
+      imdbID: string;
+      Type: string;
+      Poster: string;
+    }[];
+  };
 }
 export interface IMDBTrendingResponse {
   title: string;
@@ -197,7 +204,7 @@ const getMovieByTitle = async (
     }
 
     const encodedTitle = encodeURIComponent(title.trim());
-    const url = `http://localhost:8000/api/v1/omdb/getMovieByTitle?title=${encodedTitle}`;
+    const url = `http://localhost:8000/api/v1/omdb/getMovieByTitle/${encodedTitle}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -219,9 +226,57 @@ const getMovieByTitle = async (
     return {
       success: false,
       data: {
-        Search: [],
-        totalResults: "0",
-        Response: "False",
+        Title: "",
+        Year: "",
+        imdbID: "",
+        Type: "",
+        Poster: "",
+      },
+    };
+  }
+};
+const getMovieByTitles = async (
+  title: string
+): Promise<MovieTitlesApiResponse> => {
+  try {
+    if (!title || title.trim() === "") {
+      throw new Error("Title parameter is required");
+    }
+
+    const encodedTitle = encodeURIComponent(title.trim());
+    const url = `http://localhost:8000/api/v1/omdb/getMovieByTitles/${encodedTitle}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: MovieTitlesApiResponse = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching movie by title:", error);
+
+    return {
+      success: false,
+      data: {
+        Response: "True",
+        totalResults: "",
+        Search: [
+          {
+            Title: "",
+            Year: "",
+            imdbID: "",
+            Type: "",
+            Poster: "",
+          },
+        ],
       },
     };
   }
@@ -454,6 +509,54 @@ const getMovieReviewsHandler = async ({
     };
   }
 };
+interface CachedMoviesResponse {
+  success: boolean;
+  data: MovieResponseCached[];
+  total: number;
+  page?: number;
+}
+
+interface CachedMoviesErrorResponse {
+  success: false;
+  status: number;
+  message: string;
+  type: string;
+}
+
+const getCachedMoviesHandler = async ({
+  limit = 10,
+  page = 1,
+  token,
+}: {
+  limit?: number;
+  page?: number;
+  token: string;
+}): Promise<CachedMoviesResponse | CachedMoviesErrorResponse> => {
+  try {
+    const url = `http://localhost:8000/api/v1/omdb/cachedMovies?limit=${limit}&page=${page}`;
+    const headers = getAuthHeaders(token);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: CachedMoviesResponse = await response.json();
+
+    return data;
+  } catch (error: any) {
+    console.error("Error fetching cached movies:", error);
+
+    return {
+      success: false,
+      status: 500,
+      message: "Something went wrong while fetching cached movies",
+      type: "INTERNAL_ERROR",
+    };
+  }
+};
 
 export {
   getTrendingMovies,
@@ -462,4 +565,6 @@ export {
   submitCommentHandler,
   deleteCommentHandler,
   getMovieReviewsHandler,
+  getMovieByTitles,
+  getCachedMoviesHandler,
 };
