@@ -4,12 +4,7 @@ import type { WatchlistResponse } from "../components/UserProfileHero";
 const API_BASE_URL = "http://localhost:8000";
 
 export interface SelectedMovie {
-  tmdbId: number;
-  imdbId?: string;
   title: string;
-  poster_path?: string;
-  release_date?: string;
-  vote_average?: number;
 }
 
 export interface UserPreference {
@@ -301,7 +296,7 @@ const logoutUser = (): void => {
 };
 
 const saveUserPreferences = async (
-  preferences: SelectedMovie[],
+  preferences: { title: string; imdbID: string }[],
   token?: string
 ): Promise<UserPreferenceApiResponse> => {
   try {
