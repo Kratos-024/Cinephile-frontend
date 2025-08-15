@@ -13,6 +13,7 @@ import {
 } from "../services/user.service";
 import { useParams } from "react-router-dom";
 import NetworkSection from "./NetworkSection";
+import { RecentActivity, RecentReviews } from "./recentMovies";
 
 type WatchlistMovie = {
   imdbId: string;
@@ -270,7 +271,8 @@ const ReviewsSection = ({
   );
 };
 
-const ProfileSection = () => {
+
+const ProfileSection = ({ recentReviews } : { recentReviews: MovieCommentResponse[] }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-8 py-8">
       <div className="lg:col-span-2 space-y-8">
@@ -286,37 +288,9 @@ const ProfileSection = () => {
           </p>
         </div>
 
+   
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-gray-400 text-sm uppercase tracking-wide">
-              Recent Activity
-            </h2>
-            <button className="text-gray-400 text-sm hover:text-white">
-              ALL
-            </button>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="relative group cursor-pointer">
-              <img
-                src="https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg"
-                alt="I Saw the TV Glow"
-                className="w-full aspect-[2/3] object-cover rounded"
-              />
-              <div className="absolute bottom-2 left-2">
-                <div className="flex text-orange-500 text-xs">
-                  {"★★★☆☆".split("").map((star, i) => (
-                    <span key={i}>{star}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="w-full aspect-[2/3] bg-gray-800 rounded"
-              ></div>
-            ))}
-          </div>
+          <RecentActivity/>
         </div>
 
         <div>
@@ -329,33 +303,8 @@ const ProfileSection = () => {
             </button>
           </div>
 
-          <div className="flex gap-4 p-4 bg-gray-800 bg-opacity-30 rounded">
-            <img
-              src="https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/02/i-saw-the-tv-glow-film-poster.jpg"
-              alt="I Saw the TV Glow"
-              className="w-16 h-24 object-cover rounded"
-            />
-            <div className="flex-1">
-              <h3 className="text-white text-lg font-semibold mb-1">
-                I Saw the TV Glow
-                <span className="text-gray-400 font-normal"> 2024</span>
-              </h3>
-              <div className="flex text-green-500 text-xs mb-2">
-                {"★★★☆☆".split("").map((star, i) => (
-                  <span key={i}>{star}</span>
-                ))}
-                <span className="text-gray-400 ml-2">Watched 12 Jul 2024</span>
-              </div>
-              <p className="text-gray-300 text-sm mb-2">
-                very weird movie with a good plot that explore escapism from
-                reality However, the ending is strange and difficult to
-                understand
-              </p>
-              <div className="flex items-center text-gray-400 text-xs">
-                <span>♡ No likes yet</span>
-              </div>
-            </div>
-          </div>
+          <RecentReviews reviews={recentReviews} />
+
         </div>
       </div>
 
@@ -443,6 +392,7 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
       if (response.success) {
         setIsFollowed(true);
         setLoader(false);
+                window.location.reload()
       }
     } catch (error) {
       console.log(error);
@@ -455,7 +405,7 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
       const response = await unfollowUser(targetId, token);
       if (response.success) {
         setIsFollowed(false);
-        setLoader(false);
+        setLoader(false);window.location.reload()
       }
     } catch (error) {
       console.log(error);
@@ -514,6 +464,7 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
 };
 export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
   const [navigation, setNavigation] = useState("Profile");
+
   const navigationHandler = (nav: string) => {
     setNavigation(nav);
   };
@@ -525,16 +476,13 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
     },
     following: {
       count: 0,
-      profiles: [],
+      profiles: [{displayName:'',email:'',photoURL:'',uid:''}],
     },
     profile: {
       displayName: "",
       email: "",
-      emailVerified: false,
-      joinedDate: { _seconds: 0, _nanoseconds: 0 },
       photoURL: "",
-      updatedAt: { _seconds: 0, _nanoseconds: 0 },
-      userId: "",
+      uid: "",
     },
     reviews: [],
     stats: {
@@ -560,7 +508,8 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
         console.log(response.data);
         //@ts-ignore
         setUser(response.data);
-      }
+
+      } 
     };
     getUser();
   }, [user_userid]);
@@ -571,11 +520,12 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
       <div className="relative">
         <img
           className="w-full h-[340px] relative object-cover"
-          src={user?.profile.photoURL || "/default-banner.jpg"}
+          src='https://media.gettyimages.com/id/1798302631/video/no-tv-signal-vhs-noise-glitch-screen-overlay-grunge-old-tv-background.jpg?s=640x640&k=20&c=yrNzn6bNDtn7XWeLiVMkfNg9RhFUWHfwtyDiaXS5eaI='
           alt="user-profile-hero"
         />
         <div className="flex items-start gap-6 px-8 max-lg:-mt-10 lg:-mt-20 relative z-10">
           <img
+            loading="lazy"
             className="rounded-full lg:w-[246px] lg:h-[246px] max-lg:w-[96px] max-lg:h-[96px] max-lg:mt-0 object-cover border-4 border-white"
             src={user?.profile.photoURL || "/default-avatar.jpg"}
             alt="profile"
@@ -645,12 +595,13 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
           ))}
         </nav>
       </div>
-      {navigation === "Profile" && <ProfileSection />}
+      {navigation === "Profile" && <ProfileSection recentReviews={user.reviews} />}
       {navigation === "Reviews" && (
         <ReviewsSection userReviewData={user.reviews} />
       )}
       {navigation === "Watchlist" && <WatchlistSection />}
-      {navigation === "Network" && <NetworkSection />}
+      {navigation === "Network" && <NetworkSection
+ following={user.following} followers={user.followers} />}
     </section>
   );
 };

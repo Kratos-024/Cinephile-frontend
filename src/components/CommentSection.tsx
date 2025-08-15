@@ -68,7 +68,7 @@ export const CommentSection = ({
 
   return (
     <section>
-      <div className="flex flex-col w-full max-w-2xl">
+      <div className="flex gap-3 justify-center flex-col max-sm:w-[420px] max-md:w-[520px]  max-xl:w-[960px]  xl:w-full max-lg:w-[720px] ">
         <div className="flex items-center gap-3 mb-4">
           <img
             src={userPhotoURL || "/default-avatar.png"}

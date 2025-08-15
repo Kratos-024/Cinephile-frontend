@@ -33,16 +33,12 @@ const userSlicer = createSlice({
   initialState: userInitialState,
   reducers: {
     addUser: (state, action: PayloadAction<UserSlicerType>) => {
-      console.log("http://localhost:5173/", "added");
-
       state = { ...action.payload };
     },
     clearUser: () => {
       return { ...userInitialState };
     },
-    // updateAccessToken: (state, action: PayloadAction<string>) => {
-    //   state.accessToken = action.payload;
-    // },
+ 
   },
 });
 

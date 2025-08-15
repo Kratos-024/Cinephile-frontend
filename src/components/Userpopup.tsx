@@ -47,8 +47,11 @@ export const UserPopup = ({
   }
 
   return (
-    <div className="absolute right-0 top-12 z-50 bg-[#1b1919] border border-gray-700 rounded-lg shadow-2xl min-w-[280px]">
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+    <div className="absolute right-0 top-12 z-50
+     bg-[#1b1919] border border-gray-700 rounded-lg
+      shadow-2xl  min-w-[280px]">
+      <div className="flex items-center justify-between p-4
+       border-b border-gray-700">
         <h3 className="text-white font-semibold">Account</h3>
         <IoClose
           className="text-gray-400 hover:text-white cursor-pointer w-5 h-5 transition-colors"
@@ -80,31 +83,15 @@ export const UserPopup = ({
             </div>
           </div>
 
-          {userProfile && (
-            <div className="flex justify-between p-3 bg-gray-800/30 rounded-lg">
-              <div className="text-center">
-                <p className="text-white font-semibold">
-                  {userProfile.followersCount || 0}
-                </p>
-                <p className="text-gray-400 text-xs">Followers</p>
-              </div>
-              <div className="text-center">
-                <p className="text-white font-semibold">
-                  {userProfile.followingCount || 0}
-                </p>
-                <p className="text-gray-400 text-xs">Following</p>
-              </div>
-              <div className="text-center">
-                <p className="text-white font-semibold">0</p>
-                <p className="text-gray-400 text-xs">Reviews</p>
-              </div>
-            </div>
-          )}
+     
 
           <div className="space-y-2">
             <button
               onClick={handleMyProfile}
-              className="w-full flex items-center gap-3 px-4 py-3 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200"
+              className="w-full flex items-center gap-3 px-4
+               py-3 text-white bg-green-600
+                hover:bg-green-700 rounded-lg 
+                transition-colors duration-200"
             >
               <FaUser className="w-4 h-4" />
               My Profile

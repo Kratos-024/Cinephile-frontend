@@ -11,6 +11,7 @@ import {
 } from "../services/movie.service";
 import { useState } from "react";
 import { MovieDetails } from "../components/MovieDetials";
+import { saveRecentMovie } from "../components/recentMovies";
 
 export const MoviePage = () => {
   const [menu, setMenu] = useState(false);
@@ -85,6 +86,8 @@ export const MoviePage = () => {
           const response: MovieResponse = await getMovieData(id);
           if (response.success) {
             setMovieData(response);
+            saveRecentMovie({imdbId:response.data.imdbId,poster:response.data.poster,title:response.data.title}, 4);
+
           }
         } catch (error) {
           console.error("Error fetching movie data:", error);

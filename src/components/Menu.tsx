@@ -163,7 +163,7 @@ export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
                   {item === "Watchlist" && <CiHeart />}
                   {item === "Coming Soon" && <SlCalender />}
                 </motion.div>
-                <a href="/WatchlistPage">
+                <a href={`${item==='Watchlist'? "/WatchlistPage":'/'}`}>
                   <span className="font-semibold">{item}</span>
                 </a>{" "}
               </motion.li>

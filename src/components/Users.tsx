@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { getTop10UsersHandler } from "../services/user.service";
+import { Link } from "react-router-dom";
 
-interface ApiUserProfile {
+export interface ApiUserProfile {
   uid: string;
   displayName: string;
   email: string;
@@ -9,51 +10,49 @@ interface ApiUserProfile {
   bio: string;
   followersCount: number;
   followingCount: number;
-  createdAt: string | null;
+  createdAt: string ;
 }
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: {
-    users: ApiUserProfile[];
-    totalUsers: number;
-  };
-}
 
-const Avatar = ({ user, isActive }) => {
+
+const Avatar = ({ user }:{user:ApiUserProfile}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div
-      className={`relative transition-all duration-300 ${
-        isActive ? "scale-100 opacity-100" : "scale-90 opacity-70"
-      }`}
+   <Link to={`/profile/${user.uid}/${user.displayName}`}> <div
+      className={`relative transition-all duration-300 `}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <img
         className="group rounded-full w-[278px] h-[268px] object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
-        src={user.image}
-        alt={user.name}
+        src={user.photoURL}
+        alt={user.displayName}
       />
 
       {isHovered && (
         <div className="absolute z-50 px-3 py-2 text-white bg-gray-900 rounded-lg shadow-xl border border-gray-700 whitespace-nowrap bottom-full left-1/2 transform -translate-x-1/2 mb-2">
-          {user.name}
+          {user.displayName}
           <div className="absolute top-full left-1/2 transform -translate-x-1/2">
             <div className="border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
           </div>
         </div>
       )}
-    </div>
+    </div></Link>
   );
 };
 
 export const AvatarExamples = () => {
   const [users, setUsers] = useState<
-    Array<{ id: string; name: string; image: string }>
-  >([]);
+    Array<ApiUserProfile>
+  >([{ uid: '',
+  displayName: '',
+  email: '',
+  photoURL: '',
+  bio: '',
+  followersCount: 0,
+  followingCount: 0,
+  createdAt: '',}]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,14 +63,11 @@ export const AvatarExamples = () => {
       const limit = 10;
       const token = localStorage.getItem("authToken") || "";
       const response = await getTop10UsersHandler({ limit, token });
-
+      console
+      .log(response)
       if (response?.success) {
-        const mappedUsers = response.data.users.map((user: ApiUserProfile) => ({
-          id: user.uid,
-          name: user.displayName,
-          image: user.photoURL,
-        }));
-        setUsers(mappedUsers);
+       
+        setUsers(response.data.users);
       } else {
         setUsers([]);
         setError("Failed to fetch users");
@@ -108,7 +104,6 @@ export const AvatarExamples = () => {
 
   const visibleUsers = users.slice(currentIndex, currentIndex + itemsPerPage);
 
-  // Loading state
   if (loading) {
     return (
       <div className="p-1">
@@ -120,7 +115,6 @@ export const AvatarExamples = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="p-1">
@@ -132,7 +126,6 @@ export const AvatarExamples = () => {
     );
   }
 
-  // Empty state
   if (users.length === 0) {
     return (
       <div className="p-1">
@@ -171,11 +164,10 @@ export const AvatarExamples = () => {
           </button>
 
           <div className="flex justify-center gap-8 transition-all duration-500 ease-in-out">
-            {visibleUsers.map((user, index) => (
+            {visibleUsers.map((user) => (
               <Avatar
-                key={user.id}
+                key={user.uid}
                 user={user}
-                isActive={index === 1 || index === 2}
               />
             ))}
           </div>

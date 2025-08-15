@@ -1,4 +1,5 @@
 import type { WatchlistResponse } from "../components/UserProfileHero";
+import type { ApiUserProfile } from "../components/Users";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const API_BASE_URL = "http://localhost:8000";
@@ -48,11 +49,8 @@ type Timestamp = {
 type Profile = {
   displayName: string;
   email: string;
-  emailVerified: boolean;
-  joinedDate: Timestamp;
   photoURL: string;
-  updatedAt: Timestamp;
-  userId: string;
+  uid: string;
 };
 
 type CountWithProfiles = {
@@ -197,7 +195,6 @@ const handleFetchResponse = async (response: Response): Promise<any> => {
 };
 
 const handleFetchError = (error: any, operation: string) => {
-  console.error(`Error in ${operation}:`, error);
 
   if (error instanceof TypeError && error.message.includes("fetch")) {
     return {
@@ -309,6 +306,7 @@ const saveUserPreferences = async (
     });
 
     const data: UserPreferenceApiResponse = await handleFetchResponse(response);
+
     return data;
   } catch (error) {
     return handleFetchError(
@@ -556,9 +554,6 @@ const getUserFollowing = async (
 }> => {
   try {
     const url = `${API_BASE_URL}/api/v1/user/following`;
-
-    console.log("Getting user following from:", url);
-
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(token),
@@ -569,7 +564,6 @@ const getUserFollowing = async (
       message: string;
       success: boolean;
     } = await handleFetchResponse(response);
-    console.log(data);
     return data;
   } catch (error) {
     const errorResponse = handleFetchError(error, "getUserFollowing");
@@ -681,7 +675,7 @@ export interface GetTop10UsersResponse {
   success: boolean;
   message: string;
   data: {
-    users: UserProfile[];
+    users: ApiUserProfile[];
     totalUsers: number;
   };
 }
@@ -729,7 +723,6 @@ export const getTop10UsersHandler = async ({
     }
 
     const data: GetTop10UsersResponse = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching top users:", error);

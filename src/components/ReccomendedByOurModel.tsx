@@ -2,7 +2,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { Link } from "react-router-dom"; // ✅ Import Link from react-router-dom
 import { getCachedMoviesHandler } from "../services/movie.service";
+import { addToWatchList, RemoveFromWatchlist } from "../services/user.service";
+import { toast } from "react-toastify";
+
 type Timestamp = {
   _seconds: number;
   _nanoseconds: number;
@@ -51,38 +55,92 @@ const ReccomendedByOurModelTemplate = ({
   movie: MovieResponseCached;
 }) => {
   const [isLiked, setIsLiked] = useState(false);
-  const movieData = {
-    title: movie.Title,
-    genre: movie.Genre,
-    rating: movie.imdbRating,
-    image: movie.Poster,
+  
+  const likeHandler = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      return;
+    }
+    
+    if (!isLiked) {
+      setIsLiked(true);
+
+      const response = await addToWatchList(token, {
+        imdbId: movie.imdbID,
+        title: movie.Title,
+        poster_path: movie.Poster,
+        release_date: movie.Year,
+        vote_average: movie.imdbVotes,
+      });
+      
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    } else {
+      setIsLiked(false);
+      const response = await RemoveFromWatchlist(token, {
+        imdbId: movie.imdbID,
+      });
+      
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    }
   };
 
   return (
     <div className="relative rounded-2xl group cursor-pointer transform transition-all duration-300 hover:scale-105">
-      <div className="relative overflow-hidden rounded-2xl">
-        <img
-          className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-          src={movieData.image}
-          alt={movieData.title}
-        />
+             <Link to={`/movie/${movie.imdbID}/${movie.Title}`}>
+ <div className="relative overflow-hidden rounded-2xl">
+          <img
+            className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+            src={movie.Poster}
+            alt={movie.Title}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1489599511985-c1b6c27e3e1b?w=280&h=400&fit=crop";
+            }}
+          />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
         <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <h4 className="text-white font-semibold text-lg mb-1">
-            {movieData.title}
+          <h4 className="text-white font-semibold text-lg mb-1 line-clamp-2">
+            {movie.Title}
           </h4>
-          <p className="text-gray-300 text-sm">{movieData.genre}</p>
+          <p className="text-gray-300 text-sm line-clamp-1">{movie.Genre}</p>
         </div>
       </div>
+        </Link>
 
       <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
-        <span>{movieData.rating}</span>
+        <span>{movie.imdbRating}</span>
       </div>
+      
       <div className="absolute top-3 right-3">
         <button
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={(e) => {
+            e.preventDefault(); // Prevent navigation when clicking heart
+            likeHandler();
+          }}
           className="p-2 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-300"
         >
           <Heart
@@ -113,23 +171,27 @@ export const ReccomendedByOurModel = () => {
     const loadCachedMovies = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         const token = localStorage.getItem("authToken") || "";
         const result = await getCachedMoviesHandler({
           limit: 12,
           page: 1,
           token,
         });
-        console.log(result);
-        if (result.success) {
+        
+        
+        if (result.success && result.data) {
           setMovies(result.data);
-          setError(null);
         } else {
           //@ts-ignore
-          setError(result.message);
+          setError(result.message || "Failed to load movies");
+          setMovies([]); 
         }
       } catch (err) {
         console.error("Error loading cached movies:", err);
         setError("Failed to load movies");
+        setMovies([]);
       } finally {
         setLoading(false);
       }
@@ -173,12 +235,16 @@ export const ReccomendedByOurModel = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+
   if (loading) {
     return (
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center h-64">
-            <div className="text-white text-xl">Loading movies...</div>
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <div className="text-white text-xl">Loading movies...</div>
+            </div>
           </div>
         </div>
       </section>
@@ -191,6 +257,18 @@ export const ReccomendedByOurModel = () => {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center h-64">
             <div className="text-red-400 text-xl">Error: {error}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!loading && movies.length === 0) {
+    return (
+      <section className="py-16">
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-400 text-xl">No movies available</div>
           </div>
         </div>
       </section>
@@ -243,7 +321,7 @@ export const ReccomendedByOurModel = () => {
             }}
           >
             {movies.map((movie) => (
-              <div key={movie.id} className="flex-shrink-0">
+              <div key={movie.id || movie.imdbID} className="flex-shrink-0">
                 <ReccomendedByOurModelTemplate movie={movie} />
               </div>
             ))}
@@ -265,19 +343,21 @@ export const ReccomendedByOurModel = () => {
           </button>
         </div>
 
-        <div className="flex justify-center items-center gap-2 mt-8">
-          {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? "bg-white w-8"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
-            />
-          ))}
-        </div>
+        {movies.length > visibleItems && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex
+                    ? "bg-white w-8"
+                    : "bg-white/30 hover:bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -580,7 +580,8 @@ const getSimilarMovies = async (
     if (!response.ok || !data.success) {
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
-
+    console
+    .log("fishfisdhodsfhsdkf",data)
     return data;
   } catch (error) {
     console.error("Error fetching movie by title:", error);

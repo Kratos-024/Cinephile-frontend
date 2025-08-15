@@ -28,10 +28,8 @@ export const TrendingSectionTemplate = ({
     if (!token) {
       return;
     }
-    console.log("liked came to handler");
     if (!isLiked) {
       setIsLiked(true);
-      console.log("liked added to watchylist");
 
       const response = await addToWatchList(token, {
         imdbId: movie.watchlistId,
@@ -136,7 +134,6 @@ export const TrendingSection = () => {
 
         if (response.success && Array.isArray(response.data)) {
           setMovie(response.data);
-          console.log(response.data);
 
           const filteredMovies = response.data.filter(
             (movie) =>

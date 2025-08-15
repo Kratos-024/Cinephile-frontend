@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { IoIosSearch, IoIosNotifications } from "react-icons/io";
 import { RiMenuSearchFill } from "react-icons/ri";
-import { LuMessageCircleMore } from "react-icons/lu";
 import { CiUser } from "react-icons/ci";
 import { googleLogin } from "../firebase/login";
 import { UserPopup } from "./Userpopup";
@@ -149,7 +148,7 @@ export const NavBar = ({
     }
   };
   return (
-    <div className="w-full">
+    <div className="w-full py-2">
       <div
         className="flex items-center
        justify-between"
@@ -176,7 +175,8 @@ export const NavBar = ({
             <FaAngleRight className="cursor-pointer w-6 h-6" />
           </div>
 
-          <div className="flex items-center px-2 pl-5 py-3 w-[320px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0">
+          <div className="flex items-center px-2 pl-5 py-3
+           w-[320px] max-md:w-[260px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0">
             <div className=" cursor-pointer" onClick={searchHandler}>
               <IoIosSearch className="text-gray-400 w-6 h-6" />
             </div>{" "}
@@ -184,7 +184,8 @@ export const NavBar = ({
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
-              className="text-white bg-transparent outline-none flex-1 min-w-0"
+              className="text-white bg-transparent outline-none
+               flex-1 min-w-0"
               placeholder="Search Anything"
             />
             <RiMenuSearchFill className="text-gray-400 w-6 h-6" />
@@ -192,7 +193,6 @@ export const NavBar = ({
         </div>
 
         <div className="flex items-center gap-4 text-white">
-          <LuMessageCircleMore className="w-7 h-7 cursor-pointer" />
           <IoIosNotifications className="w-7 h-7 cursor-pointer" />
           <div className="relative" ref={popupRef}>
             <CiUser

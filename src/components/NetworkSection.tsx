@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { MoreHorizontal, User } from "lucide-react";
-import { useParams } from "react-router-dom";
 import {
   type UserFollowData,
-  getUserFollowers,
-  getUserFollowing,
+
   unfollowUser,
 } from "../services/user.service";
 
@@ -54,6 +52,7 @@ const UserCard = ({ users }: { users: UserProfile }) => {
                  border-2 border-gray-600 ${!imageLoaded ? "hidden" : "block"}`}
             src={users.photoURL || ""}
             alt={`${users.displayName} profile`}
+            loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageLoaded(true)}
           />
@@ -107,12 +106,15 @@ const UserCard = ({ users }: { users: UserProfile }) => {
   );
 };
 
-const NetworkSection = () => {
+const NetworkSection = ({ followers, following }: {
+  followers:{count:number,profiles:{displayName:string,email:string,photoURL:string,uid:string}[]}
+  following:{count:number,profiles:{displayName:string,email:string,photoURL:string,uid:string}[]}
+
+}) => {
   const [activeTab, setActiveTab] = useState<"followers" | "following">(
     "followers"
   );
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [networkData, setNetworkData] = useState<UserFollowData>({
     followers: [],
@@ -120,74 +122,76 @@ const NetworkSection = () => {
     followersCount: 0,
     followingCount: 0,
   });
-  const currentUserId = useParams();
+  // const currentUserId = useParams();
   useEffect(() => {
-    const fetchNetworkData = async () => {
-      if (!currentUserId.userid) {
-        setError("User ID not found");
-        setLoading(false);
-        return;
-      }
+    // const fetchNetworkData = async () => {
+    //   if (!currentUserId.userid) {
+    //     setError("User ID not found");
+    //     setLoading(false);
+    //     return;
+    //   }
 
-      try {
-        setLoading(true);
-        setError(null);
+    //   try {
+    //     setLoading(true);
+    //     setError(null);
 
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          setError("Authentication token not found");
-          setLoading(false);
-          return;
-        }
+    //     const token = localStorage.getItem("authToken");
+    //     if (!token) {
+    //       setError("Authentication token not found");
+    //       setLoading(false);
+    //       return;
+    //     }
 
-        const [followersResponse, followingResponse] = await Promise.all([
-          getUserFollowers(currentUserId.userid, token),
-          getUserFollowing(currentUserId.userid, token),
-        ]);
+    //     const [followersResponse, followingResponse] = await Promise.all([
+    //       getUserFollowers(currentUserId.userid, token),
+    //       getUserFollowing(currentUserId.userid, token),
+    //     ]);
 
-        const followersData = (followersResponse.data?.followers || []).map(
-          (user) => ({
-            uid: user.uid,
-            displayName: user.displayName || "Unknown User",
-            photoURL: user.photoURL || "",
-            email: user.email || "",
-            bio: user.bio || undefined,
-          })
-        );
+    //     const followersData = (followersResponse.data?.followers || []).map(
+    //       (user) => ({
+    //         uid: user.uid,
+    //         displayName: user.displayName || "Unknown User",
+    //         photoURL: user.photoURL || "",
+    //         email: user.email || "",
+    //         bio: user.bio || undefined,
+    //       })
+    //     );
 
-        const followingData = (followingResponse.data?.following || []).map(
-          (user) => ({
-            uid: user.uid,
-            displayName: user.displayName || "Unknown User",
-            photoURL: user.photoURL || "",
-            email: user.email || "",
-            bio: user.bio || undefined,
-          })
-        );
+    //     const followingData = (followingResponse.data?.following || []).map(
+    //       (user) => ({
+    //         uid: user.uid,
+    //         displayName: user.displayName || "Unknown User",
+    //         photoURL: user.photoURL || "",
+    //         email: user.email || "",
+    //         bio: user.bio || undefined,
+    //       })
+    //     );
 
-        setNetworkData({
-          followers: followersData,
-          following: followingData,
-          followersCount: followersResponse.data?.followersCount || 0,
-          followingCount: followingResponse.data?.followingCount || 0,
-        });
+    //     setNetworkData({
+    //       followers: followersData,
+    //       following: followingData,
+    //       followersCount: followersResponse.data?.followersCount || 0,
+    //       followingCount: followingResponse.data?.followingCount || 0,
+    //     });
 
-        console.log("Network data fetched:", {
-          followers: followersData,
-          following: followingData,
-          followersCount: followersResponse.data?.followersCount || 0,
-          followingCount: followingResponse.data?.followingCount || 0,
-        });
-      } catch (error) {
-        console.error("Error fetching network data:", error);
-        setError("Failed to load network data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNetworkData();
-  }, [currentUserId]);
+    //     console.log("Network data fetched:", {
+    //       followers: followersData,
+    //       following: followingData,
+    //       followersCount: followersResponse.data?.followersCount || 0,
+    //       followingCount: followingResponse.data?.followingCount || 0,
+    //     });
+    //   } catch (error) {
+    //     console.error("Error fetching network data:", error);
+    //     setError("Failed to load network data");
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+    console.log(followers)
+    setNetworkData({ followersCount: followers.count, followingCount: following.count, followers: followers.profiles, following: following.profiles })
+    setLoading(false)
+    // fetchNetworkData();
+  }, []);
 
   const currentUsers =
     activeTab === "followers"
@@ -205,25 +209,7 @@ const NetworkSection = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="w-full px-8 py-8">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-red-800/20 rounded-full flex items-center justify-center mb-4">
-            <span className="text-red-400 text-2xl">⚠️</span>
-          </div>
-          <h3 className="text-red-400 text-lg font-medium mb-2">Error</h3>
-          <p className="text-gray-500 text-sm">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="w-full px-8 py-8">

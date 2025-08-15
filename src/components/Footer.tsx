@@ -34,21 +34,13 @@ export const Footer = () => {
                              relative z-20"
                       href="/"
                     >
-                      <img
-                        alt="logo"
-                        loading="lazy"
-                        width="60"
-                        height="60"
-                        decoding="async"
-                        data-nimg="1"
-                        src="./images/logo.png"
-                        style={{ color: "transparent" }}
-                      ></img>
+                   
                       <span
                         className="font-medium text-black
                      "
                       >
-                        SymptoSort
+                         <span className="text-white">Cine</span>
+            <span className="text-red-600">phile</span>
                       </span>
                     </a>
                   </div>
@@ -104,7 +96,7 @@ export const Footer = () => {
                 </div>
                 <div className="flex sm:flex-row flex-col justify-between mt-8 items-center w-full">
                   <p className=" dark:text-neutral-400 mb-8 sm:mb-0">
-                    © SymptoSort
+                    © Cinephile
                   </p>
                   <div className="flex gap-4">
                     <a href="#">
