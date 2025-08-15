@@ -60,7 +60,7 @@ const RecentActivity = () => {
         {recentMovies.map((movie) => (
           <div key={movie.imdbId} className="relative group cursor-pointer">
             <img
-              src={movie.poster || "https://via.placeholder.com/300x450?text=No+Image"}
+            src={movie.poster.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
               alt={movie.title}
               className="w-full aspect-[2/3] object-cover rounded"
             />

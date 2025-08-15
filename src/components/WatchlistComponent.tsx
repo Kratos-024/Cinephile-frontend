@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { getUserWatchlist } from "../services/user.service";
+import { getUserWatchlist, RemoveFromWatchlist } from "../services/user.service";
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 export const MovieSection = ({
   movie,
 }: {
@@ -14,13 +15,49 @@ export const MovieSection = ({
     poster_path: string;
   };
 }) => {
+  const [isLiked, setIsLiked] = useState(true); 
+
+  const removeHandler = async () => {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      return;
+    }
+    setIsLiked(false);
+    try {
+      const response = await RemoveFromWatchlist(token, {
+        imdbId: movie.imdbId,
+      });
+      
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+                setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        setIsLiked(true);
+      }
+    } catch (error) {
+      console.error("Error removing from watchlist:", error);      setIsLiked(true);
+    }
+  };
+
   return (
     <div className="relative group cursor-pointer transform transition-all duration-500 hover:scale-105">
       <Link to={`/movie/${movie.imdbId}/${movie.title}`}>
         <div className="relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500">
           <img
             className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-110"
-            src={movie.poster_path.replace(/_V1_.*\.jpg$/, "_V1_.jpg")}
+            src={movie.poster_path.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
             alt={movie.title}
             loading="lazy"
           />
@@ -43,8 +80,21 @@ export const MovieSection = ({
       </Link>
 
       <div className="absolute top-4 right-4 z-10">
-        <button className="p-3 rounded-xl bg-black/60 backdrop-blur-md hover:bg-black/80 hover:scale-110 transition-all duration-300 shadow-lg group/heart">
-          <Heart className="w-5 h-5 text-white group-hover/heart:text-red-400 group-hover/heart:fill-red-400 transition-all duration-300" />
+        <button 
+          onClick={(e) => {
+            e.preventDefault(); 
+            e.stopPropagation(); 
+            removeHandler();
+          }}
+          className="p-3 rounded-xl bg-black/60 backdrop-blur-md hover:bg-black/80 hover:scale-110 transition-all duration-300 shadow-lg group/heart"
+        >
+          <Heart 
+            className={`w-5 h-5 transition-all duration-300 ${
+              isLiked
+                ? "fill-red-500 text-red-500"
+                : "text-white hover:text-red-400"
+            }`}
+          />
         </button>
       </div>
     </div>
@@ -63,11 +113,12 @@ export const Watchlist = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const token = localStorage.getItem("authToken") || "";
+  const userId = localStorage.getItem("userId") || "";
 
   useEffect(() => {
     const getUserWatchlistHandler = async (isLoadMore: boolean = false) => {
       try {
-        const response = await getUserWatchlist(token);
+        const response = await getUserWatchlist(token,userId);
         if (response.success) {
           setMovies(response.data.watchlistMovies);
           setLoading(false);
@@ -113,3 +164,4 @@ export const Watchlist = () => {
     </section>
   );
 };
+          //  src={image.src.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}

@@ -630,9 +630,9 @@ const addToWatchList = async (
   }
 };
 
-const getUserWatchlist = async (token: string): Promise<WatchlistResponse> => {
+const getUserWatchlist = async (token: string, userId?: string): Promise<WatchlistResponse> => {
   try {
-    const url = API_BASE_URL + "/api/v1/user/GetUserWatchlist";
+    const url = API_BASE_URL + `/api/v1/user/GetUserWatchlist/${userId}`;
     const header = getAuthHeaders(token);
 
     const response = await fetch(url, {
@@ -646,6 +646,7 @@ const getUserWatchlist = async (token: string): Promise<WatchlistResponse> => {
     return handleFetchError(error, "getUserProfile") as WatchlistResponse;
   }
 };
+
 const RemoveFromWatchlist = async (
   token: string,
   movieData: {

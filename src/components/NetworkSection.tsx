@@ -14,9 +14,10 @@ interface UserProfile {
   bio?: string;
 }
 
-const UserCard = ({ users }: { users: UserProfile }) => {
+const UserCard = ({ users, tabType }: { users: UserProfile; tabType: "followers" | "following" }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  
   const unFollowHandler = async () => {
     try {
       const token = localStorage.getItem("authToken") || "";
@@ -28,6 +29,7 @@ const UserCard = ({ users }: { users: UserProfile }) => {
       console.log("Error", error);
     }
   };
+
   return (
     <div className="group relative rounded-2xl cursor-pointer transform transition-all duration-300 hover:z-10">
       <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-gray-800/50 p-4">
@@ -48,7 +50,7 @@ const UserCard = ({ users }: { users: UserProfile }) => {
             <MoreHorizontal className="w-4 h-4" />
           </button>
           <img
-            className={`w-20 h-20 object- rounded-full mb-3 transition-transform duration-300 group-hover:scale-110
+            className={`w-20 h-20 object-cover rounded-full mb-3 transition-transform duration-300 group-hover:scale-110
                  border-2 border-gray-600 ${!imageLoaded ? "hidden" : "block"}`}
             src={users.photoURL || ""}
             alt={`${users.displayName} profile`}
@@ -72,20 +74,19 @@ const UserCard = ({ users }: { users: UserProfile }) => {
 
             <div className="relative">
               {showMenu && (
-                <div
-                  className=" mt-1 bg-gray-800 border border-gray-700 rounded-lg
-                   shadow-lg z-50 min-w-[120px]"
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowMenu(false);
-                      unFollowHandler();
-                    }}
-                    className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-700 transition-colors text-sm"
-                  >
-                    Unfollow
-                  </button>
+                <div className="mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 min-w-[120px]">
+                  {tabType === "following" && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                        unFollowHandler();
+                      }}
+                      className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-700 transition-colors text-sm"
+                    >
+                      Unfollow
+                    </button>
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -106,6 +107,7 @@ const UserCard = ({ users }: { users: UserProfile }) => {
   );
 };
 
+
 const NetworkSection = ({ followers, following }: {
   followers:{count:number,profiles:{displayName:string,email:string,photoURL:string,uid:string}[]}
   following:{count:number,profiles:{displayName:string,email:string,photoURL:string,uid:string}[]}
@@ -122,75 +124,12 @@ const NetworkSection = ({ followers, following }: {
     followersCount: 0,
     followingCount: 0,
   });
-  // const currentUserId = useParams();
   useEffect(() => {
-    // const fetchNetworkData = async () => {
-    //   if (!currentUserId.userid) {
-    //     setError("User ID not found");
-    //     setLoading(false);
-    //     return;
-    //   }
-
-    //   try {
-    //     setLoading(true);
-    //     setError(null);
-
-    //     const token = localStorage.getItem("authToken");
-    //     if (!token) {
-    //       setError("Authentication token not found");
-    //       setLoading(false);
-    //       return;
-    //     }
-
-    //     const [followersResponse, followingResponse] = await Promise.all([
-    //       getUserFollowers(currentUserId.userid, token),
-    //       getUserFollowing(currentUserId.userid, token),
-    //     ]);
-
-    //     const followersData = (followersResponse.data?.followers || []).map(
-    //       (user) => ({
-    //         uid: user.uid,
-    //         displayName: user.displayName || "Unknown User",
-    //         photoURL: user.photoURL || "",
-    //         email: user.email || "",
-    //         bio: user.bio || undefined,
-    //       })
-    //     );
-
-    //     const followingData = (followingResponse.data?.following || []).map(
-    //       (user) => ({
-    //         uid: user.uid,
-    //         displayName: user.displayName || "Unknown User",
-    //         photoURL: user.photoURL || "",
-    //         email: user.email || "",
-    //         bio: user.bio || undefined,
-    //       })
-    //     );
-
-    //     setNetworkData({
-    //       followers: followersData,
-    //       following: followingData,
-    //       followersCount: followersResponse.data?.followersCount || 0,
-    //       followingCount: followingResponse.data?.followingCount || 0,
-    //     });
-
-    //     console.log("Network data fetched:", {
-    //       followers: followersData,
-    //       following: followingData,
-    //       followersCount: followersResponse.data?.followersCount || 0,
-    //       followingCount: followingResponse.data?.followingCount || 0,
-    //     });
-    //   } catch (error) {
-    //     console.error("Error fetching network data:", error);
-    //     setError("Failed to load network data");
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    console.log(followers)
+ 
+   
     setNetworkData({ followersCount: followers.count, followingCount: following.count, followers: followers.profiles, following: following.profiles })
     setLoading(false)
-    // fetchNetworkData();
+  
   }, []);
 
   const currentUsers =
@@ -239,9 +178,9 @@ const NetworkSection = ({ followers, following }: {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-        {currentUsers.map((user) => (
-          <UserCard key={user.uid} users={user} />
-        ))}
+         {currentUsers.map((user) => (
+    <UserCard key={user.uid} users={user} tabType={activeTab} />
+  ))}
       </div>
 
       {currentUsers.length === 0 && !loading && (

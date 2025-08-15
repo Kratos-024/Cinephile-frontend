@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 
 import { MovieLoader } from "./Loader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addToWatchList, RemoveFromWatchlist } from "../services/user.service";
 import { toast } from "react-toastify";
 import {
@@ -125,7 +125,10 @@ export const TrendingSection = () => {
   const itemWidth = 300;
   const visibleItems = 4;
   const maxIndex = Math.max(0, movie2025.length - visibleItems);
-
+  const navigate = useNavigate()
+  const handleLoadMore = () => {
+    navigate('/movies/trending')
+  }
   useEffect(() => {
     const getTrendingMovieArray = async () => {
       try {
@@ -276,12 +279,12 @@ export const TrendingSection = () => {
                 />
               </div>
             ))}
-            <div
+            <div onClick={handleLoadMore}
               className="
              w-[480px] cursor-pointer text-white text-[24px] font-semibold h-[400px] px-[96px] whitespace-nowrap  bg-neutral-800 flex justify-center items-center object-cover rounded-2xl 
              transition-transform duration-300 group-hover:scale-110"
             >
-              Load more+
+              Load more +
             </div>
           </div>
           <button

@@ -7,11 +7,11 @@ import {
   getUserProfile,
   getUserWatchlist,
   isFollowingServiceHandler,
-  unfollowUser,
+
   type MovieCommentResponse,
   type UserData,
 } from "../services/user.service";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import NetworkSection from "./NetworkSection";
 import { RecentActivity, RecentReviews } from "./recentMovies";
 
@@ -69,11 +69,11 @@ export const MovieSectionTemplate = ({
           </div>
         )}
 
-        <img
+ <img
           className={`w-full aspect-[2/3] object-cover 
             rounded-2xl transition-transform duration-300 
             group-hover:scale-110 ${!imageLoaded ? "hidden" : "block"}`}
-          src={movie.poster_path}
+            src={movie.poster_path.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
           alt={`${movie.title} poster`}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageLoaded(true)}
@@ -91,7 +91,7 @@ export const MovieSectionTemplate = ({
             </p>
           )}
 
-          <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+         <Link to={`/movie/${movie.imdbId}/${movie.title}`}>  <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
             <button className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-white/30 transition-colors">
               View Details
             </button>
@@ -100,7 +100,7 @@ export const MovieSectionTemplate = ({
                 Add to List
               </button>
             )}
-          </div>
+          </div></Link> 
         </div>
       </div>
 
@@ -138,7 +138,7 @@ export const MovieSectionTemplate = ({
   );
 };
 
-const WatchlistSection = () => {
+const WatchlistSection = ({ userId }: { userId: string }) => {
   const [watchlist, setWatchlist] = useState<WatchlistResponse["data"]>({
     currentPage: 0,
     totalPages: 0,
@@ -155,22 +155,22 @@ const WatchlistSection = () => {
           : "";
       if (!token) return;
 
-      const response = await getUserWatchlist(token);
+      const response = await getUserWatchlist(token, userId);
       if (response.success) {
         setWatchlist(response.data);
       }
     };
     getUserWatchList();
-  }, []);
+  }, [userId]);
 
   return (
     <div className="w-full">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white mb-1">
-            Recent Activity
+            Watchlist
           </h2>
-          <p className="text-gray-400 text-sm">Your latest watched films</p>
+          <p className="text-gray-400 text-sm">Your latest watchelist</p>
         </div>
       </div>
 
@@ -319,11 +319,15 @@ const ProfileSection = ({ recentReviews } : { recentReviews: MovieCommentRespons
             </button>
           </div>
           <div className="flex items-center gap-3 p-3 bg-gray-800 bg-opacity-30 rounded">
-            <div className="text-center">
-              <div className="text-gray-400 text-xs">12</div>
+            {recentReviews.map((review) => {
+           return ( <div>  <div className="text-center">
+              <div className="text-gray-400 text-xs">{review.timestamp?.split(',')[1]}</div>
+
               <div className="text-gray-400 text-xs">JUL</div>
             </div>
-            <span className="text-gray-300 text-sm">I Saw the TV Glow</span>
+             <span className="text-gray-300 text-sm">{review.movieTitle}</span></div>
+        )
+         })}
           </div>
         </div>
 
@@ -400,19 +404,7 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
       setLoader(true);
     }
   };
-  const unfollowHandler = async () => {
-    try {
-      const response = await unfollowUser(targetId, token);
-      if (response.success) {
-        setIsFollowed(false);
-        setLoader(false);window.location.reload()
-      }
-    } catch (error) {
-      console.log(error);
-      setIsFollowed(false);
-      setLoader(true);
-    }
-  };
+
   useEffect(() => {
     const isFollowingHandler = async () => {
       setIsFollowed(false);
@@ -449,14 +441,8 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
                 Follow
               </span>
             </div>
-          )}{" "}
-          {isFollow && (
-            <div onClick={unfollowHandler}>
-              <span className=" bg-blue-400 rounded-xl  cursor-pointer hover:opacity-95 text-white px-2 py-2">
-                unfollow
-              </span>
-            </div>
           )}
+          
         </div>
       )}
     </>
@@ -526,7 +512,7 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
         <div className="flex items-start gap-6 px-8 max-lg:-mt-10 lg:-mt-20 relative z-10">
           <img
             loading="lazy"
-            className="rounded-full lg:w-[246px] lg:h-[246px] max-lg:w-[96px] max-lg:h-[96px] max-lg:mt-0 object-cover border-4 border-white"
+            className="rounded-full lg:w-[246px] lg:h-[246px] max-lg:w-[148px] max-lg:h-[148px] max-lg:mt-0 object-cover border-4 border-white"
             src={user?.profile.photoURL || "/default-avatar.jpg"}
             alt="profile"
           />
@@ -599,7 +585,7 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
       {navigation === "Reviews" && (
         <ReviewsSection userReviewData={user.reviews} />
       )}
-      {navigation === "Watchlist" && <WatchlistSection />}
+{navigation === "Watchlist" && <WatchlistSection userId={userid} />}
       {navigation === "Network" && <NetworkSection
  following={user.following} followers={user.followers} />}
     </section>

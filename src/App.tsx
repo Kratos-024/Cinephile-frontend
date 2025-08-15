@@ -1,7 +1,5 @@
 import { useState } from "react";
 import "./App.css";
-import { Container } from "./components/Container";
-import { Menu } from "./components/Menu";
 import { HomePage } from "./pages/HomePage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MoviePage } from "./pages/MoviePage";
@@ -12,15 +10,29 @@ import { Provider } from "react-redux";
 import { store } from "./Apps/store";
 import { WatchListPage } from "./pages/WatchListPage";
 import { SearchPage } from "./pages/SearchPage";
+import { onIdTokenChanged } from "firebase/auth";
+import { auth } from "./firebase/firebase";
+import { LayoutWithMenu } from "./components/Layout";
+import { FullTrendingPage } from "./pages/FullTrendingPage";
+onIdTokenChanged(auth, async (user) => {
+  if (user) {
+    const token = await user.getIdToken();
+    localStorage.setItem("authToken", token);
+  } else {
+    localStorage.removeItem("authToken");
+  }
+});
 
 function Layout({ children }: { children: React.ReactNode }) {
   return <Provider store={store}>{children}</Provider>;
 }
+
 function App() {
   const [menu, setMenu] = useState<boolean>(true);
   const menuHandler = () => {
     setMenu(!menu);
   };
+
   return (
     <section className="">
       <ToastContainer />
@@ -30,41 +42,45 @@ function App() {
             <Route
               path="/"
               element={
-                <Container>
-                  <Menu menu={menu} />
+                <LayoutWithMenu menu={menu} menuHandler={menuHandler}>
                   <HomePage menu={menu} menuHandler={menuHandler} />
-                </Container>
+                </LayoutWithMenu>
               }
-            ></Route>
-            <Route path="/movie/:id/:title" element={<MoviePage />}></Route>
-            <Route path="/genres" element={<GenrePage />}></Route>{" "}
+            />
             <Route
               path="/profile/:userid/:username"
               element={
-                <Container>
-                  <Menu menu={menu} />
-                  <UserProfile menu={menu} menuHandler={menuHandler} />{" "}
-                </Container>
+                <LayoutWithMenu menu={menu} menuHandler={menuHandler}>
+                  <UserProfile menu={menu} menuHandler={menuHandler} />
+                </LayoutWithMenu>
               }
-            ></Route>
+            />
             <Route
               path="/WatchlistPage"
               element={
-                <Container>
-                  <Menu menu={menu} />
-                  <WatchListPage menu={menu} menuHandler={menuHandler} />{" "}
-                </Container>
+                <LayoutWithMenu menu={menu} menuHandler={menuHandler}>
+                  <WatchListPage menu={menu} menuHandler={menuHandler} />
+                </LayoutWithMenu>
               }
-            ></Route>{" "}
+            />
             <Route
               path="/search/:title"
               element={
-                <Container>
-                  <Menu menu={menu} />
-                  <SearchPage menu={menu} menuHandler={menuHandler} />{" "}
-                </Container>
+                <LayoutWithMenu menu={menu} menuHandler={menuHandler}>
+                  <SearchPage menu={menu} menuHandler={menuHandler} />
+                </LayoutWithMenu>
               }
-            ></Route>
+            />
+            <Route
+              path="/movies/trending"
+              element={
+                <LayoutWithMenu menu={menu} menuHandler={menuHandler}>
+                  <FullTrendingPage menu={menu} menuHandler={menuHandler} />
+                </LayoutWithMenu>
+              }
+            />
+            <Route path="/movie/:id/:title" element={<MoviePage />} />
+            <Route path="/genres" element={<GenrePage />} />
           </Routes>
         </BrowserRouter>
       </Layout>

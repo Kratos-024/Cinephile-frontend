@@ -133,7 +133,6 @@ export const MovieDetails = ({
       
       console.log("Response", response);
       if (response.success) {
-        // Filter out movies that don't have valid data
         const validMovies = response.similarMovies.filter(movie => 
           movie.success && movie.data && movie.data.imdbID && movie.data.Title
         );
@@ -254,7 +253,55 @@ export const MovieDetails = ({
       }
     }
   };
+   const [isLiked, setIsLiked] = useState(false);
 
+ const likeHandler = async () => {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      return;
+    }
+    if (!isLiked) {
+      setIsLiked(true);
+
+      const response = await addToWatchList(token, {
+        imdbId: movieData.imdb_id,
+        title: movieData.data.title,
+        poster_path: movieData.data.poster,
+        release_date: movieData.data.imdbId,
+        vote_average: movieData.data.ratings.imdbScore.rating,
+      });
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    } else {
+      setIsLiked(false);
+      const response = await RemoveFromWatchlist(token, {
+        imdbId: movieData.imdb_id,
+      });
+      if (response.success) {
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    }
+  };
   const onDeleteReviewHandler = async (imdb_id: string) => {
     const originalReviews = [...reviews];
     setReview(reviews.filter((review) => review.imdb_id !== imdb_id));
@@ -325,15 +372,10 @@ export const MovieDetails = ({
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <VideoPlayer Videos={movieData["data"].videoSources || []} />
 
-        {/* Main Content Grid */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-8 space-y-6 lg:space-y-8">
-              
-              {/* Tabs Navigation */}
-              <div className="flex space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 overflow-x-auto">
+                        <div className="lg:col-span-8 space-y-6 lg:space-y-8">
+                            <div className="flex space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 overflow-x-auto">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -349,15 +391,12 @@ export const MovieDetails = ({
                 ))}
               </div>
 
-              {/* Tab Content */}
               <div className="space-y-6">
                 {activeTab === "Info" && (
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                     
-                    {/* Movie Info - Takes 2 columns on large screens */}
                     <div className="lg:col-span-2 space-y-6">
                       
-                      {/* Movie Title and Basic Info */}
                       <div className="space-y-4">
                         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
@@ -373,7 +412,6 @@ export const MovieDetails = ({
                         </p>
                       </div>
 
-                      {/* Languages */}
                       <div>
                         <h4 className="font-semibold mb-2 text-sm sm:text-base">
                           Available Languages:
@@ -385,7 +423,6 @@ export const MovieDetails = ({
                         </div>
                       </div>
 
-                      {/* Ratings */}
                       <div className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8">
                         {movieData["data"].rating.map((rating, index) => {
                           let logoSrc = "";
@@ -409,8 +446,6 @@ export const MovieDetails = ({
                           );
                         })}
                       </div>
-
-                      {/* Streaming Services - Mobile First */}
                       <div className="lg:hidden">
                         <h3 className="text-base sm:text-lg font-semibold mb-4">
                           Streaming Services
@@ -437,15 +472,13 @@ export const MovieDetails = ({
                       </div>
                     </div>
 
-                    {/* Sidebar - Actions and Cast */}
                     <div className="lg:col-span-1 space-y-6">
-                      
-                      {/* Actions */}
-                      <div>
+                    <div>
                         <h3 className="text-base font-semibold mb-4">Actions</h3>
                         <div className="flex max-lg:gap-4 gap-3">
                           {actions.map((action) => (
                             <button
+                              onClick={action.label==='Watchlist'?likeHandler:()=>{return }}
                               key={action.id}
                               className="flex flex-col lg:flex-row items-center lg:space-x-3 space-y-2 lg:space-y-0 text-gray-400 hover:text-white transition-colors p-2 lg:p-3 rounded-lg hover:bg-gray-800/50"
                             >
@@ -494,8 +527,6 @@ export const MovieDetails = ({
                     </div>
                   </div>
                 )}
-
-                {/* Images Tab */}
                 {activeTab === "Images" && (
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold mb-4">Movie Images</h3>
@@ -504,7 +535,7 @@ export const MovieDetails = ({
                         movieData["data"].images.map((image, index) => (
                           <img
                             key={index}
-                            src={image.src}
+            src={image.src.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
                             alt={image.alt || `Movie image ${index + 1}`}
                             className="w-full h-48 sm:h-56 lg:h-64 object-cover rounded-lg hover:scale-105 transition-transform duration-300"
                             onError={(e) => {

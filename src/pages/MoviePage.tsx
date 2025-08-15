@@ -110,7 +110,7 @@ export const MoviePage = () => {
       return () => clearInterval(interval);
     }
   }, [movieData["data"].images]);
-
+ 
   const currentBackgroundImage =
     movieData["data"].images && movieData["data"].images.length > 0
       ? (movieData["data"].images[currentImageIndex]?.src || "").replace(

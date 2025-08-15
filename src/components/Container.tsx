@@ -1,3 +1,22 @@
-export const Container = ({ children }: { children: React.ReactNode }) => {
-  return <div className=" max-w-full w-full">{children}</div>;
+import { Menu } from "./Menu";
+
+export const Container = ({ 
+  children, 
+  showMenu = false, 
+  menu, 
+  menuHandler 
+}: { 
+  children: React.ReactNode;
+  showMenu?: boolean;
+  menu?: boolean;
+  menuHandler?: () => void;
+}) => {
+  return (
+    <div className="max-w-full w-full">
+      {showMenu && menu !== undefined && menuHandler && (
+        <Menu menu={menu} />
+      )}
+      {children}
+    </div>
+  );
 };

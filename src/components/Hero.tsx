@@ -1,4 +1,4 @@
-import { Play, Info, Circle } from "lucide-react";
+import { Play,  Circle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -48,7 +48,7 @@ export default function Hero() {
 
   const currentMovie = movies[currentMovieIndex];
 
-  const handleWatchNow = () => {
+  const handleViewDetails = () => {
     navigate(`/movie/${currentMovie.id}/${currentMovie.slug}`);
   };
 
@@ -79,15 +79,13 @@ export default function Hero() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={handleWatchNow}
-                  className="group flex items-center gap-3 bg-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-xl"
-                >
+               
+                <button onClick={handleViewDetails}
+                  className="group flex items-center gap-3 bg-white/10 
+ backdrop-blur-sm text-white px-8 py-4 rounded-full
+  font-semibold text-lg cursor-pointer hover:bg-white/20 transition-all
+  duration-300 border border-white/20 hover:border-white/40">
                   <Play className="w-6 h-6 fill-current" />
-                  Watch Now
-                </button>
-                <button className="group flex items-center gap-3 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40">
-                  <Info className="w-6 h-6" />
                   Details
                 </button>
               </div>

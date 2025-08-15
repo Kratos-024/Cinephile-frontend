@@ -1,4 +1,3 @@
-const string =
-  "https://m.mediaamazon.com/images/M/MV5BMjM2Njc1MGItZjJiYy00ZTYzLWIyNWUtODI4MGJmZjBkZWFjXkEyXkFqcGc@._V1_QL75_UX180_CR0,0,180,266_.jpg";
-const url = string.split("@")[0] + ".jpg";
-console.log(url);
+const string = 'August 15, 2025 at 12:50:22 PM UTC+5:30'
+console
+.log(string.split(',')[0])

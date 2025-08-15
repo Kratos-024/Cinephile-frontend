@@ -36,7 +36,6 @@ async function createOrUpdateUserProfile(user: any) {
 
 export async function googleLogin() {
   try {
-    console.log("Starting Firebase Google login...");
 
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
@@ -46,6 +45,7 @@ export async function googleLogin() {
     console.log("Firebase auth successful:", user);
 
     localStorage.setItem("authToken", idToken);
+    localStorage.setItem("userId", user.uid); 
 
     return {
       success: true,
@@ -124,7 +124,7 @@ export async function createAccountWithEmail(
     await createOrUpdateUserProfile(user);
 
     localStorage.setItem("authToken", idToken);
-    localStorage.setItem("uid", user.uid);
+    localStorage.setItem("userId", user.uid); 
 
     return {
       success: true,
