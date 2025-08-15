@@ -235,8 +235,9 @@ const getMovieByTitle = async (
     };
   }
 };
-const getMovieByTitles = async (
-  title: string
+const getMoviesByTitle = async (
+  title: string | undefined,
+  page: number | undefined = 1
 ): Promise<MovieTitlesApiResponse> => {
   try {
     if (!title || title.trim() === "") {
@@ -244,7 +245,7 @@ const getMovieByTitles = async (
     }
 
     const encodedTitle = encodeURIComponent(title.trim());
-    const url = `http://localhost:8000/api/v1/omdb/getMovieByTitles/${encodedTitle}`;
+    const url = `http://localhost:8000/api/v1/omdb/getMoviesByTitle/${encodedTitle}?page=${page}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -253,32 +254,16 @@ const getMovieByTitles = async (
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const data = await response.json();
 
-    const data: MovieTitlesApiResponse = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
 
     return data;
   } catch (error) {
     console.error("Error fetching movie by title:", error);
-
-    return {
-      success: false,
-      data: {
-        Response: "True",
-        totalResults: "",
-        Search: [
-          {
-            Title: "",
-            Year: "",
-            imdbID: "",
-            Type: "",
-            Poster: "",
-          },
-        ],
-      },
-    };
+    throw error;
   }
 };
 
@@ -557,7 +542,51 @@ const getCachedMoviesHandler = async ({
     };
   }
 };
+export interface SimilarMoviesResponse {
+  message: string;
+  similarMovies: {
+    success: boolean;
+    data: {
+      Poster: string;
+      Released: string;
+      Title: string;
+      Year: string;
+      imdbID: string;
+      imdbRating: string;
+    };
+    source: string;
+    added_to_user: string;
+  }[];
+  similarMoviesCount: number;
+  success: boolean;
+}
+const getSimilarMovies = async (
+  title: string
+): Promise<SimilarMoviesResponse> => {
+  try {
+    if (!title || title.trim() === "") {
+      throw new Error("Title parameter is required");
+    }
 
+    const encodedTitle = encodeURIComponent(title.trim());
+    const url = `http://localhost:8000/api/v1/tmdb/getSimilarMovies/${encodedTitle}`;
+    const headers = getAuthHeaders();
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching movie by title:", error);
+    throw error;
+  }
+};
 export {
   getTrendingMovies,
   getMovieByTitle,
@@ -565,6 +594,7 @@ export {
   submitCommentHandler,
   deleteCommentHandler,
   getMovieReviewsHandler,
-  getMovieByTitles,
+  getMoviesByTitle,
   getCachedMoviesHandler,
+  getSimilarMovies,
 };

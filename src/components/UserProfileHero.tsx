@@ -574,33 +574,36 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
           src={user?.profile.photoURL || "/default-banner.jpg"}
           alt="user-profile-hero"
         />
-        <div className="flex items-start gap-6 px-8 -mt-20 relative z-10">
+        <div className="flex items-start gap-6 px-8 max-lg:-mt-10 lg:-mt-20 relative z-10">
           <img
-            className="rounded-full w-[246px] h-[246px] object-cover border-4 border-white"
+            className="rounded-full lg:w-[246px] lg:h-[246px] max-lg:w-[96px] max-lg:h-[96px] max-lg:mt-0 object-cover border-4 border-white"
             src={user?.profile.photoURL || "/default-avatar.jpg"}
             alt="profile"
           />
           <div className="flex-1 flex justify-between mt-[86px]">
-            <div className="flex flex-col gap-4 mb-4">
+            <div className="flex flex-col gap-2 mb-2">
               <div className="flex items-center gap-4">
-                <h1 className="text-white text-4xl font-bold">
+                <h1
+                  className="text-white max-lg:text-lg whitespace-nowrap
+                 lg:text-4xl font-bold"
+                >
                   {user?.profile.displayName}
                 </h1>
                 <FollowButton targetId={userid} />
               </div>
-              <p className="text-gray-300 text-lg mb-6">
+              <p className="text-gray-300 max-lg:text-sm lg:text-lg mb-6">
                 It makes you forget the wonderful yesterday
               </p>
             </div>
-            <div className="flex gap-8">
+            <div className="hidden lg:flex gap-8">
               <div className="text-center">
-                <div className="text-white text-2xl font-bold">
+                <div className="text-white lg:text-2xl font-bold">
                   {user?.stats.followingCount || 0}
                 </div>
                 <div className="text-gray-400 text-sm">FOLLOWING</div>
               </div>
               <div className="text-center">
-                <div className="text-white text-2xl font-bold">
+                <div className="text-white lg:text-2xl font-bold">
                   {user?.stats.followersCount || 0}
                 </div>
                 <div className="text-gray-400 text-sm">FOLLOWERS</div>
@@ -608,26 +611,38 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
             </div>
           </div>
         </div>
+        <div className="max-lg:flex hidden justify-center gap-8">
+          <div className="text-center">
+            <div className="text-white lg:text-2xl font-bold">
+              {user?.stats.followingCount || 0}
+            </div>
+            <div className="text-gray-400 text-sm">FOLLOWING</div>
+          </div>
+          <div className="text-center">
+            <div className="text-white lg:text-2xl font-bold">
+              {user?.stats.followersCount || 0}
+            </div>
+            <div className="text-gray-400 text-sm">FOLLOWERS</div>
+          </div>
+        </div>
       </div>
       <div className="border-b border-gray-700 mt-8">
-        <nav className="flex space-x-8 px-8">
-          {["Profile", "Watchlist", "Reviews", "Likes", "Network"].map(
-            (tab) => (
-              <button
-                onClick={() => {
-                  navigationHandler(tab);
-                }}
-                key={tab}
-                className={`py-3 px-1 border-b-2 text-sm font-medium ${
-                  tab === navigation
-                    ? "border-orange-500 text-white"
-                    : "border-transparent text-gray-400 hover:text-white"
-                }`}
-              >
-                {tab}
-              </button>
-            )
-          )}
+        <nav className="flex max-lg:justify-center lg:space-x-8 lg:px-8 max-lg:space-x-2 max-lg:px-2">
+          {["Profile", "Watchlist", "Reviews", "Network"].map((tab) => (
+            <button
+              onClick={() => {
+                navigationHandler(tab);
+              }}
+              key={tab}
+              className={`py-3 px-1 border-b-2 text-sm font-medium ${
+                tab === navigation
+                  ? "border-orange-500 text-white"
+                  : "border-transparent text-gray-400 hover:text-white"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </nav>
       </div>
       {navigation === "Profile" && <ProfileSection />}

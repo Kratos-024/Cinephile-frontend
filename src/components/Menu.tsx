@@ -22,8 +22,6 @@ const UserFollowingSection: React.FC = () => {
     const fetchFollowing = async () => {
       try {
         const token = localStorage.getItem("authToken");
-
-        // Don't run if no token
         if (!token) {
           setLoading(false);
           return;
@@ -41,7 +39,6 @@ const UserFollowingSection: React.FC = () => {
     fetchFollowing();
   }, []);
 
-  // Don't render anything if no token
   const token = localStorage.getItem("authToken");
   if (!token) {
     return null;
@@ -116,8 +113,11 @@ export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
           transition={{ delay: 0.1, duration: 0.4 }}
           className="text-[28px] text-center font-semibold mb-[48px]"
         >
-          <span className="text-white">Cine</span>
-          <span className="text-red-600">phile</span>
+          <a href="/">
+            {" "}
+            <span className="text-white">Cine</span>
+            <span className="text-red-600">phile</span>
+          </a>
         </motion.h2>
 
         <div className="flex flex-col items-center gap-8 text-gray-500 w-full text-[21px]">

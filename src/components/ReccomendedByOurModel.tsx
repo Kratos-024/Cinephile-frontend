@@ -65,10 +65,6 @@ const ReccomendedByOurModelTemplate = ({
           className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
           src={movieData.image}
           alt={movieData.title}
-          loading="lazy"
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-            e.currentTarget.src = "images/heroImages/placeholder.jpg";
-          }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
@@ -123,7 +119,7 @@ export const ReccomendedByOurModel = () => {
           page: 1,
           token,
         });
-
+        console.log(result);
         if (result.success) {
           setMovies(result.data);
           setError(null);

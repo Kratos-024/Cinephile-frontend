@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { RiMenuSearchFill } from "react-icons/ri";
 import { FaCheck } from "react-icons/fa";
-import { getMovieByTitle, getMovieByTitles } from "../services/movie.service";
+import { getMovieByTitle, getMoviesByTitle } from "../services/movie.service";
 import { saveUserPreferences } from "../services/user.service";
 
 interface Movie {
@@ -147,7 +147,7 @@ const MoviesApp = () => {
     setError(null);
 
     try {
-      const res = await getMovieByTitles(query.trim());
+      const res = await getMoviesByTitle(query.trim());
       if (
         res.success &&
         res.data.Response === "True" &&

@@ -1,12 +1,8 @@
 import { motion } from "framer-motion";
 import { NavBar } from "../components/NavBar";
-import Hero from "../components/Hero";
-import { TrendingSection } from "../components/TrendingSection";
-import { ReccomendedByOurModel } from "../components/ReccomendedByOurModel";
-import { AvatarExamples } from "../components/Users";
-import { Footer } from "../components/Footer";
+import { SearchComponent } from "../components/SearchComponent";
 
-export const HomePage = ({
+export const SearchPage = ({
   menuHandler,
   menu,
 }: {
@@ -24,11 +20,7 @@ export const HomePage = ({
       className="px-3 bg-primary   "
     >
       <NavBar menuHandler={menuHandler} menu={menu} />;
-      <Hero />
-      <TrendingSection />
-      <ReccomendedByOurModel />
-      <AvatarExamples />
-      <Footer />
+      <SearchComponent />
     </motion.section>
   );
 };

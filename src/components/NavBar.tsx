@@ -11,6 +11,7 @@ import { auth } from "../firebase/firebase";
 import type { UserProfile } from "../services/user.service";
 import { useDispatch } from "react-redux";
 import { addUser } from "../function/user.redux";
+import { useNavigate } from "react-router-dom";
 
 export const NavBar = ({
   menuHandler,
@@ -19,6 +20,7 @@ export const NavBar = ({
   menuHandler: () => void;
   menu: boolean;
 }) => {
+  const navigate = useNavigate();
   const [showUserPopup, setShowUserPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfileData, setUserProfile] = useState<UserProfile>({
@@ -136,7 +138,16 @@ export const NavBar = ({
       setShowUserPopup(false);
     }
   };
-
+  const [search, setSearch] = useState<string>("");
+  const searchHandler = () => {
+    if (search.length >= 1) {
+      navigate(`/search/${search}`);
+      setSearch("");
+      window.location.reload();
+    } else {
+      alert("Please enter a search query");
+    }
+  };
   return (
     <div className="w-full">
       <div
@@ -166,8 +177,13 @@ export const NavBar = ({
           </div>
 
           <div className="flex items-center px-2 pl-5 py-3 w-[320px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0">
-            <IoIosSearch className="text-gray-400 w-6 h-6" />
+            <div className=" cursor-pointer" onClick={searchHandler}>
+              <IoIosSearch className="text-gray-400 w-6 h-6" />
+            </div>{" "}
             <input
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
               className="text-white bg-transparent outline-none flex-1 min-w-0"
               placeholder="Search Anything"
             />

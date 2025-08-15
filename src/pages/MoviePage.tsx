@@ -142,9 +142,8 @@ export const MoviePage = () => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="relative z-10"
       >
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0b0818] via-[#0b0818]/50 to-transparent z-20"></div>
-
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0b0818] via-[#0b0818]/50 to-transparent z-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-slate-900/30"></div>
 
         <div className="min-h-screen relative z-10">
           <NavBar menuHandler={menuHandler} menu={menu} />

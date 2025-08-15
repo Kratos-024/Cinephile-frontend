@@ -677,6 +677,66 @@ const isAuthenticated = (): boolean => {
   return !!localStorage.getItem("authToken");
 };
 
+export interface GetTop10UsersResponse {
+  success: boolean;
+  message: string;
+  data: {
+    users: UserProfile[];
+    totalUsers: number;
+  };
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  status: number;
+  message: string;
+  type: string;
+}
+
+export const getTop10UsersHandler = async ({
+  limit = 10,
+  token,
+}: {
+  limit?: number;
+  token?: string;
+}): Promise<GetTop10UsersResponse | null> => {
+  try {
+    if (limit < 1 || limit > 50) {
+      throw new Error("Limit must be between 1 and 50");
+    }
+
+    const url = new URL(`${API_BASE_URL}/api/v1/user/GetTop10Users`);
+    url.searchParams.append("limit", limit.toString());
+
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers,
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData: ApiErrorResponse = await response.json();
+      console.error("API Error:", errorData);
+      throw new Error(errorData.message || "Failed to fetch users");
+    }
+
+    const data: GetTop10UsersResponse = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching top users:", error);
+    return null;
+  }
+};
+
 export {
   RemoveFromWatchlist,
   registerUser,

@@ -11,6 +11,7 @@ import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import { store } from "./Apps/store";
 import { WatchListPage } from "./pages/WatchListPage";
+import { SearchPage } from "./pages/SearchPage";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return <Provider store={store}>{children}</Provider>;
@@ -51,7 +52,16 @@ function App() {
               element={
                 <Container>
                   <Menu menu={menu} />
-                  <WatchListPage />{" "}
+                  <WatchListPage menu={menu} menuHandler={menuHandler} />{" "}
+                </Container>
+              }
+            ></Route>{" "}
+            <Route
+              path="/search/:title"
+              element={
+                <Container>
+                  <Menu menu={menu} />
+                  <SearchPage menu={menu} menuHandler={menuHandler} />{" "}
                 </Container>
               }
             ></Route>
