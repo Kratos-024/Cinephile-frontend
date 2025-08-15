@@ -509,9 +509,7 @@ export const MovieDetails = ({
                                   src={member.imageUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face"}
                                   alt={member.actorName}
                                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                                  onError={(e) => {
-                                    e.currentTarget.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face";
-                                  }}
+                               
                                 />
                                 <div className="min-w-0">
                                   <p className="text-gray-400 text-xs truncate">{member.characterName || "Character"}</p>

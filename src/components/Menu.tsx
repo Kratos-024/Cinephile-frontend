@@ -5,7 +5,9 @@ import { SlCalender } from "react-icons/sl";
 import { motion } from "framer-motion";
 import { FaChevronDown } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
+import { signOut } from 'firebase/auth';
 import { getUserFollowing } from "../services/user.service";
+import { auth } from "../firebase/firebase";
 
 interface User {
   uid: string;
@@ -78,6 +80,21 @@ const UserFollowingSection: React.FC = () => {
 export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
   const [feed, setFeed] = useState("Browser");
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      
+      localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+
+    
+      window.location.href = '/'; 
+      
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   const menuVariants = {
     hidden: { x: "-100%", opacity: 0 },
     visible: { x: 0, opacity: 1 },
@@ -114,7 +131,6 @@ export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
           className="text-[28px] text-center font-semibold mb-[48px]"
         >
           <a href="/">
-            {" "}
             <span className="text-white">Cine</span>
             <span className="text-red-600">phile</span>
           </a>
@@ -165,7 +181,7 @@ export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
                 </motion.div>
                 <a href={`${item==='Watchlist'? "/WatchlistPage":'/'}`}>
                   <span className="font-semibold">{item}</span>
-                </a>{" "}
+                </a>
               </motion.li>
             ))}
           </motion.ul>
@@ -176,7 +192,10 @@ export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
           </div>
         </div>
 
-        <div className="flex items-center mt-[148px] cursor-pointer gap-3">
+        <div 
+          onClick={handleLogout}
+          className="flex items-center cursor-pointer gap-3 mt-8"
+        >
           <div className="w-fit p-2 rounded-full text-white transition-colors duration-200">
             <IoIosLogOut className="w-7 h-7" />
           </div>

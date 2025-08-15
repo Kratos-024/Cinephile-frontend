@@ -42,9 +42,7 @@ const TrendingSectionTemplate = ({
           className="rounded-2xl transition-transform duration-300 group-hover:scale-110 w-full h-[240px] object-cover"
           src={movie.Poster !== "N/A" ? movie.Poster : "/placeholder-movie.jpg"}
           alt={movie.Title}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/placeholder-movie.jpg";
-          }}
+       
         />
 
         {isSelected && (
@@ -67,20 +65,17 @@ const TrendingSectionTemplate = ({
 };
 
 const movieTitles = [
-  "Inception",
-  "The Godfather",
+  "Sonic the Hedgehog",
   "The Dark Knight",
-  "Pulp Fiction",
-  "Forrest Gump",
-  "Interstellar",
+  "Moana",
   "Fight Club",
   "The Shawshank Redemption",
-  "La La Land",
+  "Batman v Superman: Dawn of Justice",
   "Parasite",
   "Spirited Away",
   "The Social Network",
   "Gladiator",
-  "Whiplash",
+  "500 Days of Summer",
   "The Matrix",
   "Avengers: Endgame",
 ];
@@ -251,11 +246,22 @@ const MoviesApp = () => {
     <div className="min-h-screen bg-primary relative">
       <div className="text-center py-8">
         <h1 className="text-white text-2xl font-bold tracking-wider">
-          AI MOVIE RECOMMENDATION APP
+           <span
+                        className="font-medium text-black
+                     "
+                      >
+                         <span className="text-white">Cine</span>
+            <span className="text-red-600">phile</span>
+          </span>
+          
         </h1>
         <p className="text-gray-300 mt-2">
           Select 3-5 movies to get personalized recommendations
         </p>
+        <p className="text-gray-300 mt-2">
+          Cold start problem
+        </p>
+        
       </div>
 
       <div className="w-[920px] mx-auto px-6">
@@ -299,7 +305,7 @@ const MoviesApp = () => {
           </div>
           {loading && (
             <div className="flex justify-center items-center mb-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
               <span className="text-white ml-3">Loading movies...</span>
             </div>
           )}
@@ -347,7 +353,6 @@ const MoviesApp = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex justify-center gap-4">
                 {selectedMovies.length >= 2 && (
                   <button
@@ -386,6 +391,7 @@ const MoviesApp = () => {
               {selectedMovies.length >= 5 && (
                 <p className="text-yellow-400 text-sm mt-4">
                   Maximum 5 movies can be selected
+                  <span>Sorry but have to wait cuz i'm doing some data stealing</span>
                 </p>
               )}
             </div>
