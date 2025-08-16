@@ -1,7 +1,7 @@
 import type { WatchlistResponse } from "../components/UserProfileHero";
 import type { ApiUserProfile } from "../components/Users";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 const API_BASE_URL = "http://localhost:8000";
 
 export interface SelectedMovie {
@@ -418,7 +418,7 @@ const getUserReviewsHandler = async (
   token: string
 ): Promise<any> => {
   try {
-    const url = `http://localhost:8000/api/v1/user/reviews/${userId}`;
+    const url = `https://cinephile-backend-1-gj4v.onrender.com/api/v1/user/reviews/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",

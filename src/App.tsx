@@ -6,8 +6,6 @@ import { MoviePage } from "./pages/MoviePage";
 import { GenrePage } from "./pages/GenrePage";
 import { UserProfile } from "./pages/UserProfile";
 import { ToastContainer } from "react-toastify";
-import { Provider } from "react-redux";
-import { store } from "./Apps/store";
 import { WatchListPage } from "./pages/WatchListPage";
 import { SearchPage } from "./pages/SearchPage";
 import { onIdTokenChanged } from "firebase/auth";
@@ -23,9 +21,7 @@ onIdTokenChanged(auth, async (user) => {
   }
 });
 
-function Layout({ children }: { children: React.ReactNode }) {
-  return <Provider store={store}>{children}</Provider>;
-}
+
 
 function App() {
   const [menu, setMenu] = useState<boolean>(true);
@@ -36,7 +32,7 @@ function App() {
   return (
     <section className="">
       <ToastContainer />
-      <Layout>
+     
         <BrowserRouter>
           <Routes>
             <Route
@@ -83,7 +79,7 @@ function App() {
             <Route path="/genres" element={<GenrePage />} />
           </Routes>
         </BrowserRouter>
-      </Layout>
+    
     </section>
   );
 }

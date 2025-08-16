@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { useEffect, useState } from "react";
 import { getUserWatchlist, RemoveFromWatchlist } from "../services/user.service";
 import { Heart } from "lucide-react";

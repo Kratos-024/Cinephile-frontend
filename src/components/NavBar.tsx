@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { useState, useEffect, useRef } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { IoIosSearch, IoIosNotifications } from "react-icons/io";
@@ -8,8 +8,6 @@ import { googleLogin } from "../firebase/login";
 import { UserPopup } from "./Userpopup";
 import { auth } from "../firebase/firebase";
 import type { UserProfile } from "../services/user.service";
-import { useDispatch } from "react-redux";
-import { addUser } from "../function/user.redux";
 import { useNavigate } from "react-router-dom";
 
 export const NavBar = ({
@@ -36,24 +34,10 @@ export const NavBar = ({
   });
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
-  const dispath = useDispatch();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        dispath(
-          addUser({
-            // accessToken: user,
-            displayName: user.displayName,
-            email: user.email,
-            emailVerified: user.emailVerified,
-            isAnonymous: user.isAnonymous,
-            phoneNumber: user.phoneNumber,
-            photoURL: user.photoURL,
-            providerId: user.providerId,
-            uid: user.uid,
-            refreshToken: user.refreshToken,
-          })
-        );
+        
         setIsLoggedIn(true);
         setUserProfile({
           uid: user.uid,

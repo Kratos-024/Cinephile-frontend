@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+ 
 import { motion } from "framer-motion";
 import { NavBar } from "../components/NavBar";
 import { Menu } from "../components/Menu";

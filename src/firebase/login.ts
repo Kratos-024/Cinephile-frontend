@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, updateProfile } from "firebase/auth";
 import {

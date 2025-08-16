@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+ 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";

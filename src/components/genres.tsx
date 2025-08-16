@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { RiMenuSearchFill } from "react-icons/ri";
