@@ -2,7 +2,7 @@ import type { WatchlistResponse } from "../components/UserProfileHero";
 import type { ApiUserProfile } from "../components/Users";
 
  
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://13.51.87.174:8000";
 
 export interface SelectedMovie {
   title: string;
@@ -417,7 +417,7 @@ const getUserReviewsHandler = async (
   token: string
 ): Promise<any> => {
   try {
-    const url = `http://localhost:8000/api/v1/user/reviews/${userId}`;
+    const url = `http://13.51.87.174:8000/api/v1/user/reviews/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",
