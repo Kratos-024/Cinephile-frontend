@@ -8,6 +8,7 @@ import { IoIosLogOut } from "react-icons/io";
 import { signOut } from 'firebase/auth';
 import { getUserFollowing } from "../services/user.service";
 import { auth } from "../firebase/firebase";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface User {
   uid: string;
@@ -79,19 +80,43 @@ const UserFollowingSection: React.FC = () => {
 
 export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
   const [feed, setFeed] = useState("Browser");
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Map current path to feed name
+  useEffect(() => {
+    if (location.pathname === "/WatchlistPage") {
+      setFeed("Watchlist");
+    } else if (location.pathname === "/ComingSoon") {
+      setFeed("Coming Soon");
+    } else {
+      setFeed("Browser");
+    }
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
       
       localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
+      localStorage.removeItem('userData');
 
-    
       window.location.href = '/'; 
       
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleMenuItemClick = (item: string) => {
+    setFeed(item);
+    
+    if (item === "Watchlist") {
+      navigate("/WatchlistPage");
+    } else if (item === "Coming Soon") {
+      navigate("/ComingSoon");
+    } else {
+      navigate("/");
     }
   };
 
@@ -152,38 +177,47 @@ export const Menu: React.FC<{ menu: boolean }> = ({ menu }) => {
             animate={menu ? "visible" : "hidden"}
             className="flex flex-col gap-9"
           >
-            {["Browser", "Watchlist", "Coming Soon"].map((item) => (
-              <motion.li
-                key={item}
-                variants={itemVariants}
-                onClick={() => setFeed(item)}
-                whileHover={{ scale: 1.05, x: 5 }}
-                whileTap={{ scale: 0.95 }}
-                className={`${
-                  feed === item ? "text-white" : ""
-                } flex cursor-pointer text-gray-600 items-center gap-4 relative`}
-              >
-                <motion.span
-                  initial={{ scaleY: 0 }}
-                  animate={{ scaleY: feed === item ? 1 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="h-[46px] left-[-24px] absolute w-1 bg-red-700 origin-center"
-                />
-                <motion.div
-                  whileHover={{ rotate: 5 }}
-                  className={`${
-                    feed === item ? "bg-red-500" : ""
-                  } p-2 rounded-full text-white transition-colors duration-200`}
-                >
-                  {item === "Browser" && <BsBrowserEdge />}
-                  {item === "Watchlist" && <CiHeart />}
-                  {item === "Coming Soon" && <SlCalender />}
-                </motion.div>
-                <a href={`${item==='Watchlist'? "/WatchlistPage":'/'}`}>
-                  <span className="font-semibold">{item}</span>
-                </a>
-              </motion.li>
-            ))}
+        {["Browser", "Watchlist", "Coming Soon"].map((item) => (
+  <motion.li
+    key={item}
+    variants={itemVariants}
+    onClick={() => item !== "Coming Soon" ? handleMenuItemClick(item) : null}
+    whileHover={item !== "Coming Soon" ? { scale: 1.05, x: 5 } : {}}
+    whileTap={item !== "Coming Soon" ? { scale: 0.95 } : {}}
+    className={`${
+      feed === item ? "text-white" : ""
+    } flex items-center gap-4 relative ${
+      item === "Coming Soon" 
+        ? "cursor-not-allowed opacity-50" 
+        : "cursor-pointer text-gray-600"
+    }`}
+  >
+    <motion.span
+      initial={{ scaleY: 0 }}
+      animate={{ scaleY: feed === item ? 1 : 0 }}
+      transition={{ duration: 0.2 }}
+      className="h-[46px] left-[-24px] absolute w-1 bg-red-700 origin-center"
+    />
+    <motion.div
+      whileHover={item !== "Coming Soon" ? { rotate: 5 } : {}}
+      className={`${
+        feed === item ? "bg-red-500" : ""
+      } p-2 rounded-full text-white transition-colors duration-200 ${
+        item === "Coming Soon" ? "opacity-50" : ""
+      }`}
+    >
+      {item === "Browser" && <BsBrowserEdge />}
+      {item === "Watchlist" && <CiHeart />}
+      {item === "Coming Soon" && <SlCalender />}
+    </motion.div>
+    <span className={`font-semibold ${
+      item === "Coming Soon" ? "opacity-50" : ""
+    }`}>
+      {item}
+    </span>
+  </motion.li>
+))}
+
           </motion.ul>
 
           <div className="w-[196px] bg-slate-700 right-0 h-[1px]"></div>

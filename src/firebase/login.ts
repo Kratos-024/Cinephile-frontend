@@ -46,7 +46,6 @@ export async function googleLogin() {
 
     localStorage.setItem("authToken", idToken);
     localStorage.setItem("userId", user.uid); 
-
     return {
       success: true,
       data: {

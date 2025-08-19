@@ -11,9 +11,10 @@ import {
   type MovieCommentResponse,
   type UserData,
 } from "../services/user.service";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import NetworkSection from "./NetworkSection";
 import { RecentActivity, RecentReviews } from "./recentMovies";
+import { toast } from "react-toastify";
 
 type WatchlistMovie = {
   imdbId: string;
@@ -450,11 +451,29 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
 };
 export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
   const [navigation, setNavigation] = useState("Profile");
-
+const navigate = useNavigate();
   const navigationHandler = (nav: string) => {
     setNavigation(nav);
   };
-
+useEffect(() => {
+    const token =
+      typeof window !== "undefined"
+        ? window.localStorage?.getItem("authToken")
+        : null;
+    if (!token) {
+      toast.error("You need to log in to view profiles", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
   const [user, setUser] = useState<UserData["data"]>({
     followers: {
       count: 0,

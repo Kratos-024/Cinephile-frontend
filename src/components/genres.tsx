@@ -88,7 +88,16 @@ const MoviesApp = () => {
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        window.location.href = "/"; 
+      }
+    };
+    
+    checkAuth();
+  }, []);
   useEffect(() => {
     const loadInitialMovies = async () => {
       setLoading(true);

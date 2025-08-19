@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 
@@ -22,28 +24,67 @@ export const TrendingSectionTemplate = ({
   };
 }) => {
   const [isLiked, setIsLiked] = useState(false);
+  
   const likeHandler = async () => {
     const token = localStorage.getItem("authToken");
 
     if (!token) {
+      toast.error("Please log in to save to watchlist", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       return;
     }
+    
     if (!isLiked) {
       setIsLiked(true);
 
-      const response = await addToWatchList(token, {
-        imdbId: movie.watchlistId,
-        title: movie.title,
-        poster_path: movie.poster_path,
-        release_date: movie.releaseData,
-        vote_average: movie.vote_average,
-      });
-      if (response.success) {
-        toast.success(response.message, {
+      try {
+        const response = await addToWatchList(token, {
+          imdbId: movie.watchlistId,
+          title: movie.title,
+          poster_path: movie.poster_path,
+          release_date: movie.releaseData,
+          vote_average: movie.vote_average,
+        });
+        
+        if (response.success) {
+          toast.success(response.message, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          setIsLiked(false);
+          toast.error("Failed to add to watchlist. Please try again.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
+      } catch (error:any) {
+        setIsLiked(false);
+        toast.error("An error occurred. Please try again.", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 3000,
           hideProgressBar: false,
-          closeOnClick: false,
+          closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
@@ -52,15 +93,43 @@ export const TrendingSectionTemplate = ({
       }
     } else {
       setIsLiked(false);
-      const response = await RemoveFromWatchlist(token, {
-        imdbId: movie.watchlistId,
-      });
-      if (response.success) {
-        toast.success(response.message, {
+      
+      try {
+        const response = await RemoveFromWatchlist(token, {
+          imdbId: movie.watchlistId,
+        });
+        
+        if (response.success) {
+          toast.success(response.message, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          setIsLiked(true);
+          toast.error("Failed to remove from watchlist. Please try again.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
+      } catch (error) {
+        setIsLiked(true);
+        toast.error("An error occurred. Please try again.", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 3000,
           hideProgressBar: false,
-          closeOnClick: false,
+          closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
@@ -69,36 +138,45 @@ export const TrendingSectionTemplate = ({
       }
     }
   };
+
   return (
     <div className="relative rounded-2xl group cursor-pointer transform transition-all duration-300 hover:scale-105">
       <Link to={`movie/${movie.watchlistId}/${movie.title}`}>
         <div className="relative overflow-hidden rounded-2xl">
           <img
             className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-            src={
-              movie.poster_path?.includes("http")
-                ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
-                : `https://image.tmdb.org/t/p/w500/${
-                    movie.poster_path || "Image_loading"
-                  }`
-            }
+src={
+  movie.poster_path?.includes("http")
+    ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
+    : `https://image.tmdb.org/t/p/w500/${movie.poster_path || "Image_loading"}`
+}
+
             alt={movie.title}
-          />{" "}
+            loading="lazy"
+          />
+          
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+          
           <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <h4 className="text-white font-semibold text-lg mb-1">
+            <h4 className="text-white font-semibold text-lg mb-1 line-clamp-2">
               {movie.title}
             </h4>
           </div>
         </div>
+        
         <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
           <span>{movie.vote_average}</span>
         </div>
       </Link>
-      <div className="absolute top-3 right-3">
-        <div
-          onClick={() => likeHandler()}
-          className="p-2 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-300"
+      
+      <div className="absolute top-3 right-3 z-10">
+        <button
+          onClick={(e) => {
+            e.preventDefault(); 
+            e.stopPropagation(); 
+            likeHandler();
+          }}
+          className="p-2 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-300 shadow-lg group/heart"
         >
           <Heart
             className={`w-6 h-6 transition-all duration-300 ${
@@ -107,12 +185,11 @@ export const TrendingSectionTemplate = ({
                 : "text-white hover:text-red-400"
             }`}
           />
-        </div>
+        </button>
       </div>
     </div>
   );
 };
-
 export const TrendingSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);

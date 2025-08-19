@@ -168,7 +168,6 @@ export const ReccomendedByOurModel = () => {
   const itemWidth = 300;
   const visibleItems = 4;
 
-  // Check auth status
   useEffect(() => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem("authToken");
@@ -177,7 +176,6 @@ export const ReccomendedByOurModel = () => {
 
     checkAuthStatus();
     
-    // Listen for storage changes (when user logs out in another tab)
     window.addEventListener('storage', checkAuthStatus);
     
     return () => {
@@ -235,47 +233,45 @@ export const ReccomendedByOurModel = () => {
       navigate("/genres");
     }
   };
+useEffect(() => {
+  const loadCachedMovies = async () => {
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      setMovies([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
 
-  useEffect(() => {
-    const loadCachedMovies = async () => {
-      const token = localStorage.getItem("authToken");
+    try {
+      setLoading(true);
+      setError(null);
       
-      // Only fetch movies if user is logged in
-      if (!token) {
-        setMovies([]);
-        setLoading(false);
-        setError(null);
+      const result = await getCachedMoviesHandler({
+        limit: 12,
+        page: 1,
+        token,
+      });
+      
+      if (result.success && result.data && result.data.length > 0) {
+        setMovies(result.data);
+      } else {
+        console.log("No cached movies found, redirecting to genres...");
+        navigate("/genres");
         return;
       }
+    } catch (err) {
+      console.error("Error loading cached movies:", err);
+      navigate("/genres");
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const result = await getCachedMoviesHandler({
-          limit: 12,
-          page: 1,
-          token,
-        });
-        
-        if (result.success && result.data) {
-          setMovies(result.data);
-        } else {
-          //@ts-ignore
-          setError(result.message || "Failed to load movies");
-          setMovies([]); 
-        }
-      } catch (err) {
-        console.error("Error loading cached movies:", err);
-        setError("Failed to load movies");
-        setMovies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCachedMovies();
-  }, [isLoggedIn]); // Re-run when auth status changes
+  loadCachedMovies();
+}, [isLoggedIn, navigate])
 
   const maxIndex = Math.max(0, movies.length - visibleItems);
 
@@ -329,7 +325,6 @@ export const ReccomendedByOurModel = () => {
     <section className="py-16">
       <div className="container mx-auto px-6">
         
-        {/* Show button only when user is NOT logged in */}
         {!isLoggedIn && (
           <div className="mb-12 text-center">
             <button
@@ -344,7 +339,6 @@ export const ReccomendedByOurModel = () => {
           </div>
         )}
 
-        {/* Show content only when user is logged in */}
         {isLoggedIn && (
           <>
             <div className="flex items-center justify-between mb-12">

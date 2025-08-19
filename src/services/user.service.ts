@@ -297,7 +297,6 @@ const saveUserPreferences = async (
   token?: string
 ): Promise<UserPreferenceApiResponse> => {
   try {
-    console.log("Saving user preferences...");
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/preferences`, {
       method: "POST",
@@ -418,7 +417,7 @@ const getUserReviewsHandler = async (
   token: string
 ): Promise<any> => {
   try {
-    const url = `https://cinephile-backend-1-gj4v.onrender.com/api/v1/user/reviews/${userId}`;
+    const url = `http://localhost:8000/api/v1/user/reviews/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -600,35 +599,7 @@ const getUserProfile = async (
   }
 };
 
-const addToWatchList = async (
-  token: string,
-  movieData: {
-    imdbId: string;
-    title: string;
-    poster_path: string;
-    release_date: string;
-    vote_average: string;
-  }
-): Promise<UserProfileApiResponse> => {
-  try {
-    console.log("Adding to user profile watchlist:");
-    const url = API_BASE_URL + "/api/v1/user/AddToWatchlist";
-    const header = getAuthHeaders(token);
-    console.log(header);
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: header,
-      body: JSON.stringify(movieData),
-    });
-    console.log(response);
-    const data: UserProfileApiResponse = await handleFetchResponse(response);
-
-    return data;
-  } catch (error) {
-    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
-  }
-};
 
 const getUserWatchlist = async (token: string, userId?: string): Promise<WatchlistResponse> => {
   try {
@@ -668,6 +639,36 @@ const RemoveFromWatchlist = async (
     return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
   }
 };
+
+const addToWatchList = async (
+  token: string,
+  movieData: {
+    imdbId: string;
+    title: string;
+    poster_path: string;
+    release_date: string;
+    vote_average: string;
+  }
+): Promise<UserProfileApiResponse> => {
+  try {
+    console.log("Adding to user profile watchlist:");
+    const url = API_BASE_URL + "/api/v1/user/AddToWatchlist";
+    const header = getAuthHeaders(token);
+    console.log(header);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(movieData),
+    });
+    console.log(response);
+    const data: UserProfileApiResponse = await handleFetchResponse(response);
+
+    return data;
+  } catch (error) {
+    return handleFetchError(error, "getUserProfile") as UserProfileApiResponse;
+  }
+};
 const isAuthenticated = (): boolean => {
   return !!localStorage.getItem("authToken");
 };
@@ -690,10 +691,10 @@ export interface ApiErrorResponse {
 
 export const getTop10UsersHandler = async ({
   limit = 10,
-  token,
+
 }: {
   limit?: number;
-  token?: string;
+
 }): Promise<GetTop10UsersResponse | null> => {
   try {
     if (limit < 1 || limit > 50) {
@@ -707,9 +708,7 @@ export const getTop10UsersHandler = async ({
       "Content-Type": "application/json",
     };
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+
 
     const response = await fetch(url.toString(), {
       method: "GET",

@@ -89,9 +89,9 @@ export const UserPopup = ({
             <button
               onClick={handleMyProfile}
               className="w-full flex items-center gap-3 px-4
-               py-3 text-white bg-green-600
-                hover:bg-green-700 rounded-lg 
-                transition-colors duration-200"
+               py-3 text-whitepx-8
+               bg-gradient-to-r from-red-600 to-red-700 text-white font-bold text-lg rounded-xl transition-all 
+               duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               <FaUser className="w-4 h-4" />
               My Profile

@@ -28,6 +28,16 @@ export const SimilarMoviesComponent = ({
     const token = localStorage.getItem("authToken");
 
     if (!token) {
+      toast.error("You need to log in to add movies to your watchlist.", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       return;
     }
     
@@ -259,8 +269,19 @@ export const MovieDetails = ({
     const token = localStorage.getItem("authToken");
 
     if (!token) {
+      toast.error("You need to log in to add movies to your watchlist.", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       return;
     }
+    
     if (!isLiked) {
       setIsLiked(true);
 
@@ -302,6 +323,7 @@ export const MovieDetails = ({
       }
     }
   };
+  
   const onDeleteReviewHandler = async (imdb_id: string) => {
     const originalReviews = [...reviews];
     setReview(reviews.filter((review) => review.imdb_id !== imdb_id));
@@ -490,8 +512,6 @@ export const MovieDetails = ({
                           ))}
                         </div>
                       </div>
-
-                      {/* Cast & Crew */}
                       <div>
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="text-base font-semibold">Cast & Crew</h3>
@@ -509,7 +529,6 @@ export const MovieDetails = ({
                                   src={member.imageUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face"}
                                   alt={member.actorName}
                                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                               
                                 />
                                 <div className="min-w-0">
                                   <p className="text-gray-400 text-xs truncate">{member.characterName || "Character"}</p>
@@ -533,7 +552,7 @@ export const MovieDetails = ({
                         movieData["data"].images.map((image, index) => (
                           <img
                             key={index}
-            src={image.src.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
+            src={image.src.replace(/_V1_.*\..*.jpg$/, "_V1_.jpg")}
                             alt={image.alt || `Movie image ${index + 1}`}
                             className="w-full h-48 sm:h-56 lg:h-64 object-cover rounded-lg hover:scale-105 transition-transform duration-300"
                             onError={(e) => {
@@ -549,8 +568,6 @@ export const MovieDetails = ({
                     </div>
                   </div>
                 )}
-
-                {/* Reviews Tab */}
                 {activeTab === "Reviews" && (
                   <div>
                     {loading ? (
@@ -651,16 +668,12 @@ export const MovieDetails = ({
             </div>
           </div>
         </div>
-
-        {/* Synopsis */}
         <div className="max-w-7xl mx-auto mt-8 sm:mt-12 pt-6 sm:pt-8 border-y pb-6 border-gray-700">
           <h3 className="text-lg sm:text-xl font-semibold mb-4">Synopsis</h3>
           <p className="text-gray-400 leading-relaxed max-w-none lg:max-w-4xl text-sm sm:text-base">
             {movieData["data"].storyLine}
           </p>
         </div>
-
-        {/* Similar Movies */}
         <div className="max-w-7xl mx-auto mt-8 sm:mt-12">
           <h3 className="text-lg sm:text-xl font-semibold mb-6">Similar Movies</h3>
           {similarLoading ? (

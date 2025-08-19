@@ -122,15 +122,15 @@ export const NavBar = ({
     }
   };
   const [search, setSearch] = useState<string>("");
-  const searchHandler = () => {
-    if (search.length >= 1) {
-      navigate(`/search/${search}`);
-      setSearch("");
-      window.location.reload();
-    } else {
-      alert("Please enter a search query");
-    }
-  };
+const searchHandler = () => {
+  if (search.trim().length >= 1) {
+    navigate(`/search/${search}`);
+    setSearch("");
+  } else {
+    alert("Please enter a search query");
+  }
+};
+
   return (
     <div className="w-full py-2">
       <div
@@ -164,14 +164,17 @@ export const NavBar = ({
             <div className=" cursor-pointer" onClick={searchHandler}>
               <IoIosSearch className="text-gray-400 w-6 h-6" />
             </div>{" "}
-            <input
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-              className="text-white bg-transparent outline-none
-               flex-1 min-w-0"
-              placeholder="Search Anything"
-            />
+           <input
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  onKeyUp={(e) => {
+    if (e.key === "Enter") {
+      searchHandler();
+    }
+  }}
+  className="text-white bg-transparent outline-none flex-1 min-w-0"
+  placeholder="Search Anything"
+/>
             <RiMenuSearchFill className="text-gray-400 w-6 h-6" />
           </div>
         </div>

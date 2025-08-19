@@ -61,8 +61,8 @@ export const AvatarExamples = () => {
       setLoading(true);
       setError(null);
       const limit = 10;
-      const token = localStorage.getItem("authToken") || "";
-      const response = await getTop10UsersHandler({ limit, token });
+
+      const response = await getTop10UsersHandler({ limit });
       console
       .log(response)
       if (response?.success) {
@@ -70,7 +70,7 @@ export const AvatarExamples = () => {
         setUsers(response.data.users);
       } else {
         setUsers([]);
-        setError("Failed to fetch users");
+        setError("Login");
       }
     } catch (err) {
       console.error("Error fetching users:", err);

@@ -1,9 +1,9 @@
- 
 import { useEffect, useState } from "react";
 import { getUserWatchlist, RemoveFromWatchlist } from "../services/user.service";
 import { Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+
 export const MovieSection = ({
   movie,
 }: {
@@ -40,14 +40,15 @@ export const MovieSection = ({
           progress: undefined,
           theme: "light",
         });
-                setTimeout(() => {
+        setTimeout(() => {
           window.location.reload();
         }, 1000);
       } else {
         setIsLiked(true);
       }
     } catch (error) {
-      console.error("Error removing from watchlist:", error);      setIsLiked(true);
+      console.error("Error removing from watchlist:", error);
+      setIsLiked(true);
     }
   };
 
@@ -57,7 +58,7 @@ export const MovieSection = ({
         <div className="relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500">
           <img
             className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-110"
-            src={movie.poster_path.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
+            src={movie.poster_path.replace(/_V1_.*\..*.jpg$/, "_V1_.jpg")}
             alt={movie.title}
             loading="lazy"
           />
@@ -100,6 +101,7 @@ export const MovieSection = ({
     </div>
   );
 };
+
 export const Watchlist = () => {
   const [movies, setMovies] = useState<
     {
@@ -112,19 +114,70 @@ export const Watchlist = () => {
   >([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const token = localStorage.getItem("authToken") || "";
-  const userId = localStorage.getItem("userId") || "";
+  const navigate = useNavigate();
 
+  // Check authentication and redirect if not logged in
   useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Please log in to view your watchlist", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        navigate("/", { replace: true });
+        return false;
+      }
+      return true;
+    };
+
+    if (!checkAuth()) return;
+
+    // Only proceed with data fetching if user is authenticated
     const getUserWatchlistHandler = async (isLoadMore: boolean = false) => {
+      const token = localStorage.getItem("authToken");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        navigate("/", { replace: true });
+        return;
+      }
+
       try {
-        const response = await getUserWatchlist(token,userId);
+        setLoading(true);
+        const response = await getUserWatchlist(token, userId);
         if (response.success) {
           setMovies(response.data.watchlistMovies);
-          setLoading(false);
+        } else {
+          toast.error("Failed to load watchlist", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
         }
       } catch (error: any) {
-        console.error("Error in getSearchMovies:", error);
+        console.error("Error in getUserWatchlist:", error);
+        toast.error("An error occurred while loading your watchlist", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
 
         if (!isLoadMore) {
           setMovies([]);
@@ -134,12 +187,22 @@ export const Watchlist = () => {
         setLoading(false);
       }
     };
+
     getUserWatchlistHandler();
-  }, []);
+  }, [navigate]);
 
   return (
     <section className="min-h-screen bg-primary py-12 px-6">
       <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+            My Watchlist
+          </h1>
+          <p className="text-gray-400 text-lg">
+            Movies you've saved to watch later
+          </p>
+        </div>
+
         {loading && (
           <div className="flex justify-center items-center mb-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
@@ -155,13 +218,25 @@ export const Watchlist = () => {
           </div>
         )}
 
+        {!loading && movies.length === 0 && (
+          <div className="text-center mt-16">
+            <div className="text-gray-400 text-xl mb-4">Your watchlist is empty</div>
+            <p className="text-gray-500 mb-6">Start adding movies to your watchlist to see them here!</p>
+            <Link 
+              to="/"
+              className="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              Browse Movies
+            </Link>
+          </div>
+        )}
+
         {!loading && movies.length > 0 && !hasMore && (
           <div className="text-center mt-16">
-            <p className="text-gray-400 text-lg">No more movies to load</p>
+            <p className="text-gray-400 text-lg">That's all your saved movies!</p>
           </div>
         )}
       </div>
     </section>
   );
 };
-          //  src={image.src.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
