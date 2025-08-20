@@ -246,7 +246,7 @@ export const TrendingSection = () => {
   const maxIndex = Math.max(0, movie2025.length - visibleItems);
   const navigate = useNavigate();
   
-  const handleLoadMore = () => {
+  const handleViewMore = () => {
     navigate('/movies/trending');
   };
 
@@ -351,10 +351,22 @@ export const TrendingSection = () => {
     <section className="py-8 sm:py-10 md:py-11">
       <div className="container mx-auto px-2 sm:px-4 md:px-6">
         <div className="flex items-center justify-between mb-8 sm:mb-10 md:mb-12">
-          <h3 className="font-bold text-white
-            text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
-            Trending Movies
-          </h3>
+          <div className="flex items-center gap-4">
+            <h3 className="font-bold text-white
+              text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+              Trending Movies
+            </h3>
+            
+            {/* View More Button - Only visible on mobile and tablet (hidden after md) */}
+            <button
+              onClick={handleViewMore}
+              className="md:hidden text-white/80 hover:text-white 
+                transition-colors duration-300 font-medium
+                text-sm sm:text-base"
+            >
+              View More +
+            </button>
+          </div>
 
           <div className="hidden md:flex items-center gap-2">
             <button
@@ -408,24 +420,6 @@ export const TrendingSection = () => {
                 />
               </div>
             ))}
-            
-            {/* Mobile View More / Desktop Load More Card */}
-            <div 
-              onClick={handleLoadMore}
-              className="flex-shrink-0 cursor-pointer text-white font-semibold 
-                bg-neutral-800 flex justify-center items-center 
-                rounded-xl sm:rounded-2xl transition-transform duration-300 hover:scale-105
-                w-[180px] sm:w-[220px] md:w-[300px] lg:w-[480px]
-                h-[240px] sm:h-[300px] md:h-[350px] lg:h-[400px]
-                text-base sm:text-lg md:text-xl lg:text-2xl
-                px-4 sm:px-8 md:px-16 lg:px-24"
-              style={{ width: `${itemWidth}px` }}
-            >
-              <span className="text-center">
-                <span className="block sm:hidden">View More +</span>
-                <span className="hidden sm:block">Load more +</span>
-              </span>
-            </div>
           </div>
           
           {/* Mobile navigation buttons */}
