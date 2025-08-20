@@ -57,7 +57,6 @@ export async function googleLogin() {
       message: "Login successful",
     };
   } catch (error) {
-    console.error("Google login error:", error);
 
     if (typeof error === "object" && error !== null && "code" in error) {
       const errorCode = error.code as string;
@@ -135,7 +134,6 @@ export async function createAccountWithEmail(
       },
     };
   } catch (error: any) {
-    console.error("Account creation error:", error);
     return {
       success: false,
       message: error.message,
