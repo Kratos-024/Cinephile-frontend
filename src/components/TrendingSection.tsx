@@ -246,7 +246,7 @@ export const TrendingSection = () => {
   const maxIndex = Math.max(0, movie2025.length - visibleItems);
   const navigate = useNavigate();
   
-  const handleViewMore = () => {
+  const handleLoadMore = () => {
     navigate('/movies/trending');
   };
 
@@ -359,7 +359,7 @@ export const TrendingSection = () => {
             
             {/* View More Button - Only visible on mobile and tablet (hidden after md) */}
             <button
-              onClick={handleViewMore}
+              onClick={handleLoadMore}
               className="md:hidden text-white/80 hover:text-white 
                 transition-colors duration-300 font-medium
                 text-sm sm:text-base"
@@ -420,6 +420,21 @@ export const TrendingSection = () => {
                 />
               </div>
             ))}
+            
+            {/* Load More Card - Only visible on desktop (md and above) */}
+            <div 
+              onClick={handleLoadMore}
+              className="hidden md:flex flex-shrink-0 cursor-pointer text-white font-semibold 
+                bg-neutral-800 justify-center items-center 
+                rounded-xl sm:rounded-2xl transition-transform duration-300 hover:scale-105
+                w-[300px] lg:w-[480px]
+                h-[350px] lg:h-[400px]
+                text-xl lg:text-2xl
+                px-16 lg:px-24"
+              style={{ width: `${itemWidth}px` }}
+            >
+              <span className="text-center">Load more +</span>
+            </div>
           </div>
           
           {/* Mobile navigation buttons */}

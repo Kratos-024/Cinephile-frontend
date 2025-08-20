@@ -13,7 +13,7 @@ import {
   getSimilarMovies,
   type SimilarMoviesResponse,
 } from "../services/movie.service";
-import { Heart } from "lucide-react";
+import { Heart, Share, Bookmark, Eye, Youtube } from "lucide-react";
 import { addToWatchList, RemoveFromWatchlist } from "../services/user.service";
 import { toast } from "react-toastify";
 
@@ -395,21 +395,21 @@ export const MovieDetails = ({
     { name: "Hotstar", icon: "H", color: "bg-orange-500", badge: "UHD" },
     {
       name: "Youtube",
-      icon: "fab fa-youtube",
+      icon: Youtube,
       color: "bg-red-500",
       isIcon: true,
     },
   ];
 
   const actions = [
-    { id: "share", icon: "fas fa-share", label: "Share", color: "bg-gray-700" },
+    { id: "share", icon: Share, label: "Share", color: "bg-gray-700" },
     {
       id: "watchlist",
-      icon: "fas fa-bookmark",
+      icon: Bookmark,
       label: "Watchlist",
       color: "bg-gray-700",
     },
-    { id: "seen", icon: "fas fa-eye", label: "Seen?", color: "bg-gray-700" },
+    { id: "seen", icon: Eye, label: "Seen?", color: "bg-gray-700" },
   ];
 
   return (
@@ -517,65 +517,33 @@ export const MovieDetails = ({
                       })}
                     </div>
 
-                    {/* Streaming Services - Mobile */}
-                    <div className="xl:hidden space-y-3 sm:space-y-4">
-                      <h3 className="font-semibold
-                        text-sm sm:text-base md:text-lg">
-                        Streaming Services
-                      </h3>
-                      <div className="flex space-x-3 sm:space-x-4 overflow-x-auto pb-2">
-                        {streamingServices.map((service, index) => (
-                          <div key={index} className="flex flex-col items-center flex-shrink-0">
-                            <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 
-                              ${service.color} rounded-full flex items-center justify-center 
-                              mb-1 sm:mb-2 relative`}>
-                              {service.isIcon ? (
-                                <i className={`${service.icon} text-white 
-                                  text-xs sm:text-sm md:text-base`} />
-                              ) : (
-                                <span className="text-white font-bold text-xs">
-                                  {service.icon}
-                                </span>
-                              )}
-                              {service.badge && (
-                                <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 
-                                  bg-green-500 text-xs px-1 rounded">
-                                  {service.badge}
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-xs text-gray-400">
-                              {service.name}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    {/* Actions - Mobile/Tablet */}
                     <div className="xl:hidden space-y-3 sm:space-y-4">
                       <h3 className="font-semibold
                         text-sm sm:text-base md:text-lg">
                         Actions
                       </h3>
                       <div className="flex gap-3 sm:gap-4">
-                        {actions.map((action) => (
-                          <button
-                            onClick={action.label === 'Watchlist' ? likeHandler : () => {}}
-                            key={action.id}
-                            className="flex flex-col items-center space-y-1 sm:space-y-2 
-                              text-gray-400 hover:text-white transition-colors 
-                              p-2 sm:p-3 rounded-lg hover:bg-gray-800/50"
-                          >
-                            <div className={`w-8 h-8 sm:w-10 sm:h-10 ${action.color} 
-                              rounded-full flex items-center justify-center`}>
-                              <i className={`${action.icon} text-xs sm:text-sm`} />
-                            </div>
-                            <span className="text-xs sm:text-sm">
-                              {action.label}
-                            </span>
-                          </button>
-                        ))}
+                        {actions.map((action) => {
+                          const IconComponent = action.icon;
+                          return (
+                            <button
+                              onClick={action.label === 'Watchlist' ? likeHandler : () => {}}
+                              key={action.id}
+                              className="flex flex-col items-center space-y-1 sm:space-y-2 
+                                text-gray-400 hover:text-white transition-colors 
+                                p-2 sm:p-3 rounded-lg hover:bg-gray-800/50"
+                            >
+                              <div className={`w-8 h-8 sm:w-10 sm:h-10 ${action.color} 
+                                rounded-full flex items-center justify-center`}>
+                                <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
+                              </div>
+                              <span className="text-xs sm:text-sm">
+                                {action.label}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -790,51 +758,29 @@ export const MovieDetails = ({
             {/* Sidebar - Desktop Only */}
             <div className="hidden xl:block xl:col-span-4 space-y-6">
               
-              {/* Streaming Services */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Streaming Services</h3>
-                <div className="flex flex-wrap gap-3">
-                  {streamingServices.map((service, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                      <div className={`w-12 h-12 ${service.color} rounded-full 
-                        flex items-center justify-center mb-2 relative`}>
-                        {service.isIcon ? (
-                          <i className={`${service.icon} text-white text-base`} />
-                        ) : (
-                          <span className="text-white font-bold text-sm">
-                            {service.icon}
-                          </span>
-                        )}
-                        {service.badge && (
-                          <span className="absolute -top-2 -right-2 bg-green-500 text-xs px-1 rounded">
-                            {service.badge}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs text-gray-400">{service.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+           
 
-              {/* Actions */}
+        
               <div>
                 <h3 className="text-lg font-semibold mb-4">Actions</h3>
                 <div className="space-y-3">
-                  {actions.map((action) => (
-                    <button
-                      onClick={action.label === 'Watchlist' ? likeHandler : () => {}}
-                      key={action.id}
-                      className="flex items-center space-x-3 w-full text-gray-400 
-                        hover:text-white transition-colors p-3 rounded-lg hover:bg-gray-800/50"
-                    >
-                      <div className={`w-10 h-10 ${action.color} rounded-full 
-                        flex items-center justify-center`}>
-                        <i className={`${action.icon} text-sm`} />
-                      </div>
-                      <span className="text-sm">{action.label}</span>
-                    </button>
-                  ))}
+                  {actions.map((action) => {
+                    const IconComponent = action.icon;
+                    return (
+                      <button
+                        onClick={action.label === 'Watchlist' ? likeHandler : () => {}}
+                        key={action.id}
+                        className="flex items-center space-x-3 w-full text-gray-400 
+                          hover:text-white transition-colors p-3 rounded-lg hover:bg-gray-800/50"
+                      >
+                        <div className={`w-10 h-10 ${action.color} rounded-full 
+                          flex items-center justify-center`}>
+                          <IconComponent className="w-5 h-5" />
+                        </div>
+                        <span className="text-sm">{action.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
