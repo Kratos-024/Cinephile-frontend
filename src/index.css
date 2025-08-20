@@ -1,29 +1,37 @@
 @import "tailwindcss";
 
+/* Force desktop mode - disable responsive behavior */
+html, body {
+  min-width: 1024px;
+  overflow-x: auto;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  /* Prevent text scaling on mobile */
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  -ms-text-size-adjust: none;
+}
+
+/* Force minimum width */
+#root {
+  min-width: 1024px;
+}
+
 /* * {
     padding: 0;
     margin: 0;
     font-family: sans-serif Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;    
     box-sizing: border-box;
 } */
+
+/* Force desktop container - remove responsive breakpoints */
 .container {
   width: 100%;
-  @media (width >= 40rem /* 640px */) {
-    max-width: 40rem /* 640px */;
-  }
-  @media (width >= 48rem /* 768px */) {
-    max-width: 48rem /* 768px */;
-  }
-  @media (width >= 64rem /* 1024px */) {
-    max-width: 64rem /* 1024px */;
-  }
-  @media (width >= 80rem /* 1280px */) {
-    max-width: 96rem /* 1280px */;
-  }
-  @media (width >= 96rem /* 1536px */) {
-    max-width: 112rem /* 1536px */;
-  }
+  max-width: 96rem /* 1536px */;
+  margin: 0 auto;
+  /* Remove all responsive breakpoints - always use largest size */
 }
+
 .bg-primary {
   background-color: #0f0e0e;
 }
@@ -38,24 +46,32 @@
 .icon-btn {
   @apply bg-black/40 backdrop-blur-sm rounded-full p-3 hover:bg-black/60 transition-colors;
 }
+
 .badge {
-  @apply absolute z-10 rounded bg-black/80 text-[10px] sm:text-xs px-2 py-1 font-semibold;
+  @apply absolute z-10 rounded bg-black/80 text-xs px-2 py-1 font-semibold;
+  /* Remove responsive text sizing - always use larger text */
 }
+
 .car-btn {
   @apply absolute top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60
-         p-3 rounded-md text-white hidden lg:flex;
+         p-3 rounded-md text-white flex;
+  /* Remove lg:flex - always show on all devices */
 }
+
 .play-overlay {
   @apply absolute inset-0 flex items-center justify-center text-4xl opacity-0
          transition-opacity duration-300 group-hover:opacity-100 bg-black/60;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .gradient-bg {
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
 }
@@ -66,4 +82,103 @@
     rgba(30, 58, 138, 0.8),
     rgba(30, 64, 175, 0.9)
   );
+}
+
+/* DESKTOP-ONLY MODE OVERRIDES */
+
+/* Disable all responsive breakpoints */
+@media screen and (max-width: 1023px) {
+  /* Force desktop styles on mobile */
+  * {
+    /* Reset mobile-first responsive styles */
+    font-size: inherit !important;
+  }
+}
+
+/* Override Tailwind's responsive utilities - always use desktop sizes */
+.text-xs, .sm\:text-xs, .md\:text-xs, .lg\:text-xs { font-size: 0.75rem !important; }
+.text-sm, .sm\:text-sm, .md\:text-sm, .lg\:text-sm { font-size: 0.875rem !important; }
+.text-base, .sm\:text-base, .md\:text-base, .lg\:text-base { font-size: 1rem !important; }
+.text-lg, .sm\:text-lg, .md\:text-lg, .lg\:text-lg { font-size: 1.125rem !important; }
+.text-xl, .sm\:text-xl, .md\:text-xl, .lg\:text-xl { font-size: 1.25rem !important; }
+.text-2xl, .sm\:text-2xl, .md\:text-2xl, .lg\:text-2xl { font-size: 1.5rem !important; }
+.text-3xl, .sm\:text-3xl, .md\:text-3xl, .lg\:text-3xl { font-size: 1.875rem !important; }
+.text-4xl, .sm\:text-4xl, .md\:text-4xl, .lg\:text-4xl { font-size: 2.25rem !important; }
+.text-5xl, .sm\:text-5xl, .md\:text-5xl, .lg\:text-5xl { font-size: 3rem !important; }
+
+/* Force desktop padding/margins */
+.px-2, .sm\:px-2, .md\:px-2, .lg\:px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+.px-3, .sm\:px-3, .md\:px-3, .lg\:px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+.px-4, .sm\:px-4, .md\:px-4, .lg\:px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+.px-6, .sm\:px-6, .md\:px-6, .lg\:px-6 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+.px-8, .sm\:px-8, .md\:px-8, .lg\:px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
+
+.py-2, .sm\:py-2, .md\:py-2, .lg\:py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+.py-3, .sm\:py-3, .md\:py-3, .lg\:py-3 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+.py-4, .sm\:py-4, .md\:py-4, .lg\:py-4 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+.py-6, .sm\:py-6, .md\:py-6, .lg\:py-6 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+.py-8, .sm\:py-8, .md\:py-8, .lg\:py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+
+/* Force desktop grid layouts */
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+.grid-cols-2, .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.grid-cols-3, .sm\:grid-cols-3, .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.grid-cols-4, .sm\:grid-cols-4, .md\:grid-cols-4, .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+.grid-cols-5, .sm\:grid-cols-5, .md\:grid-cols-5, .lg\:grid-cols-5, .xl\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+.grid-cols-6, .sm\:grid-cols-6, .md\:grid-cols-6, .lg\:grid-cols-6, .xl\:grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+
+/* Force desktop gaps */
+.gap-2, .sm\:gap-2, .md\:gap-2, .lg\:gap-2 { gap: 0.5rem !important; }
+.gap-3, .sm\:gap-3, .md\:gap-3, .lg\:gap-3 { gap: 0.75rem !important; }
+.gap-4, .sm\:gap-4, .md\:gap-4, .lg\:gap-4 { gap: 1rem !important; }
+.gap-6, .sm\:gap-6, .md\:gap-6, .lg\:gap-6 { gap: 1.5rem !important; }
+.gap-8, .sm\:gap-8, .md\:gap-8, .lg\:gap-8 { gap: 2rem !important; }
+
+/* Force desktop display properties */
+.hidden { display: none !important; }
+.block, .sm\:block, .md\:block, .lg\:block { display: block !important; }
+.flex, .sm\:flex, .md\:flex, .lg\:flex { display: flex !important; }
+.grid, .sm\:grid, .md\:grid, .lg\:grid { display: grid !important; }
+
+/* Remove mobile-specific hiding */
+.md\:hidden { display: none !important; }
+.lg\:hidden { display: none !important; }
+.xl\:hidden { display: none !important; }
+
+/* Force desktop flex directions */
+.flex-col, .sm\:flex-col { flex-direction: column !important; }
+.flex-row, .sm\:flex-row, .md\:flex-row, .lg\:flex-row { flex-direction: row !important; }
+
+/* Force desktop widths */
+.w-full, .sm\:w-full, .md\:w-full, .lg\:w-full { width: 100% !important; }
+.w-auto, .sm\:w-auto, .md\:w-auto, .lg\:w-auto { width: auto !important; }
+
+/* Force desktop heights */
+.h-full, .sm\:h-full, .md\:h-full, .lg\:h-full { height: 100% !important; }
+.h-auto, .sm\:h-auto, .md\:h-auto, .lg\:h-auto { height: auto !important; }
+
+/* Force desktop spacing */
+.space-x-2 > * + *, .sm\:space-x-2 > * + *, .md\:space-x-2 > * + *, .lg\:space-x-2 > * + * { margin-left: 0.5rem !important; }
+.space-x-4 > * + *, .sm\:space-x-4 > * + *, .md\:space-x-4 > * + *, .lg\:space-x-4 > * + * { margin-left: 1rem !important; }
+.space-x-6 > * + *, .sm\:space-x-6 > * + *, .md\:space-x-6 > * + *, .lg\:space-x-6 > * + * { margin-left: 1.5rem !important; }
+.space-x-8 > * + *, .sm\:space-x-8 > * + *, .md\:space-x-8 > * + *, .lg\:space-x-8 > * + * { margin-left: 2rem !important; }
+
+.space-y-2 > * + *, .sm\:space-y-2 > * + *, .md\:space-y-2 > * + *, .lg\:space-y-2 > * + * { margin-top: 0.5rem !important; }
+.space-y-4 > * + *, .sm\:space-y-4 > * + *, .md\:space-y-4 > * + *, .lg\:space-y-4 > * + * { margin-top: 1rem !important; }
+.space-y-6 > * + *, .sm\:space-y-6 > * + *, .md\:space-y-6 > * + *, .lg\:space-y-6 > * + * { margin-top: 1.5rem !important; }
+.space-y-8 > * + *, .sm\:space-y-8 > * + *, .md\:space-y-8 > * + *, .lg\:space-y-8 > * + * { margin-top: 2rem !important; }
+
+/* Force all responsive variants to use their largest values */
+.max-w-xs, .sm\:max-w-xs { max-width: 20rem !important; }
+.max-w-sm, .sm\:max-w-sm, .md\:max-w-sm { max-width: 24rem !important; }
+.max-w-md, .sm\:max-w-md, .md\:max-w-md, .lg\:max-w-md { max-width: 28rem !important; }
+.max-w-lg, .sm\:max-w-lg, .md\:max-w-lg, .lg\:max-w-lg, .xl\:max-w-lg { max-width: 32rem !important; }
+.max-w-xl, .sm\:max-w-xl, .md\:max-w-xl, .lg\:max-w-xl, .xl\:max-w-xl { max-width: 36rem !important; }
+.max-w-2xl, .sm\:max-w-2xl, .md\:max-w-2xl, .lg\:max-w-2xl, .xl\:max-w-2xl { max-width: 42rem !important; }
+.max-w-4xl, .sm\:max-w-4xl, .md\:max-w-4xl, .lg\:max-w-4xl, .xl\:max-w-4xl { max-width: 56rem !important; }
+.max-w-7xl, .sm\:max-w-7xl, .md\:max-w-7xl, .lg\:max-w-7xl, .xl\:max-w-7xl { max-width: 80rem !important; }
+
+/* Ensure proper scrolling on mobile devices viewing desktop layout */
+body {
+  touch-action: pan-x pan-y;
 }
