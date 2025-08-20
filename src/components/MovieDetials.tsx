@@ -13,7 +13,7 @@ import {
   getSimilarMovies,
   type SimilarMoviesResponse,
 } from "../services/movie.service";
-import { Heart, Share, Bookmark, Eye, Youtube } from "lucide-react";
+import { Heart, Share, Bookmark, Eye, } from "lucide-react";
 import { addToWatchList, RemoveFromWatchlist } from "../services/user.service";
 import { toast } from "react-toastify";
 
@@ -389,17 +389,7 @@ export const MovieDetails = ({
     { id: "Images", label: "Images" },
   ];
 
-  const streamingServices = [
-    { name: "Netflix", icon: "N", color: "bg-red-600" },
-    { name: "Prime", icon: "P", color: "bg-blue-500", badge: "HD" },
-    { name: "Hotstar", icon: "H", color: "bg-orange-500", badge: "UHD" },
-    {
-      name: "Youtube",
-      icon: Youtube,
-      color: "bg-red-500",
-      isIcon: true,
-    },
-  ];
+
 
   const actions = [
     { id: "share", icon: Share, label: "Share", color: "bg-gray-700" },
