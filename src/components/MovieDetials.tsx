@@ -674,27 +674,32 @@ export const MovieDetails = ({
             {movieData["data"].storyLine}
           </p>
         </div>
-        <div className="max-w-7xl mx-auto mt-8 sm:mt-12">
-          <h3 className="text-lg sm:text-xl font-semibold mb-6">Similar Movies</h3>
-          {similarLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-              <span className="text-white ml-3">Loading similar movies...</span>
-            </div>
+     <div className="max-w-7xl mx-auto mt-8 sm:mt-12">
+  <h3 className="text-lg sm:text-xl font-semibold mb-6">Similar Movies</h3>
+  {similarLoading ? (
+    <div className="flex justify-center items-center py-12">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+      <span className="text-white ml-3">Loading similar movies...</span>
+    </div>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+      {SimilarMovies.length > 0 ? (
+        SimilarMovies.map((movie, index) => (
+          <SimilarMoviesComponent key={index} movie={movie.data} />
+        ))
+      ) : (
+        <div className="col-span-full text-center py-12">
+          {localStorage.getItem("authToken") ? (
+            <p className="text-gray-400">No similar movies found</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-              {SimilarMovies.length > 0 ? (
-                SimilarMovies.map((movie, index) => (
-                  <SimilarMoviesComponent key={index} movie={movie.data} />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-gray-400">No similar movies found</p>
-                </div>
-              )}
-            </div>
+            <p className="text-gray-400">Please log in to view similar movies.</p>
           )}
         </div>
+      )}
+    </div>
+  )}
+</div>
+
       </div>
     </div>
   );
