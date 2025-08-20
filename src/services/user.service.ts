@@ -2,7 +2,7 @@ import type { WatchlistResponse } from "../components/UserProfileHero";
 import type { ApiUserProfile } from "../components/Users";
 
  
-const API_BASE_URL = "https://9e7bac860201.ngrok-free.app";
+const API_BASE_URL = "https://af8dce592566.ngrok-free.app";
 
 export interface SelectedMovie {
   title: string;
@@ -407,7 +407,7 @@ const getUserReviewsHandler = async (
   token: string
 ): Promise<any> => {
   try {
-    const url = `https://9e7bac860201.ngrok-free.app/api/v1/user/reviews/${userId}`;
+    const url = `https://af8dce592566.ngrok-free.app/api/v1/user/reviews/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -691,7 +691,7 @@ export const getTop10UsersHandler = async ({
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
-          'ngrok-skip-browser-warning': 'true',
+      'ngrok-skip-browser-warning': 'true',
 
     };
 
