@@ -2,7 +2,7 @@ import type { WatchlistResponse } from "../components/UserProfileHero";
 import type { ApiUserProfile } from "../components/Users";
 
  
-const API_BASE_URL = "https://8280d927339a.ngrok-free.app";
+const API_BASE_URL = "https://9e7bac860201.ngrok-free.app";
 
 export interface SelectedMovie {
   title: string;
@@ -417,7 +417,7 @@ const getUserReviewsHandler = async (
   token: string
 ): Promise<any> => {
   try {
-    const url = `https://8280d927339a.ngrok-free.app/api/v1/user/reviews/${userId}`;
+    const url = `https://9e7bac860201.ngrok-free.app/api/v1/user/reviews/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",
