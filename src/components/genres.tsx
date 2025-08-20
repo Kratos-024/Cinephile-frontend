@@ -42,7 +42,6 @@ const TrendingSectionTemplate = ({
           className="rounded-2xl transition-transform duration-300 group-hover:scale-110 w-full h-[240px] object-cover"
           src={movie.Poster !== "N/A" ? movie.Poster : "/placeholder-movie.jpg"}
           alt={movie.Title}
-       
         />
 
         {isSelected && (
@@ -88,6 +87,7 @@ const MoviesApp = () => {
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem("authToken");
@@ -98,6 +98,7 @@ const MoviesApp = () => {
     
     checkAuth();
   }, []);
+
   useEffect(() => {
     const loadInitialMovies = async () => {
       setLoading(true);
@@ -254,14 +255,10 @@ const MoviesApp = () => {
     <div className="min-h-screen bg-primary relative">
       <div className="text-center py-8">
         <h1 className="text-white text-2xl font-bold tracking-wider">
-           <span
-                        className="font-medium text-black
-                     "
-                      >
-                         <span className="text-white">Cine</span>
+          <span className="font-medium text-black">
+            <span className="text-white">Cine</span>
             <span className="text-red-600">phile</span>
           </span>
-          
         </h1>
         <p className="text-gray-300 mt-2">
           Select 3-5 movies to get personalized recommendations
@@ -269,7 +266,6 @@ const MoviesApp = () => {
         <p className="text-gray-300 mt-2">
           Cold start problem
         </p>
-        
       </div>
 
       <div className="w-[920px] mx-auto px-6">
@@ -311,12 +307,14 @@ const MoviesApp = () => {
               )}
             </div>
           </div>
+
           {loading && (
             <div className="flex justify-center items-center mb-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
               <span className="text-white ml-3">Loading movies...</span>
             </div>
           )}
+
           {error && (
             <div className="text-center mb-8">
               <p className="text-red-400 font-medium">{error}</p>
@@ -341,6 +339,7 @@ const MoviesApp = () => {
               </p>
             ) : null}
           </div>
+
           {selectedMovies.length > 0 && (
             <div className="text-center border-t border-gray-700 pt-6">
               <div className="mb-4">

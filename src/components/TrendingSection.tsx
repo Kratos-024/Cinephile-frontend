@@ -78,7 +78,7 @@ export const TrendingSectionTemplate = ({
             theme: "light",
           });
         }
-      } catch (error:any) {
+      } catch (error: any) {
         setIsLiked(false);
         toast.error("An error occurred. Please try again.", {
           position: "top-right",
@@ -140,46 +140,61 @@ export const TrendingSectionTemplate = ({
   };
 
   return (
-    <div className="relative rounded-2xl group cursor-pointer transform transition-all duration-300 hover:scale-105">
+    <div className="relative rounded-xl sm:rounded-2xl group cursor-pointer 
+      transform transition-all duration-300 hover:scale-105
+      w-full max-w-[180px] sm:max-w-[220px] md:max-w-[250px] lg:max-w-[280px]">
+      
       <Link to={`movie/${movie.watchlistId}/${movie.title}`}>
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl">
           <img
-            className="w-[280px] h-[400px] object-cover rounded-2xl transition-transform duration-300 group-hover:scale-110"
-src={
-  movie.poster_path?.includes("http")
-    ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
-    : `https://image.tmdb.org/t/p/w500/${movie.poster_path || "Image_loading"}`
-}
-
+            className="w-full 
+              h-[240px] sm:h-[300px] md:h-[350px] lg:h-[400px]
+              object-cover rounded-xl sm:rounded-2xl 
+              transition-transform duration-300 group-hover:scale-110"
+            src={
+              movie.poster_path?.includes("http")
+                ? movie.poster_path.replace(/_V1_.*\.jpg/, "_V1_UX675_.jpg")
+                : `https://image.tmdb.org/t/p/w500/${movie.poster_path || "Image_loading"}`
+            }
             alt={movie.title}
             loading="lazy"
           />
           
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent 
+            opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+            rounded-xl sm:rounded-2xl" />
           
-          <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <h4 className="text-white font-semibold text-lg mb-1 line-clamp-2">
+          <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 
+            left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4 
+            transform translate-y-4 group-hover:translate-y-0 
+            opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <h4 className="text-white font-semibold 
+              text-sm sm:text-base md:text-lg mb-1 line-clamp-2">
               {movie.title}
             </h4>
           </div>
         </div>
         
-        <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full border border-green-400 text-sm font-semibold">
+        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 
+          bg-black/70 backdrop-blur-sm text-white 
+          px-2 sm:px-3 py-1 rounded-full border border-green-400 
+          text-xs sm:text-sm font-semibold">
           <span>{movie.vote_average}</span>
         </div>
       </Link>
       
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10">
         <button
           onClick={(e) => {
             e.preventDefault(); 
             e.stopPropagation(); 
             likeHandler();
           }}
-          className="p-2 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-300 shadow-lg group/heart"
+          className="p-1.5 sm:p-2 rounded-full bg-black/50 backdrop-blur-sm 
+            hover:bg-black/70 transition-all duration-300 shadow-lg group/heart"
         >
           <Heart
-            className={`w-6 h-6 transition-all duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300 ${
               isLiked
                 ? "fill-red-500 text-red-500"
                 : "text-white hover:text-red-400"
@@ -190,6 +205,7 @@ src={
     </div>
   );
 };
+
 export const TrendingSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -199,13 +215,41 @@ export const TrendingSection = () => {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const sliderRef = useRef(null);
-  const itemWidth = 300;
-  const visibleItems = 4;
+  
+  // Responsive item width and visible items
+  const [itemWidth, setItemWidth] = useState(300);
+  const [visibleItems, setVisibleItems] = useState(4);
+
+  useEffect(() => {
+    const updateLayout = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setItemWidth(200);
+        setVisibleItems(1);
+      } else if (width < 768) {
+        setItemWidth(240);
+        setVisibleItems(2);
+      } else if (width < 1024) {
+        setItemWidth(270);
+        setVisibleItems(3);
+      } else {
+        setItemWidth(300);
+        setVisibleItems(4);
+      }
+    };
+
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
+    return () => window.removeEventListener('resize', updateLayout);
+  }, []);
+
   const maxIndex = Math.max(0, movie2025.length - visibleItems);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  
   const handleLoadMore = () => {
-    navigate('/movies/trending')
-  }
+    navigate('/movies/trending');
+  };
+
   useEffect(() => {
     const getTrendingMovieArray = async () => {
       try {
@@ -287,10 +331,11 @@ export const TrendingSection = () => {
 
   if (loading || movie2025.length === 0) {
     return (
-      <section className="py-11">
-        <div className="container mx-auto px-2">
-          <div className="flex items-center justify-between mb-12">
-            <h3 className="text-4xl lg:text-5xl font-bold text-white">
+      <section className="py-8 sm:py-10 md:py-11">
+        <div className="container mx-auto px-2 sm:px-4 md:px-6">
+          <div className="flex items-center justify-between mb-8 sm:mb-10 md:mb-12">
+            <h3 className="font-bold text-white
+              text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
               Trending Movies
             </h3>
           </div>
@@ -303,10 +348,11 @@ export const TrendingSection = () => {
   }
 
   return (
-    <section className="py-11">
-      <div className="container mx-auto px-2">
-        <div className="flex items-center justify-between mb-12">
-          <h3 className="text-4xl lg:text-5xl font-bold text-white">
+    <section className="py-8 sm:py-10 md:py-11">
+      <div className="container mx-auto px-2 sm:px-4 md:px-6">
+        <div className="flex items-center justify-between mb-8 sm:mb-10 md:mb-12">
+          <h3 className="font-bold text-white
+            text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
             Trending Movies
           </h3>
 
@@ -314,19 +360,24 @@ export const TrendingSection = () => {
             <button
               onClick={goToPrev}
               disabled={currentIndex === 0}
-              className="p-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 lg:p-3 rounded-full bg-white/10 backdrop-blur-sm 
+                border border-white/20 text-white hover:bg-white/20 
+                transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
             </button>
             <button
               onClick={goToNext}
               disabled={currentIndex >= maxIndex}
-              className="p-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 lg:p-3 rounded-full bg-white/10 backdrop-blur-sm 
+                border border-white/20 text-white hover:bg-white/20 
+                transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
             </button>
           </div>
         </div>
+        
         <div
           className="relative overflow-hidden"
           onMouseEnter={() => setIsHovering(true)}
@@ -334,7 +385,8 @@ export const TrendingSection = () => {
         >
           <div
             ref={sliderRef}
-            className="flex transition-transform duration-500 ease-in-out gap-5"
+            className="flex transition-transform duration-500 ease-in-out 
+              gap-3 sm:gap-4 md:gap-5"
             style={{
               transform: `translateX(-${currentIndex * itemWidth}px)`,
             }}
@@ -343,8 +395,8 @@ export const TrendingSection = () => {
               <div
                 key={movie.watchlistId || `movie-${index}`}
                 className="flex-shrink-0"
+                style={{ width: `${itemWidth - 20}px` }}
               >
-                {" "}
                 <TrendingSectionTemplate
                   movie={{
                     releaseData: movie.year,
@@ -356,38 +408,56 @@ export const TrendingSection = () => {
                 />
               </div>
             ))}
-            <div onClick={handleLoadMore}
-              className="
-             w-[480px] cursor-pointer text-white text-[24px] font-semibold h-[400px] px-[96px] whitespace-nowrap  bg-neutral-800 flex justify-center items-center object-cover rounded-2xl 
-             transition-transform duration-300 group-hover:scale-110"
+            
+            {/* Load More Card */}
+            <div 
+              onClick={handleLoadMore}
+              className="flex-shrink-0 cursor-pointer text-white font-semibold 
+                bg-neutral-800 flex justify-center items-center 
+                rounded-xl sm:rounded-2xl transition-transform duration-300 hover:scale-105
+                w-[180px] sm:w-[220px] md:w-[300px] lg:w-[480px]
+                h-[240px] sm:h-[300px] md:h-[350px] lg:h-[400px]
+                text-base sm:text-lg md:text-xl lg:text-2xl
+                px-4 sm:px-8 md:px-16 lg:px-24"
+              style={{ width: `${itemWidth}px` }}
             >
-              Load more +
+              <span className="text-center">Load more +</span>
             </div>
           </div>
+          
+          {/* Mobile navigation buttons */}
           <button
             onClick={goToPrev}
             disabled={currentIndex === 0}
-            className="md:hidden absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/70 backdrop-blur-sm text-white hover:bg-black/90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+            className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 
+              p-2 rounded-full bg-black/70 backdrop-blur-sm text-white 
+              hover:bg-black/90 transition-all duration-300 
+              disabled:opacity-50 disabled:cursor-not-allowed z-10"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <button
             onClick={goToNext}
             disabled={currentIndex >= maxIndex}
-            className="md:hidden absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/70 backdrop-blur-sm text-white hover:bg-black/90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+            className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 
+              p-2 rounded-full bg-black/70 backdrop-blur-sm text-white 
+              hover:bg-black/90 transition-all duration-300 
+              disabled:opacity-50 disabled:cursor-not-allowed z-10"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
+        
+        {/* Pagination dots */}
         {maxIndex > 0 && (
-          <div className="flex justify-center items-center gap-2 mt-8">
+          <div className="flex justify-center items-center gap-1 sm:gap-2 mt-6 sm:mt-8">
             {Array.from({ length: maxIndex + 1 }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
                   index === currentIndex
-                    ? "bg-white w-8"
+                    ? "bg-white w-6 sm:w-8"
                     : "bg-white/30 hover:bg-white/50"
                 }`}
               />
@@ -398,3 +468,4 @@ export const TrendingSection = () => {
     </section>
   );
 };
+

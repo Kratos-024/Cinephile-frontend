@@ -1,4 +1,3 @@
- 
 import { useState, useEffect, useRef } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { IoIosSearch, IoIosNotifications } from "react-icons/io";
@@ -34,10 +33,10 @@ export const NavBar = ({
   });
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        
         setIsLoggedIn(true);
         setUserProfile({
           uid: user.uid,
@@ -82,7 +81,6 @@ export const NavBar = ({
     try {
       const result = await googleLogin();
 
-
       if (result.success && result.data) {
         console.log("");
       } else {
@@ -119,69 +117,83 @@ export const NavBar = ({
       setShowUserPopup(false);
     }
   };
+
   const [search, setSearch] = useState<string>("");
-const searchHandler = () => {
-  if (search.trim().length >= 1) {
-    navigate(`/search/${search}`);
-    setSearch("");
-  } else {
-    alert("Please enter a search query");
-  }
-};
+  const searchHandler = () => {
+    if (search.trim().length >= 1) {
+      navigate(`/search/${search}`);
+      setSearch("");
+    } else {
+      alert("Please enter a search query");
+    }
+  };
 
   return (
-    <div className="w-full py-2">
-      <div
-        className="flex items-center
-       justify-between"
-      >
-        <div
-          className="flex items-center 
-        gap-4"
-        >
-          <div
-            onClick={menu ? undefined : () => menuHandler()}
-            className={`transition-all duration-200 ease-in-out ${
-              menu ? "pointer-events-none text-slate-500" : "text-white"
-            }`}
-          >
-            <FaAngleLeft className="cursor-pointer w-6 h-6" />
+    <div className="w-full py-2 sm:py-3 md:py-4">
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
+        {/* Left side - Menu buttons and search */}
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
+          {/* Menu buttons - hide on mobile */}
+          <div className="hidden md:flex items-center gap-2">
+            <div
+              onClick={menu ? undefined : () => menuHandler()}
+              className={`transition-all duration-200 ease-in-out ${
+                menu ? "pointer-events-none text-slate-500" : "text-white"
+              }`}
+            >
+              <FaAngleLeft className="cursor-pointer w-5 h-5 lg:w-6 lg:h-6" />
+            </div>
+
+            <div
+              onClick={menu ? menuHandler : undefined}
+              className={`transition-all duration-200 ease-in-out ${
+                menu ? "text-white" : "pointer-events-none text-slate-500"
+              }`}
+            >
+              <FaAngleRight className="cursor-pointer w-5 h-5 lg:w-6 lg:h-6" />
+            </div>
           </div>
 
-          <div
-            onClick={menu ? menuHandler : undefined}
-            className={`transition-all duration-200 ease-in-out ${
-              menu ? "text-white" : "pointer-events-none text-slate-500"
-            }`}
-          >
-            <FaAngleRight className="cursor-pointer w-6 h-6" />
-          </div>
-
-          <div className="flex items-center px-2 pl-5 py-3
-           w-[320px] max-md:w-[260px] gap-3 border border-gray-700 rounded-3xl text-white min-w-0">
-            <div className=" cursor-pointer" onClick={searchHandler}>
-              <IoIosSearch className="text-gray-400 w-6 h-6" />
-            </div>{" "}
-           <input
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  onKeyUp={(e) => {
-    if (e.key === "Enter") {
-      searchHandler();
-    }
-  }}
-  className="text-white bg-transparent outline-none flex-1 min-w-0"
-  placeholder="Search Anything"
-/>
-            <RiMenuSearchFill className="text-gray-400 w-6 h-6" />
+          {/* Search bar - responsive width */}
+          <div className="flex items-center px-3 py-2 sm:py-3 
+            w-full max-w-[200px] sm:max-w-[260px] md:max-w-[300px] lg:max-w-[320px] 
+            gap-2 sm:gap-3 border border-gray-700 rounded-2xl sm:rounded-3xl 
+            text-white bg-gray-800/50 backdrop-blur-sm">
+            
+            <div className="cursor-pointer" onClick={searchHandler}>
+              <IoIosSearch className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 
+                hover:text-white transition-colors" />
+            </div>
+            
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  searchHandler();
+                }
+              }}
+              className="text-white bg-transparent outline-none flex-1 min-w-0 
+                text-sm sm:text-base placeholder-gray-500"
+              placeholder="Search..."
+            />
+            
+            <RiMenuSearchFill 
+              className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 
+                hover:text-white transition-colors cursor-pointer" 
+              onClick={searchHandler}
+            />
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-white">
-          <IoIosNotifications className="w-7 h-7 cursor-pointer" />
+        {/* Right side - Notifications and user */}
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 text-white">
+          <IoIosNotifications className="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer 
+            hover:text-gray-300 transition-colors" />
+          
           <div className="relative" ref={popupRef}>
             <CiUser
-              className={`w-7 h-7 cursor-pointer transition-colors ${
+              className={`w-6 h-6 sm:w-7 sm:h-7 cursor-pointer transition-colors ${
                 isLoading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:text-gray-300"

@@ -58,74 +58,105 @@ export const MovieSectionTemplate = ({
   };
 
   return (
-    <div
-      className="group relative rounded-2xl cursor-pointer
-     transform transition-all duration-300 
-      hover:z-10"
-    >
-      <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+    <div className="group relative rounded-xl sm:rounded-2xl cursor-pointer
+      transform transition-all duration-300 hover:z-10
+      w-full max-w-sm mx-auto">
+      
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl 
+        shadow-lg hover:shadow-2xl transition-shadow duration-300">
+        
         {!imageLoaded && (
-          <div className="w-full aspect-[2/3] bg-gray-800 animate-pulse rounded-2xl flex items-center justify-center">
-            <div className="text-gray-600 text-sm">Loading...</div>
+          <div className="w-full bg-gray-800 animate-pulse 
+            rounded-xl sm:rounded-2xl flex items-center justify-center
+            h-[240px] xs:h-[280px] sm:h-[320px] md:h-[360px] lg:h-[400px]
+            aspect-[2/3]">
+            <div className="text-gray-600 text-xs sm:text-sm">Loading...</div>
           </div>
         )}
 
- <img
-          className={`w-full aspect-[2/3] object-cover 
-            rounded-2xl transition-transform duration-300 
-            group-hover:scale-110 ${!imageLoaded ? "hidden" : "block"}`}
-            src={movie.poster_path.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
+        <img
+          className={`w-full object-cover transition-transform duration-300 
+            group-hover:scale-110 rounded-xl sm:rounded-2xl
+            h-[240px] xs:h-[280px] sm:h-[320px] md:h-[360px] lg:h-[400px]
+            aspect-[2/3] ${!imageLoaded ? "hidden" : "block"}`}
+          src={movie.poster_path.replace(/_V1_.*\..*jpg$/, "_V1_.jpg")}
           alt={`${movie.title} poster`}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageLoaded(true)}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+        <div className="absolute inset-0 bg-gradient-to-t 
+          from-black/80 via-black/20 to-transparent 
+          opacity-0 group-hover:opacity-100 
+          transition-opacity duration-300 
+          rounded-xl sm:rounded-2xl" />
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <h4 className="text-white font-bold text-lg mb-1 line-clamp-2 leading-tight">
+        <div className="absolute bottom-0 left-0 right-0 
+          p-2 sm:p-3 md:p-4 
+          transform translate-y-4 group-hover:translate-y-0 
+          opacity-0 group-hover:opacity-100 
+          transition-all duration-300">
+          
+          <h4 className="text-white font-bold mb-1 line-clamp-2 leading-tight
+            text-sm sm:text-base md:text-lg">
             {movie.title}
           </h4>
+          
           {movie.release_date && (
-            <p className="text-gray-300 text-sm font-medium">
+            <p className="text-gray-300 font-medium
+              text-xs sm:text-sm">
               {getYear(movie.release_date)}
             </p>
           )}
 
-         <Link to={`/movie/${movie.imdbId}/${movie.title}`}>  <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-            <button className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-white/30 transition-colors">
-              View Details
-            </button>
-            {section !== "watchlist" && (
-              <button className="bg-orange-500/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-orange-500 transition-colors">
-                Add to List
+          <Link to={`/movie/${movie.imdbId}/${movie.title}`}>
+            <div className="flex items-center gap-1 sm:gap-2 mt-1 sm:mt-2 
+              opacity-0 group-hover:opacity-100 
+              transition-opacity duration-300 delay-100">
+              
+              <button className="bg-white/20 backdrop-blur-sm text-white 
+                px-2 sm:px-3 py-1 rounded-full font-medium 
+                hover:bg-white/30 transition-colors
+                text-xs sm:text-sm">
+                View Details
               </button>
-            )}
-          </div></Link> 
+              
+              {section !== "watchlist" && (
+                <button className="bg-orange-500/80 backdrop-blur-sm text-white 
+                  px-2 sm:px-3 py-1 rounded-full font-medium 
+                  hover:bg-orange-500 transition-colors
+                  text-xs sm:text-sm">
+                  Add to List
+                </button>
+              )}
+            </div>
+          </Link>
         </div>
       </div>
 
-      <div
-        className="absolute top-3 left-3 bg-black/80 
-      backdrop-blur-sm text-white px-2 py-1 rounded-lg
-      border border-yellow-400/50 text-sm font-bold flex
-       items-center gap-1 shadow-lg"
-      >
+      {/* Rating badge */}
+      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 
+        bg-black/80 backdrop-blur-sm text-white 
+        px-2 py-1 rounded-lg border border-yellow-400/50 
+        text-xs sm:text-sm font-bold flex items-center gap-1 shadow-lg">
         <span className="text-yellow-400">★</span>
         <span>{formatRating(+movie.vote_average)}</span>
       </div>
 
-      <div className="absolute top-3 right-3">
+      {/* Heart button */}
+      <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
         <button
           onClick={(e) => {
             e.stopPropagation();
             setIsLiked(!isLiked);
           }}
-          className="p-2 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 transition-all duration-300 transform hover:scale-110 shadow-lg"
+          className="p-1.5 sm:p-2 rounded-full bg-black/60 backdrop-blur-sm 
+            hover:bg-black/80 transition-all duration-300 
+            transform hover:scale-110 shadow-lg"
           aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart
-            className={`w-5 h-5 transition-all duration-300 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300 ${
               isLiked
                 ? "fill-red-500 text-red-500 scale-110"
                 : "text-white hover:text-red-400"
@@ -134,10 +165,15 @@ export const MovieSectionTemplate = ({
         </button>
       </div>
 
-      <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm -z-10" />
+      {/* Glow effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r 
+        from-orange-500/20 to-yellow-500/20 rounded-xl sm:rounded-2xl 
+        opacity-0 group-hover:opacity-100 
+        transition-opacity duration-300 blur-sm -z-10" />
     </div>
   );
 };
+
 
 const WatchlistSection = ({ userId }: { userId: string }) => {
   const [watchlist, setWatchlist] = useState<WatchlistResponse["data"]>({
@@ -165,21 +201,24 @@ const WatchlistSection = ({ userId }: { userId: string }) => {
   }, [userId]);
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between">
+    <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">
+          <h2 className="font-bold text-white mb-1
+            text-lg sm:text-xl md:text-2xl">
             Watchlist
           </h2>
-          <p className="text-gray-400 text-sm">Your latest watchelist</p>
+          <p className="text-gray-400 
+            text-xs sm:text-sm">
+            Your latest watchlist
+          </p>
         </div>
       </div>
 
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 
-          md:grid-cols-3 
-      lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
-      >
+      <div className="grid gap-3 sm:gap-4 md:gap-6
+        grid-cols-2 xs:grid-cols-2 
+        sm:grid-cols-3 md:grid-cols-4 
+        lg:grid-cols-5 xl:grid-cols-6">
         {watchlist.watchlistMovies.map(
           (movie: WatchlistData["watchlistMovies"][0], idx: number) => {
             return (
@@ -194,14 +233,19 @@ const WatchlistSection = ({ userId }: { userId: string }) => {
       </div>
 
       {watchlist.watchlistMovies.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-            <span className="text-gray-600 text-2xl">🎬</span>
+        <div className="flex flex-col items-center justify-center 
+          py-8 sm:py-12 text-center">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-800 rounded-full 
+            flex items-center justify-center mb-3 sm:mb-4">
+            <span className="text-gray-600 
+              text-lg sm:text-xl md:text-2xl">🎬</span>
           </div>
-          <h3 className="text-gray-400 text-lg font-medium mb-2">
+          <h3 className="text-gray-400 font-medium mb-2
+            text-base sm:text-lg">
             No films yet
           </h3>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 
+            text-sm sm:text-base">
             Start watching and rating movies to see them here
           </p>
         </div>
@@ -273,117 +317,162 @@ const ReviewsSection = ({
 };
 
 
-const ProfileSection = ({ recentReviews } : { recentReviews: MovieCommentResponse[] }) => {
+const ProfileSection = ({ recentReviews }: { recentReviews: MovieCommentResponse[] }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-8 py-8">
-      <div className="lg:col-span-2 space-y-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 
+      px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      
+      {/* Main Content */}
+      <div className="lg:col-span-2 space-y-4 sm:space-y-6 md:space-y-8">
+        
+        {/* Favorite Films */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-gray-400 text-sm uppercase tracking-wide">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-gray-400 uppercase tracking-wide
+              text-xs sm:text-sm">
               Favorite Films
             </h2>
           </div>
-          <p className="text-gray-400 text-sm">
-            Don't forget to select your
-            <span className="text-orange-500"> favorite films</span>!
+          <p className="text-gray-400 
+            text-sm sm:text-base">
+            Don't forget to select your{" "}
+            <span className="text-orange-500">favorite films</span>!
           </p>
         </div>
 
-   
+        {/* Recent Activity */}
         <div>
-          <RecentActivity/>
+          <RecentActivity />
         </div>
 
+        {/* Recent Reviews */}
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-gray-400 text-sm uppercase tracking-wide">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-gray-400 uppercase tracking-wide
+              text-xs sm:text-sm">
               Recent Reviews
             </h2>
-            <button className="text-gray-400 text-sm hover:text-white">
+            <button className="text-gray-400 hover:text-white
+              text-xs sm:text-sm">
               MORE
             </button>
           </div>
-
           <RecentReviews reviews={recentReviews} />
-
         </div>
       </div>
 
-      <div className="space-y-8">
+      {/* Sidebar */}
+      <div className="space-y-4 sm:space-y-6 md:space-y-8">
+        
+        {/* Diary */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-gray-400 text-sm uppercase tracking-wide">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-gray-400 uppercase tracking-wide
+              text-xs sm:text-sm">
               Diary
             </h2>
-            <button className="text-gray-400 text-sm hover:text-white">
+            <button className="text-gray-400 hover:text-white
+              text-xs sm:text-sm">
               1
             </button>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-gray-800 bg-opacity-30 rounded">
+          
+          <div className="flex items-center gap-2 sm:gap-3 
+            p-2 sm:p-3 bg-gray-800 bg-opacity-30 rounded">
             {recentReviews.map((review) => {
-           return ( <div>  <div className="text-center">
-              <div className="text-gray-400 text-xs">{review.timestamp?.split(',')[1]}</div>
-
-              <div className="text-gray-400 text-xs">JUL</div>
-            </div>
-             <span className="text-gray-300 text-sm">{review.movieTitle}</span></div>
-        )
-         })}
+              return (
+                <div key={review.imdb_id} className="flex items-center gap-2">
+                  <div className="text-center">
+                    <div className="text-gray-400 
+                      text-xs sm:text-sm">
+                      {review.timestamp?.split(',')[1]}
+                    </div>
+                    <div className="text-gray-400 
+                      text-xs sm:text-sm">
+                      JUL
+                    </div>
+                  </div>
+                  <span className="text-gray-300 
+                    text-xs sm:text-sm">
+                    {review.movieTitle}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
+        {/* Ratings */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-gray-400 text-sm uppercase tracking-wide">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-gray-400 uppercase tracking-wide
+              text-xs sm:text-sm">
               Ratings
             </h2>
-            <button className="text-gray-400 text-sm hover:text-white">
+            <button className="text-gray-400 hover:text-white
+              text-xs sm:text-sm">
               1
             </button>
           </div>
+          
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-green-500 text-sm">★</span>
-              <div className="flex-1 mx-3 bg-gray-700 h-2 rounded">
-                <div
-                  className="bg-gray-600 h-2 rounded"
-                  style={{ width: "100%" }}
-                ></div>
+              <span className="text-green-500 
+                text-sm sm:text-base">★</span>
+              <div className="flex-1 mx-2 sm:mx-3 bg-gray-700 h-2 rounded">
+                <div className="bg-gray-600 h-2 rounded w-full" />
               </div>
-              <span className="text-green-500 text-sm">★★★★★</span>
+              <span className="text-green-500 
+                text-sm sm:text-base">★★★★★</span>
             </div>
           </div>
         </div>
 
+        {/* Activity */}
         <div>
-          <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">
+          <h2 className="text-gray-400 uppercase tracking-wide mb-3 sm:mb-4
+            text-xs sm:text-sm">
             Activity
           </h2>
-          <p className="text-gray-400 text-sm">No recent activity</p>
+          <p className="text-gray-400 
+            text-xs sm:text-sm">
+            No recent activity
+          </p>
         </div>
 
-        <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-6 relative overflow-hidden">
+        {/* Upgrade Card */}
+        <div className="bg-gradient-to-r from-gray-800 to-gray-700 
+          rounded-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
           <div className="relative z-10">
-            <h3 className="text-white text-xl font-bold mb-2">
+            <h3 className="text-white font-bold mb-1 sm:mb-2
+              text-base sm:text-lg md:text-xl">
               NEED AN UPGRADE?
             </h3>
-            <p className="text-gray-300 text-sm mb-4">
-              Profile stats, filtering by favorite streaming services, watchlist
-              alerts and no ads!
+            <p className="text-gray-300 mb-2 sm:mb-3 md:mb-4
+              text-xs sm:text-sm">
+              Profile stats, filtering by favorite streaming services, 
+              watchlist alerts and no ads!
             </p>
-            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium flex items-center gap-2">
+            <button className="bg-green-600 hover:bg-green-700 text-white 
+              px-3 sm:px-4 py-1.5 sm:py-2 rounded font-medium 
+              flex items-center gap-1 sm:gap-2
+              text-xs sm:text-sm
+              transition-colors duration-200">
               GET
-              <span className="bg-green-700 px-2 py-1 rounded text-xs">
+              <span className="bg-green-700 px-1 sm:px-2 py-0.5 sm:py-1 
+                rounded text-xs">
                 PRO
               </span>
             </button>
           </div>
-          <div className="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-orange-500 to-transparent opacity-20"></div>
+          <div className="absolute right-0 top-0 w-16 sm:w-20 md:w-24 h-full 
+            bg-gradient-to-l from-orange-500 to-transparent opacity-20" />
         </div>
       </div>
     </div>
   );
 };
+
 
 const FollowButton = ({ targetId }: { targetId: string }) => {
   const [isFollow, setIsFollowed] = useState<boolean>(false);
@@ -397,7 +486,7 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
       if (response.success) {
         setIsFollowed(true);
         setLoader(false);
-                window.location.reload()
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);
@@ -423,39 +512,53 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
       } catch (error) {
         console.log(error);
         setLoader(true);
-
         setIsFollowed(false);
       }
     };
     isFollowingHandler();
   }, []);
+
   if (loader) {
-    return <div>Loading...</div>;
+    return (
+      <div className="animate-pulse bg-gray-600 
+        px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl
+        text-xs sm:text-sm">
+        Loading...
+      </div>
+    );
   }
+
   return (
     <>
       {!self && (
         <div className="relative">
           {!isFollow && (
-            <div onClick={followHandler}>
-              <span className=" bg-emerald-400 rounded-xl  cursor-pointer hover:opacity-95 text-white px-2 py-2">
-                Follow
-              </span>
-            </div>
+            <button 
+              onClick={followHandler}
+              className="bg-emerald-400 hover:bg-emerald-500 
+                rounded-xl cursor-pointer transition-colors
+                text-white px-3 sm:px-4 py-1.5 sm:py-2
+                text-xs sm:text-sm md:text-base
+                font-medium shadow-lg hover:shadow-xl
+                transform hover:scale-105 duration-200">
+              Follow
+            </button>
           )}
-          
         </div>
       )}
     </>
   );
 };
+
 export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
   const [navigation, setNavigation] = useState("Profile");
-const navigate = useNavigate();
+  const navigate = useNavigate();
+  
   const navigationHandler = (nav: string) => {
     setNavigation(nav);
   };
-useEffect(() => {
+
+  useEffect(() => {
     const token =
       typeof window !== "undefined"
         ? window.localStorage?.getItem("authToken")
@@ -474,6 +577,7 @@ useEffect(() => {
       navigate("/", { replace: true });
     }
   }, [navigate]);
+
   const [user, setUser] = useState<UserData["data"]>({
     followers: {
       count: 0,
@@ -481,7 +585,7 @@ useEffect(() => {
     },
     following: {
       count: 0,
-      profiles: [{displayName:'',email:'',photoURL:'',uid:''}],
+      profiles: [{ displayName: '', email: '', photoURL: '', uid: '' }],
     },
     profile: {
       displayName: "",
@@ -513,83 +617,126 @@ useEffect(() => {
         console.log(response.data);
         //@ts-ignore
         setUser(response.data);
-
-      } 
+      }
     };
     getUser();
   }, [user_userid]);
+
   const { userid } = useParams() || "";
-  if (!userid) return;
+  if (!userid) return null;
+
   return (
-    <section className="bg-primary w-full min-h-screen pb-[96px]">
+    <section className="bg-primary w-full min-h-screen 
+      pb-12 sm:pb-16 md:pb-24">
+      
+      {/* Hero Section */}
       <div className="relative">
         <img
-          className="w-full h-[340px] relative object-cover"
+          className="w-full object-cover
+            h-[200px] sm:h-[250px] md:h-[300px] lg:h-[340px]"
           src='https://media.gettyimages.com/id/1798302631/video/no-tv-signal-vhs-noise-glitch-screen-overlay-grunge-old-tv-background.jpg?s=640x640&k=20&c=yrNzn6bNDtn7XWeLiVMkfNg9RhFUWHfwtyDiaXS5eaI='
           alt="user-profile-hero"
         />
-        <div className="flex items-start gap-6 px-8 max-lg:-mt-10 lg:-mt-20 relative z-10">
+        
+        {/* Profile Content */}
+        <div className="flex flex-col lg:flex-row items-start gap-3 sm:gap-4 md:gap-6 
+          px-2 sm:px-4 md:px-6 lg:px-8 
+          -mt-8 sm:-mt-12 md:-mt-16 lg:-mt-20 
+          relative z-10">
+          
+          {/* Profile Picture */}
           <img
             loading="lazy"
-            className="rounded-full lg:w-[246px] lg:h-[246px] max-lg:w-[148px] max-lg:h-[148px] max-lg:mt-0 object-cover border-4 border-white"
+            className="rounded-full object-cover border-4 border-white shadow-lg
+              w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 
+              md:w-32 md:h-32 lg:w-48 lg:h-48 xl:w-[246px] xl:h-[246px]
+              mx-auto lg:mx-0"
             src={user?.profile.photoURL || "/default-avatar.jpg"}
             alt="profile"
           />
-          <div className="flex-1 flex justify-between mt-[86px]">
-            <div className="flex flex-col gap-2 mb-2">
-              <div className="flex items-center gap-4">
-                <h1
-                  className="text-white max-lg:text-lg whitespace-nowrap
-                 lg:text-4xl font-bold"
-                >
+          
+          {/* Profile Info */}
+          <div className="flex-1 flex flex-col lg:flex-row justify-between 
+            items-center lg:items-start text-center lg:text-left
+            mt-2 sm:mt-4 md:mt-6 lg:mt-20 xl:mt-[86px]
+            w-full">
+            
+            <div className="flex flex-col gap-1 sm:gap-2 mb-3 sm:mb-4 lg:mb-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <h1 className="text-white font-bold whitespace-nowrap
+                  text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
                   {user?.profile.displayName}
                 </h1>
                 <FollowButton targetId={userid} />
               </div>
-              <p className="text-gray-300 max-lg:text-sm lg:text-lg mb-6">
+              
+              <p className="text-gray-300 mb-2 sm:mb-4 md:mb-6
+                text-sm sm:text-base lg:text-lg">
                 It makes you forget the wonderful yesterday
               </p>
             </div>
-            <div className="hidden lg:flex gap-8">
+            
+            {/* Stats - Desktop */}
+            <div className="hidden lg:flex gap-6 xl:gap-8">
               <div className="text-center">
-                <div className="text-white lg:text-2xl font-bold">
+                <div className="text-white font-bold
+                  text-xl lg:text-2xl">
                   {user?.stats.followingCount || 0}
                 </div>
-                <div className="text-gray-400 text-sm">FOLLOWING</div>
+                <div className="text-gray-400 text-sm uppercase tracking-wide">
+                  Following
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-white lg:text-2xl font-bold">
+                <div className="text-white font-bold
+                  text-xl lg:text-2xl">
                   {user?.stats.followersCount || 0}
                 </div>
-                <div className="text-gray-400 text-sm">FOLLOWERS</div>
+                <div className="text-gray-400 text-sm uppercase tracking-wide">
+                  Followers
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="max-lg:flex hidden justify-center gap-8">
+        
+        {/* Stats - Mobile/Tablet */}
+        <div className="flex lg:hidden justify-center gap-6 sm:gap-8 
+          mt-3 sm:mt-4 px-4">
           <div className="text-center">
-            <div className="text-white lg:text-2xl font-bold">
+            <div className="text-white font-bold
+              text-lg sm:text-xl">
               {user?.stats.followingCount || 0}
             </div>
-            <div className="text-gray-400 text-sm">FOLLOWING</div>
+            <div className="text-gray-400 text-xs sm:text-sm uppercase tracking-wide">
+              Following
+            </div>
           </div>
           <div className="text-center">
-            <div className="text-white lg:text-2xl font-bold">
+            <div className="text-white font-bold
+              text-lg sm:text-xl">
               {user?.stats.followersCount || 0}
             </div>
-            <div className="text-gray-400 text-sm">FOLLOWERS</div>
+            <div className="text-gray-400 text-xs sm:text-sm uppercase tracking-wide">
+              Followers
+            </div>
           </div>
         </div>
       </div>
-      <div className="border-b border-gray-700 mt-8">
-        <nav className="flex max-lg:justify-center lg:space-x-8 lg:px-8 max-lg:space-x-2 max-lg:px-2">
+      
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-700 mt-4 sm:mt-6 md:mt-8">
+        <nav className="flex justify-center lg:justify-start 
+          space-x-1 sm:space-x-2 md:space-x-4 lg:space-x-8 
+          px-2 sm:px-4 md:px-6 lg:px-8 
+          overflow-x-auto scrollbar-hide">
           {["Profile", "Watchlist", "Reviews", "Network"].map((tab) => (
             <button
-              onClick={() => {
-                navigationHandler(tab);
-              }}
+              onClick={() => navigationHandler(tab)}
               key={tab}
-              className={`py-3 px-1 border-b-2 text-sm font-medium ${
+              className={`py-2 sm:py-3 px-1 sm:px-2 border-b-2 font-medium 
+                whitespace-nowrap transition-colors duration-200
+                text-xs sm:text-sm md:text-base ${
                 tab === navigation
                   ? "border-orange-500 text-white"
                   : "border-transparent text-gray-400 hover:text-white"
@@ -600,13 +747,17 @@ useEffect(() => {
           ))}
         </nav>
       </div>
-      {navigation === "Profile" && <ProfileSection recentReviews={user.reviews} />}
-      {navigation === "Reviews" && (
-        <ReviewsSection userReviewData={user.reviews} />
-      )}
-{navigation === "Watchlist" && <WatchlistSection userId={userid} />}
-      {navigation === "Network" && <NetworkSection
- following={user.following} followers={user.followers} />}
+      
+      {/* Tab Content */}
+      <div className="mt-4 sm:mt-6 md:mt-8">
+        {navigation === "Profile" && <ProfileSection recentReviews={user.reviews} />}
+        {navigation === "Reviews" && <ReviewsSection userReviewData={user.reviews} />}
+        {navigation === "Watchlist" && <WatchlistSection userId={userid} />}
+        {navigation === "Network" && (
+          <NetworkSection following={user.following} followers={user.followers} />
+        )}
+      </div>
     </section>
   );
 };
+
