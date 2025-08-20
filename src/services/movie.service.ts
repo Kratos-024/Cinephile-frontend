@@ -204,7 +204,7 @@ const getMovieByTitle = async (
     }
 
     const encodedTitle = encodeURIComponent(title.trim());
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/omdb/getMovieByTitle/${encodedTitle}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/omdb/getMovieByTitle/${encodedTitle}`;
 ///
     const response = await fetch(url, {
       method: "GET",
@@ -218,7 +218,7 @@ const getMovieByTitle = async (
     }
 
     const data: MovieTitleApiResponse = await response.json();
-
+console.log(data)
     return data;
   } catch (error) {
     console.error("Error fetching movie by title:", error);
@@ -245,7 +245,7 @@ const getMoviesByTitle = async (
     }
 
     const encodedTitle = encodeURIComponent(title.trim());
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/omdb/getMoviesByTitle/${encodedTitle}?page=${page}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/omdb/getMoviesByTitle/${encodedTitle}?page=${page}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -269,7 +269,7 @@ const getMoviesByTitle = async (
 
 const getTrendingMovies = async (): Promise<MovieTrendingApiResponse> => {
   try {
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/tmdb/trending/movies`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/tmdb/trending/movies`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -321,7 +321,7 @@ const getMovieData = async (
   imdbid: string
 ): Promise<ApiMovieResponse | MovieApiErrorResponse> => {
   try {
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/tmdb/moviesdata/${imdbid}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/tmdb/moviesdata/${imdbid}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -370,7 +370,7 @@ const deleteCommentHandler = async ({
   token: string;
 }): Promise<CommentResponseType | CommentErrorResponseType> => {
   try {
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/user/reviews/${imdb_id}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/user/reviews/${imdb_id}`;
 
     const response = await fetch(url, {
       method: "DELETE",
@@ -421,7 +421,7 @@ const submitCommentHandler = async ({
   token: string;
 }): Promise<CommentResponseType | CommentErrorResponseType> => {
   try {
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/user/reviews/`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/user/reviews/`;
     const commentData = {
       imdb_id,
       movieTitle,
@@ -469,7 +469,7 @@ const getMovieReviewsHandler = async ({
   imdb_id: string;
 }): Promise<any> => {
   try {
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/tmdb/moviesdata/reviews/${imdb_id}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/tmdb/moviesdata/reviews/${imdb_id}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -518,7 +518,7 @@ const getCachedMoviesHandler = async ({
   token: string;
 }): Promise<CachedMoviesResponse | CachedMoviesErrorResponse> => {
   try {
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/omdb/cachedMovies?limit=${limit}&page=${page}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/omdb/cachedMovies?limit=${limit}&page=${page}`;
     const headers = getAuthHeaders(token);
     const response = await fetch(url, {
       method: "GET",
@@ -569,7 +569,7 @@ const getSimilarMovies = async (
     }
 
     const encodedTitle = encodeURIComponent(title.trim());
-    const url = `https://85a72f4fecb2.ngrok-free.app/api/v1/tmdb/getSimilarMovies/${encodedTitle}`;
+    const url = `https://8280d927339a.ngrok-free.app/api/v1/tmdb/getSimilarMovies/${encodedTitle}`;
     const headers = getAuthHeaders();
     const response = await fetch(url, {
       method: "GET",
