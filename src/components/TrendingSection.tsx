@@ -357,10 +357,9 @@ export const TrendingSection = () => {
               Trending Movies
             </h3>
             
-            {/* View More Button - Only visible on mobile and tablet (hidden after md) */}
             <button
               onClick={handleLoadMore}
-              className="md:hidden text-white/80 hover:text-white 
+              className="text-white/80 hover:text-white 
                 transition-colors duration-300 font-medium
                 text-sm sm:text-base"
             >
