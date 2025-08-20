@@ -259,7 +259,6 @@ export const ReccomendedByOurModel = () => {
           });
         }
       } catch (error) {
-        console.error("Login error:", error);
         toast.error("An unexpected error occurred during login.", {
           position: "top-right",
           autoClose: 5000,
@@ -304,9 +303,9 @@ export const ReccomendedByOurModel = () => {
           setError("No cached movies found");
         }
       } catch (err) {
-        console.error("Error loading cached movies:", err);
         setError("Failed to load movies");
         setMovies([]);
+        throw err
       } finally {
         setLoading(false);
       }

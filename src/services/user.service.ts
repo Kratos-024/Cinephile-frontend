@@ -323,7 +323,7 @@ const isFollowingServiceHandler = async (
     const data = await handleFetchResponse(response);
     return data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return handleFetchError(error, "isFollowingHandler");
   }
 };
@@ -421,7 +421,7 @@ const getUserReviewsHandler = async (
     const data: MovieCommentResponse = await response.json();
     return data;
   } catch (error: any) {
-    console.error("Error getting user reviews:", error);
+    // console.error("Error getting user reviews:", error);
     return {
       success: false,
       status: 500,
@@ -572,7 +572,7 @@ const getUserProfile = async (
       : `${API_BASE_URL}/api/v1/user/profile`;
 
     const header = getAuthHeaders(token);
-    console.log(header);
+    // console.log(header);
     const response = await fetch(url, {
       method: "GET",
       headers: header,
@@ -639,14 +639,14 @@ const addToWatchList = async (
   try {
     const url = API_BASE_URL + "/api/v1/user/AddToWatchlist";
     const header = getAuthHeaders(token);
-    console.log(header);
+    // console.log(header);
 
     const response = await fetch(url, {
       method: "POST",
       headers: header,
       body: JSON.stringify(movieData),
     });
-    console.log(response);
+    // console.log(response);
     const data: UserProfileApiResponse = await handleFetchResponse(response);
 
     return data;
@@ -705,14 +705,14 @@ export const getTop10UsersHandler = async ({
 
     if (!response.ok) {
       const errorData: ApiErrorResponse = await response.json();
-      console.error("API Error:", errorData);
+      // console.error("API Error:", errorData);
       throw new Error(errorData.message || "Failed to fetch users");
     }
 
     const data: GetTop10UsersResponse = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching top users:", error);
+    // console.error("Error fetching top users:", error);
     return null;
   }
 };

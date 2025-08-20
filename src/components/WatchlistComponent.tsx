@@ -47,8 +47,8 @@ export const MovieSection = ({
         setIsLiked(true);
       }
     } catch (error) {
-      console.error("Error removing from watchlist:", error);
       setIsLiked(true);
+      throw error
     }
   };
 
@@ -167,7 +167,6 @@ export const Watchlist = () => {
           });
         }
       } catch (error: any) {
-        console.error("Error in getUserWatchlist:", error);
         toast.error("An error occurred while loading your watchlist", {
           position: "top-right",
           autoClose: 3000,
@@ -183,6 +182,7 @@ export const Watchlist = () => {
           setMovies([]);
         }
         setHasMore(false);
+        throw error
       } finally {
         setLoading(false);
       }

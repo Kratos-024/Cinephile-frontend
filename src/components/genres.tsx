@@ -108,7 +108,6 @@ const MoviesApp = () => {
       for (const title of movieTitles) {
         try {
           const res = await getMovieByTitle(title);
-          console.log(res);
           if (res.success) {
             const firstResult = res.data;
             if (firstResult.imdbID && firstResult.Title) {
@@ -122,7 +121,8 @@ const MoviesApp = () => {
             }
           }
         } catch (error) {
-          console.error(`Error fetching ${title}:`, error);
+          // console.error(`Error fetching ${title}:`, error);
+       return
         }
       }
 
@@ -173,7 +173,6 @@ const MoviesApp = () => {
         setError("No movies found for your search.");
       }
     } catch (error) {
-      console.error("Error searching movies:", error);
       setError("Failed to search movies. Please try again.");
       setMovies([]);
     }
@@ -240,7 +239,7 @@ const MoviesApp = () => {
         throw new Error(response.error || "Failed to save preferences");
       }
     } catch (error) {
-      console.error("Error saving preferences:", error);
+      console.log("Error saving preferences:", error);
       alert("Failed to save your preferences. Please try again.");
     } finally {
       setIsProcessing(false);

@@ -221,10 +221,8 @@ const getMovieByTitle = async (
     }
 
     const data: MovieTitleApiResponse = await response.json();
-console.log(data)
     return data;
   } catch (error) {
-    console.error("Error fetching movie by title:", error);
 
     return {
       success: false,
@@ -292,7 +290,6 @@ const getTrendingMovies = async (): Promise<MovieTrendingApiResponse> => {
     const data: MovieTrendingApiResponse = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching movie by title:", error);
 
     return {
       success: false,
@@ -345,7 +342,6 @@ const getMovieData = async (
     const data: ApiMovieResponse = await response.json();
     return data;
   } catch (error: unknown) {
-    console.error("Error fetching movie by title:", error);
 
     return {
       success: false,
@@ -391,10 +387,8 @@ const deleteCommentHandler = async ({
     }
 
     const data: CommentResponseType = await response.json();
-    console.log(data);
     return data;
   } catch (error: any) {
-    console.error("Error deleting review:", error);
 
     if (error) {
       return {
@@ -450,10 +444,8 @@ const submitCommentHandler = async ({
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: CommentResponseType = await response.json();
-    console.log(data);
     return data;
   } catch (error: any) {
-    console.error("Error saving review:", error);
 
     if (error) {
       return {
@@ -496,7 +488,6 @@ const getMovieReviewsHandler = async ({
     const data = await response.json();
     return data;
   } catch (error: any) {
-    console.error("Error getting movie reviews:", error);
     return {
       success: false,
       status: 500,
@@ -543,7 +534,6 @@ const getCachedMoviesHandler = async ({
 
     return data;
   } catch (error: any) {
-    console.error("Error fetching cached movies:", error);
 
     return {
       success: false,
@@ -593,7 +583,7 @@ const getSimilarMovies = async (
     
     return data;
   } catch (error) {
-    console.error("Error fetching movie by title:", error);
+    console.log("Error fetching movie by title:", error);
     throw error;
   }
 };

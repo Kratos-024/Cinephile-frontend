@@ -93,8 +93,8 @@ export const NavBar = ({
         }
       }
     } catch (error) {
-      console.error("Unexpected login error:", error);
       alert("An unexpected error occurred during login");
+      throw error
     } finally {
       setIsLoading(false);
     }

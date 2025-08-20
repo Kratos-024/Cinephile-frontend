@@ -172,9 +172,9 @@ export const MovieDetails = ({
         setSimilarMovies(validMovies);
       }
       setSimilarLoading(false);
-    } catch (error) {
-      console.log("Error has been occurred", error);
+    } catch (e) {
       setSimilarLoading(false);
+      throw e
     }
   };
 
@@ -205,7 +205,6 @@ export const MovieDetails = ({
         });
       }
     } catch (error) {
-      console.error("Error fetching movie reviews:", error);
       setReview([]);
       toast.error("Something went wrong while loading reviews", {
         position: "top-right",
@@ -217,6 +216,7 @@ export const MovieDetails = ({
         progress: undefined,
         theme: "light",
       });
+      throw error
     } finally {
       setLoading(false);
     }

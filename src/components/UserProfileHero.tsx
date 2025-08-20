@@ -489,9 +489,9 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
         window.location.reload();
       }
     } catch (error) {
-      console.log(error);
       setIsFollowed(false);
       setLoader(true);
+      throw error 
     }
   };
 
@@ -510,9 +510,9 @@ const FollowButton = ({ targetId }: { targetId: string }) => {
           }
         }
       } catch (error) {
-        console.log(error);
         setLoader(true);
         setIsFollowed(false);
+        throw error
       }
     };
     isFollowingHandler();
@@ -614,7 +614,6 @@ export const UserProfileHero = ({ user_userid }: { user_userid: string }) => {
       const response = await getUserProfile(user_userid, token);
 
       if (response.success && response.data) {
-        console.log(response.data);
         //@ts-ignore
         setUser(response.data);
       }

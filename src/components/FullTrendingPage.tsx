@@ -103,7 +103,8 @@ export const FullTrending = () => {
           setItemsToShow(itemsPerPage); // Set initial items based on screen size
         }
       } catch (error) {
-        console.error("Error fetching trending movies:", error);
+        // console.error("Error fetching trending movies:", error);
+return    
       } finally {
         setLoading(false);
       }

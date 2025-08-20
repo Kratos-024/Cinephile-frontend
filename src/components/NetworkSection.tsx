@@ -28,6 +28,7 @@ const UserCard = ({ users, tabType }: { users: UserProfile; tabType: "followers"
       }
     } catch (error) {
       console.log("Error", error);
+      throw error
     }
   };
 

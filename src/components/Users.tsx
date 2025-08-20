@@ -96,7 +96,6 @@ export const AvatarExamples = () => {
       const limit = 10;
 
       const response = await getTop10UsersHandler({ limit });
-      console.log(response);
       if (response?.success) {
         setUsers(response.data.users);
       } else {
@@ -104,9 +103,9 @@ export const AvatarExamples = () => {
         setError("Login");
       }
     } catch (err) {
-      console.error("Error fetching users:", err);
       setUsers([]);
       setError("Error loading users");
+      throw err
     } finally {
       setLoading(false);
     }
