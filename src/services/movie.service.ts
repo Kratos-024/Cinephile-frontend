@@ -210,6 +210,9 @@ const getMovieByTitle = async (
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+            'ngrok-skip-browser-warning': 'true',
+
+
       },
     });
 
@@ -251,6 +254,8 @@ const getMoviesByTitle = async (
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+            'ngrok-skip-browser-warning': 'true',
+
       },
     });
 
@@ -275,6 +280,8 @@ const getTrendingMovies = async (): Promise<MovieTrendingApiResponse> => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+            'ngrok-skip-browser-warning': 'true',
+
       },
     });
 
@@ -327,6 +334,8 @@ const getMovieData = async (
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+            'ngrok-skip-browser-warning': 'true',
+
       },
     });
 
@@ -475,6 +484,8 @@ const getMovieReviewsHandler = async ({
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+            'ngrok-skip-browser-warning': 'true',
+
       },
     });
 

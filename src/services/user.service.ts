@@ -163,6 +163,8 @@ export interface MovieApiReview {
 export const getAuthHeaders = (token?: string) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+        'ngrok-skip-browser-warning': 'true',
+
   };
   const authToken = token || localStorage.getItem("authToken");
 
@@ -706,6 +708,8 @@ export const getTop10UsersHandler = async ({
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
+          'ngrok-skip-browser-warning': 'true',
+
     };
 
 
