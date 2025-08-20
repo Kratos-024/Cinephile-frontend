@@ -409,7 +409,7 @@ export const TrendingSection = () => {
               </div>
             ))}
             
-            {/* Load More Card */}
+            {/* Mobile View More / Desktop Load More Card */}
             <div 
               onClick={handleLoadMore}
               className="flex-shrink-0 cursor-pointer text-white font-semibold 
@@ -421,7 +421,10 @@ export const TrendingSection = () => {
                 px-4 sm:px-8 md:px-16 lg:px-24"
               style={{ width: `${itemWidth}px` }}
             >
-              <span className="text-center">Load more +</span>
+              <span className="text-center">
+                <span className="block sm:hidden">View More +</span>
+                <span className="hidden sm:block">Load more +</span>
+              </span>
             </div>
           </div>
           
@@ -468,4 +471,3 @@ export const TrendingSection = () => {
     </section>
   );
 };
-
