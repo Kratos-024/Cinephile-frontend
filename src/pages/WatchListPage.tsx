@@ -17,10 +17,16 @@ export const WatchListPage = ({
         width: menu ? "calc(100% - 280px)" : "100%",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="px-3 bg-primary   "
+      className="min-h-screen bg-primary relative z-10"
+      style={{
+        paddingLeft: '0',
+        paddingRight: '0',
+      }}
     >
-      <NavBar menuHandler={menuHandler} menu={menu} />;
-      <Watchlist />
+      <NavBar menuHandler={menuHandler} menu={menu} />
+      <div className="px-6">
+        <Watchlist />
+      </div>
     </motion.section>
   );
 };
