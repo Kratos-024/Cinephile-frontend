@@ -578,7 +578,6 @@ const getSimilarMovies = async (
     if (!title || title.trim() === "") {
       throw new Error("Title parameter is required");
     }
-
     const encodedTitle = encodeURIComponent(title.trim());
     const url = `https://9e7bac860201.ngrok-free.app/api/v1/tmdb/getSimilarMovies/${encodedTitle}`;
     const headers = getAuthHeaders();
@@ -591,8 +590,7 @@ const getSimilarMovies = async (
     if (!response.ok || !data.success) {
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
-    console
-    .log("fishfisdhodsfhsdkf",data)
+    
     return data;
   } catch (error) {
     console.error("Error fetching movie by title:", error);

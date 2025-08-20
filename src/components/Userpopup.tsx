@@ -27,8 +27,6 @@ export const UserPopup = ({
       await signOut(auth);
       localStorage.removeItem("authToken");
       onAuthChange(false);
-      onClose();
-      console.log("User logged out successfully");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -37,7 +35,6 @@ export const UserPopup = ({
   };
 
   const handleMyProfile = () => {
-    console.log("Navigate to profile");
     onClose();
     navigate(`/profile/${userProfile?.uid}/${userProfile?.displayName}`);
   };

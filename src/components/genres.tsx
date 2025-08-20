@@ -233,7 +233,6 @@ const MoviesApp = () => {
       const response = await saveUserPreferences(preferences, token);
 
       if (response.success) {
-        console.log("Preferences saved successfully!");
         window.location.href = "/";
       } else {
         //@ts-ignore

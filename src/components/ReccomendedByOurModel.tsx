@@ -257,7 +257,6 @@ useEffect(() => {
       if (result.success && result.data && result.data.length > 0) {
         setMovies(result.data);
       } else {
-        console.log("No cached movies found, redirecting to genres...");
         navigate("/genres");
         return;
       }

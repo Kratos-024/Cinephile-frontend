@@ -180,17 +180,12 @@ const handleFetchResponse = async (response: Response): Promise<any> => {
   }
 
   const contentLength = response.headers.get("content-length");
-  const contentType = response.headers.get("content-type");
 
   if (contentLength === "0") {
     throw new Error("Server returned empty response");
   }
 
-  if (!contentType || !contentType.includes("application/json")) {
-    const text = await response.text();
-    console.log("Non-JSON response:", text);
-    throw new Error("Server returned non-JSON response");
-  }
+ 
   const data = await response.json();
 
   return data;
@@ -226,7 +221,6 @@ const registerUser = async (
   displayName?: string
 ): Promise<AuthResponse> => {
   try {
-    console.log("Registering user...");
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/register`, {
       method: "POST",
@@ -252,7 +246,6 @@ const registerUser = async (
 
 const loginUser = async (idToken: string): Promise<AuthResponse> => {
   try {
-    console.log("Sending idToken to backend...");
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/login`, {
       method: "POST",
@@ -274,7 +267,6 @@ const loginUser = async (idToken: string): Promise<AuthResponse> => {
 
 const resetPassword = async (email: string): Promise<UserApiResponse> => {
   try {
-    console.log("Sending password reset request...");
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/reset-password`, {
       method: "POST",
@@ -290,7 +282,6 @@ const resetPassword = async (email: string): Promise<UserApiResponse> => {
 };
 
 const logoutUser = (): void => {
-  console.log("Logging out user...");
   localStorage.removeItem("authToken");
 };
 
@@ -346,7 +337,6 @@ const getUserPreferences = async (
       ? `${API_BASE_URL}/api/v1/user/preferences/${userId}`
       : `${API_BASE_URL}/api/v1/user/preferences`;
 
-    console.log("Getting user preferences from:", url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -368,7 +358,6 @@ const updateUserPreferences = async (
   token?: string
 ): Promise<UserPreferenceApiResponse> => {
   try {
-    console.log("Updating user preferences...");
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/preferences`, {
       method: "PUT",
@@ -394,7 +383,6 @@ const saveUserReview = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
-    console.log("Saving user review...");
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/reviews`, {
       method: "POST",
@@ -448,7 +436,6 @@ const deleteUserReview = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
-    console.log("Deleting user review:", reviewId);
 
     const response = await fetch(
       `${API_BASE_URL}/api/v1/user/reviews/${reviewId}`,
@@ -470,7 +457,6 @@ const followUser = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
-    console.log("Following user:", targetUserId);
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/follow`, {
       method: "POST",
@@ -490,7 +476,6 @@ const unfollowUser = async (
   token?: string
 ): Promise<UserApiResponse> => {
   try {
-    console.log("Unfollowing user:", targetUserId);
 
     const response = await fetch(`${API_BASE_URL}/api/v1/user/unfollow`, {
       method: "POST",
@@ -514,7 +499,6 @@ const getUserFollowers = async (
       ? `${API_BASE_URL}/api/v1/user/followers/${userId}`
       : `${API_BASE_URL}/api/v1/user/followers`;
 
-    console.log("Getting user followers from:", url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -653,7 +637,6 @@ const addToWatchList = async (
   }
 ): Promise<UserProfileApiResponse> => {
   try {
-    console.log("Adding to user profile watchlist:");
     const url = API_BASE_URL + "/api/v1/user/AddToWatchlist";
     const header = getAuthHeaders(token);
     console.log(header);

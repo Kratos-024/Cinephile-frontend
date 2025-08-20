@@ -80,16 +80,14 @@ export const NavBar = ({
     setIsLoading(true);
 
     try {
-      console.log("Starting Google login...");
       const result = await googleLogin();
 
-      console.log("Google login result:", result);
 
       if (result.success && result.data) {
-        console.log("Login successful!");
+        console.log("");
       } else {
         if (result.code === "auth/popup-closed-by-user") {
-          console.log("User cancelled login");
+          console.log("");
           return;
         } else {
           console.error("Login failed:", result.message);

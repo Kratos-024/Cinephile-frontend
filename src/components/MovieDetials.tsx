@@ -141,7 +141,6 @@ export const MovieDetails = ({
     try {
       const response = await getSimilarMovies(movieData.data.title);
       
-      console.log("Response", response);
       if (response.success) {
         const validMovies = response.similarMovies.filter(movie => 
           movie.success && movie.data && movie.data.imdbID && movie.data.Title
@@ -515,11 +514,7 @@ export const MovieDetails = ({
                       <div>
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="text-base font-semibold">Cast & Crew</h3>
-                          {movieData["data"].cast && movieData["data"].cast.length > 4 && (
-                            <button className="text-blue-400 text-xs hover:text-blue-300 transition-colors">
-                              View {movieData["data"].cast.length - 4}+ more
-                            </button>
-                          )}
+                 
                         </div>
                         <div className="space-y-6">
                           {movieData["data"].cast && movieData["data"].cast.length > 0 ? (

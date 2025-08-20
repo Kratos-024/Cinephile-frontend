@@ -42,7 +42,6 @@ export async function googleLogin() {
     const idToken = await user.getIdToken();
     await createOrUpdateUserProfile(user);
 
-    console.log("Firebase auth successful:", user);
 
     localStorage.setItem("authToken", idToken);
     localStorage.setItem("userId", user.uid); 
